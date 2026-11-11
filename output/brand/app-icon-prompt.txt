@@ -1,0 +1,6 @@
+Praxis app icon
+
+Generated with the built-in image generation tool from the selected fist-and-book concept.
+
+Edit the provided reference into ONE standalone square iOS app icon for Praxis. The edit target is specifically the smaller ivory raised-fist-and-open-book emblem on the red icon at the RIGHT of the reference. Preserve that exact emblem: the angled fist, broad finger cuts, angular thumb negative space and wrist, two open book pages beneath with central V, same proportions and spacing. Enlarge and isolate this existing icon, do not redesign it. Output a square 1024x1024 image: solid warm vermilion red background filling the ENTIRE canvas to all four square corners, ivory symbol centered with comfortable approximately 12% side margins and 9% top/bottom margins. No rounded outer corners (iOS supplies its own mask), no outer ivory canvas, no text, no wordmark, no shadow, no lighting, no texture, no gradient, no mockup, no border. Crisp flat two-color graphic. Fully opaque.
+

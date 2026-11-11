@@ -18,7 +18,7 @@ from urllib.parse import urljoin
 BASE = "https://www.marxists.org/portugues/"
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CACHE = os.path.join(ROOT, "tools", ".cache")
-OUT = os.path.join(ROOT, "ios", "MarxistReader", "Resources", "catalog-pt.json")
+OUT = os.path.join(ROOT, "ios", "Praxis", "Resources", "catalog-pt.json")
 DELAY = 0.35  # pausa entre downloads, para não sobrecarregar o site
 UA = "LeitorMarxista-catalogo/1.0 (app de leitura; uso pessoal)"
 

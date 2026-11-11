@@ -4,7 +4,7 @@ This small system follows the principles in the monorepo’s design and accessib
 
 ## Tokens
 
-`DesignTokens` in `MarxistReader/DesignSystem.swift` owns shared semantic values. Use `accent` for interactive emphasis, `Spacing` for recurring layout, and `Reader` for the web reader's light/dark palette and stylesheet. Prefer native semantic colors and SwiftUI text styles where the platform already supplies the role and accessibility behavior. Add a token when a shared visual decision emerges; avoid inventing unused scales.
+`DesignTokens` in `Praxis/DesignSystem.swift` owns shared semantic values. Use `accent` for interactive emphasis, `Spacing` for recurring layout, and `Reader` for the web reader's light/dark palette and stylesheet. Prefer native semantic colors and SwiftUI text styles where the platform already supplies the role and accessibility behavior. Add a token when a shared visual decision emerges; avoid inventing unused scales.
 
 ## Components
 

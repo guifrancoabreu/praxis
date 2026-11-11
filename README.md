@@ -1,11 +1,13 @@
-# Leitor Marxista for iOS
+# Praxis for iOS
 
-Native SwiftUI reader for the Marxists Internet Archive (MIA). The app runs on iOS 17 and later and supports Portuguese, English, and Spanish catalogs.
+Praxis is a Marxist reading and study app for iOS, built with SwiftUI and drawing on the Marxists Internet Archive (MIA). Its name refers to the connection between theory and practice. The app runs on iOS 17 and later and supports Portuguese, English, and Spanish catalogs.
+
+The app's name is **Praxis**. `Praxis` remains the internal Xcode project, scheme, and source-directory name.
 
 ## Open and run
 
-1. Open `ios/MarxistReader.xcodeproj` in Xcode.
-2. Select the `MarxistReader` scheme and an iOS simulator.
+1. Open `ios/Praxis.xcodeproj` in Xcode.
+2. Select the `Praxis` scheme and an iOS simulator.
 3. Run the app.
 
 For a physical device, choose a development team in **Signing & Capabilities** and set a bundle identifier if needed.
@@ -14,9 +16,9 @@ For a physical device, choose a development team in **Signing & Capabilities** a
 
 ```text
 ios/
-  MarxistReader.xcodeproj/       Xcode project and app scheme
-  MarxistReader/
-    MarxistReaderApp.swift       SwiftUI screens, reader, and app entry point
+  Praxis.xcodeproj/       Xcode project and app scheme
+  Praxis/
+    PraxisApp.swift       SwiftUI screens, reader, and app entry point
     Catalog.swift                Catalog models, loading, and language metadata
     Resources/                   Bundled Portuguese, English, and Spanish catalogs
   Tests/                         Catalog and core behavior tests
@@ -37,7 +39,7 @@ python3 tools/build_catalog_en.py
 python3 tools/build_catalog_es.py
 ```
 
-The scripts write JSON files to `ios/MarxistReader/Resources/`. They fetch data from the corresponding MIA archive section; an internet connection is required. The Spanish catalog is a starter selection, not a complete mirror of the Spanish archive.
+The scripts write JSON files to `ios/Praxis/Resources/`. They fetch data from the corresponding MIA archive section; an internet connection is required. The Spanish catalog is a starter selection, not a complete mirror of the Spanish archive.
 
 ## Tests
 

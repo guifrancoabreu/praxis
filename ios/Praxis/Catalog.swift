@@ -22,7 +22,7 @@ enum Language: String, CaseIterable, Identifiable {
         "Language": "Idioma", "Writers": "Autores", "works": "obras", "Works": "Obras",
         "No results found.": "No se encontraron resultados.", "No results found": "No se encontraron resultados.", "Catalog updated": "Catálogo actualizado el",
         "Search writers and works": "Buscar autores y obras", "Catalog unavailable": "Catálogo no disponible",
-        "The catalog could not be opened.": "No se pudo abrir el catálogo.", "Marxist Reader": "Lector Marxista",
+        "The catalog could not be opened.": "No se pudo abrir el catálogo.", "Praxis": "Praxis",
         "This work is a PDF.": "Esta obra está en PDF.", "Open PDF": "Abrir PDF",
         "Could not load the work": "No se pudo cargar la obra", "Check your connection and try again.": "Comprueba tu conexión e inténtalo de nuevo.",
         "Try again": "Intentar de nuevo", "Loading…": "Cargando…", "Open source": "Abrir fuente",
@@ -86,7 +86,7 @@ struct PrivacyPolicyCopy {
         case .pt:
             PrivacyPolicyCopy(
                 title: "Privacidade",
-                intro: "O Leitor Marxista não exige uma conta. Não vendemos dados nem usamos anúncios. Seus dados de leitura ficam no aparelho, salvo quando você autoriza o envio opcional de análises descrito abaixo.",
+                intro: "O Praxis não exige uma conta. Não vendemos dados nem usamos anúncios. Seus dados de leitura ficam no aparelho, salvo quando você autoriza o envio opcional de análises descrito abaixo.",
                 onDeviceTitle: "No seu aparelho",
                 onDeviceBody: "Favoritos, histórico, posição de leitura, idioma, ordenação e aparência são guardados no armazenamento do app para manter sua biblioteca como você deixou. Textos e PDFs abertos também podem ficar no cache local, limitado a 100 MB. Esses dados não são enviados à equipe do app.",
                 archiveTitle: "Conteúdo do arquivo",
@@ -108,7 +108,7 @@ struct PrivacyPolicyCopy {
         case .en:
             PrivacyPolicyCopy(
                 title: "Privacy",
-                intro: "Marxist Reader does not require an account. We do not sell data or use ads. Reading data stays on your device unless you choose to share the optional analytics described below.",
+                intro: "Praxis does not require an account. We do not sell data or use ads. Reading data stays on your device unless you choose to share the optional analytics described below.",
                 onDeviceTitle: "On your device",
                 onDeviceBody: "Saved works, reading history, reading position, language, sorting, and reader appearance are stored in the app so your library stays as you left it. Opened texts and PDFs may also be kept in a local cache capped at 100 MB. This data is not sent to the app team.",
                 archiveTitle: "Archive content",
@@ -130,7 +130,7 @@ struct PrivacyPolicyCopy {
         case .es:
             PrivacyPolicyCopy(
                 title: "Privacidad",
-                intro: "Lector Marxista no requiere una cuenta. No vendemos datos ni usamos anuncios. Los datos de lectura permanecen en tu dispositivo, salvo que aceptes compartir las analíticas opcionales descritas abajo.",
+                intro: "Praxis no requiere una cuenta. No vendemos datos ni usamos anuncios. Los datos de lectura permanecen en tu dispositivo, salvo que aceptes compartir las analíticas opcionales descritas abajo.",
                 onDeviceTitle: "En tu dispositivo",
                 onDeviceBody: "Los textos guardados, el historial, la posición de lectura, el idioma, el orden y la apariencia del lector se guardan en la app para conservar tu biblioteca. Los textos y PDF abiertos también pueden permanecer en una caché local limitada a 100 MB. Estos datos no se envían al equipo de la app.",
                 archiveTitle: "Contenido del archivo",

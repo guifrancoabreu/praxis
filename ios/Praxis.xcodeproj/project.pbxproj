@@ -1,0 +1,239 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A0000000000000000000000E /* Praxis/PraxisApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000000B /* Praxis/PraxisApp.swift */; };
+		A0000000000000000000000F /* Praxis/Resources/catalog-pt.json in Resources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000000C /* Praxis/Resources/catalog-pt.json */; };
+		A00000000000000000000010 /* Praxis/Resources/catalog-en.json in Resources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000000D /* Praxis/Resources/catalog-en.json */; };
+		A00000000000000000000016 /* Praxis/Catalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000015 /* Praxis/Catalog.swift */; };
+		A00000000000000000000018 /* Praxis/Resources/catalog-es.json in Resources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000017 /* Praxis/Resources/catalog-es.json */; };
+		A0000000000000000000001A /* Praxis/DesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000019 /* Praxis/DesignSystem.swift */; };
+		A0000000000000000000001E /* TelemetryDeck in Frameworks */ = {isa = PBXBuildFile; productRef = A0000000000000000000001D /* TelemetryDeck */; };
+		A0000000000000000000001F /* Praxis/Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000001B /* Praxis/Analytics.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		A0000000000000000000000A /* Praxis.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; path = Praxis.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A0000000000000000000000B /* Praxis/PraxisApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Praxis/PraxisApp.swift; sourceTree = "<group>"; };
+		A0000000000000000000000C /* Praxis/Resources/catalog-pt.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "Praxis/Resources/catalog-pt.json"; sourceTree = "<group>"; };
+		A0000000000000000000000D /* Praxis/Resources/catalog-en.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "Praxis/Resources/catalog-en.json"; sourceTree = "<group>"; };
+		A00000000000000000000015 /* Praxis/Catalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Praxis/Catalog.swift; sourceTree = "<group>"; };
+		A00000000000000000000017 /* Praxis/Resources/catalog-es.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "Praxis/Resources/catalog-es.json"; sourceTree = "<group>"; };
+		A00000000000000000000019 /* Praxis/DesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Praxis/DesignSystem.swift; sourceTree = "<group>"; };
+		A0000000000000000000001B /* Praxis/Analytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Praxis/Analytics.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A00000000000000000000008 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A0000000000000000000001E /* TelemetryDeck in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A00000000000000000000004 = {
+			isa = PBXGroup;
+			children = (
+				A0000000000000000000000B /* Praxis/PraxisApp.swift */,
+				A00000000000000000000015 /* Praxis/Catalog.swift */,
+				A00000000000000000000019 /* Praxis/DesignSystem.swift */,
+				A0000000000000000000001B /* Praxis/Analytics.swift */,
+				A0000000000000000000000C /* Praxis/Resources/catalog-pt.json */,
+				A0000000000000000000000D /* Praxis/Resources/catalog-en.json */,
+				A00000000000000000000017 /* Praxis/Resources/catalog-es.json */,
+				A00000000000000000000005 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A00000000000000000000005 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A0000000000000000000000A /* Praxis.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A00000000000000000000002 /* Praxis */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A00000000000000000000006 /* Build configuration list for PBXNativeTarget "Praxis" */;
+			buildPhases = (
+				A00000000000000000000007 /* Sources */,
+				A00000000000000000000008 /* Frameworks */,
+				A00000000000000000000009 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Praxis;
+			packageProductDependencies = (
+				A0000000000000000000001D /* TelemetryDeck */,
+			);
+			productName = Praxis;
+			productReference = A0000000000000000000000A /* Praxis.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A00000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					A00000000000000000000002 = {
+						CreatedOnToolsVersion = 16.0;
+					};
+				};
+			};
+			buildConfigurationList = A00000000000000000000003 /* Build configuration list for PBXProject "Praxis" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+				pt,
+			);
+			mainGroup = A00000000000000000000004;
+			packageReferences = (
+				A0000000000000000000001C /* XCRemoteSwiftPackageReference "SwiftSDK" */,
+			);
+			productRefGroup = A00000000000000000000005 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A00000000000000000000002 /* Praxis */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A00000000000000000000009 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A0000000000000000000000F /* Praxis/Resources/catalog-pt.json in Resources */,
+				A00000000000000000000010 /* Praxis/Resources/catalog-en.json in Resources */,
+				A00000000000000000000018 /* Praxis/Resources/catalog-es.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A00000000000000000000007 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A0000000000000000000000E /* Praxis/PraxisApp.swift in Sources */,
+				A00000000000000000000016 /* Praxis/Catalog.swift in Sources */,
+				A0000000000000000000001A /* Praxis/DesignSystem.swift in Sources */,
+				A0000000000000000000001F /* Praxis/Analytics.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		A00000000000000000000011 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		A00000000000000000000012 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				SDKROOT = iphoneos;
+			};
+			name = Release;
+		};
+		A00000000000000000000013 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Praxis;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = br.praxis.ios;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A00000000000000000000014 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Praxis;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = br.praxis.ios;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A00000000000000000000003 /* Build configuration list for PBXProject "Praxis" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A00000000000000000000011 /* Debug */,
+				A00000000000000000000012 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A00000000000000000000006 /* Build configuration list for PBXNativeTarget "Praxis" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A00000000000000000000013 /* Debug */,
+				A00000000000000000000014 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		A0000000000000000000001C /* XCRemoteSwiftPackageReference "SwiftSDK" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/TelemetryDeck/SwiftSDK";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.14.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A0000000000000000000001D /* TelemetryDeck */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A0000000000000000000001C /* XCRemoteSwiftPackageReference "SwiftSDK" */;
+			productName = TelemetryDeck;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = A00000000000000000000001 /* Project object */;
+}

@@ -27,7 +27,7 @@ final class CatalogTests: XCTestCase {
     func testBundledCatalogSnapshotsDecode() throws {
         let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
         for code in ["pt", "en", "es"] {
-            let catalog = try Catalog.decode(Data(contentsOf: root.appendingPathComponent("MarxistReader/Resources/catalog-\(code).json")))
+            let catalog = try Catalog.decode(Data(contentsOf: root.appendingPathComponent("Praxis/Resources/catalog-\(code).json")))
             XCTAssertGreaterThan(catalog.authors.count, 5)
             XCTAssertTrue(catalog.authors.contains { !$0.works.isEmpty })
         }

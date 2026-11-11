@@ -11,7 +11,7 @@ import build_catalog as b
 
 b.BASE = "https://www.marxists.org/espanol/"
 b.CACHE = os.path.join(b.ROOT, "tools", ".cache-es")
-OUT = os.path.join(b.ROOT, "ios", "MarxistReader", "Resources", "catalog-es.json")
+OUT = os.path.join(b.ROOT, "ios", "Praxis", "Resources", "catalog-es.json")
 
 def main():
     index = b.fetch("marxistas.htm")

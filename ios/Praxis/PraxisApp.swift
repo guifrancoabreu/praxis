@@ -3,9 +3,11 @@ import WebKit
 import CryptoKit
 import UIKit
 import PDFKit
+import Vision
+import ImageIO
 
 @main
-struct MarxistReaderApp: App {
+struct PraxisApp: App {
     init() { Analytics.configure() }
 
     var body: some Scene { WindowGroup { LibraryView() } }
@@ -44,7 +46,7 @@ struct LibraryView: View {
         // not a measurement of activity in this app.
         let rankedIDs: [String]
         switch language {
-        case .pt: rankedIDs = ["marx", "engels", "gramsci", "luxemburgo", "trotsky", "guevara", "mao", "castro", "bukharin"]
+        case .pt: rankedIDs = ["marx", "lenin", "engels", "gramsci", "luxemburgo", "trotsky", "guevara", "mao", "castro", "bukharin"]
         case .en: rankedIDs = ["archive/marx", "archive/lenin", "archive/luxemburg", "archive/trotsky", "archive/gramsci", "archive/guevara", "reference/archive/mao", "history/cuba/archive/castro"]
         case .es: rankedIDs = ["m-e/index.htm", "lenin/index.htm", "luxem/index.htm", "trotsky/index.htm", "gramsci/index.htm", "guevara/index.htm", "bujarin/index.htm"]
         }
@@ -297,9 +299,10 @@ struct LibraryView: View {
                     } label: {
                         Text(item.title(language)).font(.subheadline.weight(.medium))
                             .padding(.horizontal, 15).padding(.vertical, 9)
-                            .background(filter == item ? DesignTokens.ink : DesignTokens.surface, in: Capsule())
+                            .background(filter == item ? DesignTokens.ink : DesignTokens.filterSurface, in: Capsule())
                             .foregroundStyle(filter == item ? DesignTokens.paper : DesignTokens.ink)
                     }.buttonStyle(.plain)
+                        .accessibilityAddTraits(filter == item ? .isSelected : [])
                 }
             }
         }.contentMargins(.trailing, 2)
@@ -335,7 +338,7 @@ struct LibraryView: View {
         NavigationLink { PrivacyPolicyView(language: language) } label: {
             Text(PrivacyPolicyCopy.forLanguage(language).title)
                 .font(.footnote)
-                .foregroundStyle(DesignTokens.muted.opacity(0.8))
+                .foregroundStyle(DesignTokens.muted)
                 .frame(maxWidth: .infinity)
                 .frame(minHeight: 44)
                 .contentShape(Rectangle())
@@ -613,7 +616,7 @@ struct LibraryView: View {
     }
 
     private func sectionHeading(_ title: String) -> some View {
-        Text(title.uppercased()).font(.caption.weight(.semibold)).tracking(1.1).foregroundStyle(DesignTokens.muted)
+        Text(title.uppercased()).font(.subheadline.weight(.semibold)).tracking(0.8).foregroundStyle(DesignTokens.muted)
     }
 
     private func emptyState(title: String, detail: String) -> some View {
@@ -684,6 +687,8 @@ struct BookCover: View {
 struct AuthorArtwork: View {
     let author: Author
     let language: Language
+    @State private var portrait: UIImage?
+    @State private var faceCenter: CGPoint?
     private var url: URL? {
         if let photo = author.photo, let url = URL(string: photo, relativeTo: URL(string: language.base))?.absoluteURL {
             return url
@@ -702,18 +707,47 @@ struct AuthorArtwork: View {
         GeometryReader { proxy in
             ZStack {
                 DesignTokens.coverStone
-                if let url {
-                    AsyncImage(url: url) { phase in
-                        if let image = phase.image {
-                            image.resizable().scaledToFit()
-                                .frame(width: proxy.size.width, height: proxy.size.height, alignment: .center)
-                        } else { monogram }
-                    }
+                if let portrait {
+                    let scale = max(proxy.size.width / portrait.size.width, proxy.size.height / portrait.size.height)
+                    let size = CGSize(width: portrait.size.width * scale, height: portrait.size.height * scale)
+                    let center = author.id == "engels" ? CGPoint(x: 0.5, y: 0) : (faceCenter ?? CGPoint(x: 0.5, y: 0.25))
+                    let x = min(max((0.5 - center.x) * size.width, -(size.width - proxy.size.width) / 2), (size.width - proxy.size.width) / 2)
+                    let y = min(max((0.5 - center.y) * size.height, -(size.height - proxy.size.height) / 2), (size.height - proxy.size.height) / 2)
+                    Image(uiImage: portrait).resizable()
+                        .frame(width: size.width, height: size.height)
+                        .offset(x: x, y: y)
                 } else { monogram }
             }
             .frame(width: proxy.size.width, height: proxy.size.height)
             .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 9, style: .continuous).stroke(DesignTokens.rule, lineWidth: 1))
+        }
+        .task(id: url) {
+            portrait = nil
+            faceCenter = nil
+            guard let url, let (data, _) = try? await URLSession.shared.data(from: url),
+                  !Task.isCancelled, let image = UIImage(data: data), image.size.width > 0, image.size.height > 0 else { return }
+            let center = await Task.detached(priority: .utility) { () -> CGPoint? in
+                guard let cgImage = image.cgImage else { return nil }
+                let orientation: CGImagePropertyOrientation
+                switch image.imageOrientation {
+                case .up: orientation = .up
+                case .down: orientation = .down
+                case .left: orientation = .left
+                case .right: orientation = .right
+                case .upMirrored: orientation = .upMirrored
+                case .downMirrored: orientation = .downMirrored
+                case .leftMirrored: orientation = .leftMirrored
+                case .rightMirrored: orientation = .rightMirrored
+                @unknown default: orientation = .up
+                }
+                let request = VNDetectFaceRectanglesRequest()
+                guard (try? VNImageRequestHandler(cgImage: cgImage, orientation: orientation).perform([request])) != nil,
+                      let face = request.results?.max(by: { $0.boundingBox.width * $0.boundingBox.height < $1.boundingBox.width * $1.boundingBox.height }) else { return nil }
+                return CGPoint(x: face.boundingBox.midX, y: 1 - face.boundingBox.midY)
+            }.value
+            guard !Task.isCancelled else { return }
+            faceCenter = center
+            portrait = image
         }
     }
     private var monogram: some View {

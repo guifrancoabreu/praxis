@@ -54,7 +54,16 @@ extension DesignTokens {
             ? UIColor(red: 0.15, green: 0.14, blue: 0.13, alpha: 1)
             : UIColor(red: 1, green: 0.998, blue: 0.989, alpha: 1)
     })
-    static let muted = Color(uiColor: .secondaryLabel)
+    static let muted = Color(uiColor: UIColor { traits in
+        traits.userInterfaceStyle == .dark
+            ? UIColor.secondaryLabel
+            : UIColor(red: 0.32, green: 0.30, blue: 0.28, alpha: 1)
+    })
+    static let filterSurface = Color(uiColor: UIColor { traits in
+        traits.userInterfaceStyle == .dark
+            ? UIColor(red: 0.20, green: 0.19, blue: 0.18, alpha: 1)
+            : UIColor(red: 0.91, green: 0.89, blue: 0.85, alpha: 1)
+    })
     static let ink = Color(uiColor: .label)
     static let rule = Color(uiColor: .separator).opacity(0.45)
     static let coverOchre = Color(red: 0.54, green: 0.36, blue: 0.15)

@@ -19,7 +19,7 @@ import build_catalog as b  # noqa: E402  (reaproveita download, cache e parser)
 
 b.BASE = "https://www.marxists.org/"
 b.CACHE = os.path.join(b.ROOT, "tools", ".cache-en")
-OUT = os.path.join(b.ROOT, "ios", "MarxistReader", "Resources", "catalog-en.json")
+OUT = os.path.join(b.ROOT, "ios", "Praxis", "Resources", "catalog-en.json")
 
 SKIP = ("admin/", "css/", "ebooks/", "audiobooks/", "xlang/", "img/", "images/", "search")
 
