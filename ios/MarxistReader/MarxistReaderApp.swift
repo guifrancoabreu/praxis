@@ -1,13 +1,13 @@
 import SwiftUI
 import WebKit
 import CryptoKit
-import CoreImage
-import CoreImage.CIFilterBuiltins
 import UIKit
 import PDFKit
 
 @main
 struct MarxistReaderApp: App {
+    init() { Analytics.configure() }
+
     var body: some Scene { WindowGroup { LibraryView() } }
 }
 
@@ -217,7 +217,6 @@ struct LibraryView: View {
                                 case .history: collectionList(catalog.history.filter { $0.title.localizedStandardContains(query) }, title: language.text("História", "History"))
                                 case .figures: figureList(matchingFigures)
                                 case .countries: countryList(matchingCountries)
-                                case .support: SupportView(language: language)
                                 case .popular: popularWorkList(popularWorks.filter { $0.1.title.localizedStandardContains(query) || $0.0.full.localizedStandardContains(query) }, title: language.text("Textos populares", "Popular texts"))
                                 }
                             } else {
@@ -236,18 +235,21 @@ struct LibraryView: View {
                                 case .history: collectionList(catalog.history, title: language.text("História", "History"))
                                 case .figures: figureList(catalog.figures.filter { !peopleOnly || $0.person })
                                 case .countries: countryList(Array(Set(catalog.authors.map(\.country).filter { !$0.isEmpty })).sorted())
-                                case .support: SupportView(language: language)
                                 case .popular: popularWorkList(popularWorks, title: language.text("Textos populares", "Popular texts"))
                                 }
                             }
                             Text(language.text("Catálogo atualizado em", "Catalog updated") + " " + catalog.generated + " · Marxists Internet Archive")
                                 .font(.footnote).foregroundStyle(DesignTokens.muted).frame(maxWidth: .infinity, alignment: .center).padding(.vertical, 12)
-                            if query.isEmpty && filter == .all { supportFooter }
+                            if query.isEmpty && filter == .all {
+                                supportFooter
+                                privacyFooter
+                            }
                         }
                         .padding(.horizontal, 20)
                         .padding(.top, 14)
                         .padding(.bottom, 28)
                     }
+                    .id(filter)
                     .background(DesignTokens.paper.ignoresSafeArea())
                 } else if error {
                     ContentUnavailableView(language.text("Catálogo indisponível", "Catalog unavailable"), systemImage: "books.vertical", description: Text(language.text("Não foi possível abrir o catálogo.", "The catalog could not be opened.")))
@@ -289,7 +291,10 @@ struct LibraryView: View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
                 ForEach(primaryFilters) { item in
-                    Button { withAnimation(.easeOut(duration: 0.18)) { filter = item } } label: {
+                    Button {
+                        Analytics.track(.filterSelected(item))
+                        withAnimation(.easeOut(duration: 0.18)) { filter = item }
+                    } label: {
                         Text(item.title(language)).font(.subheadline.weight(.medium))
                             .padding(.horizontal, 15).padding(.vertical, 9)
                             .background(filter == item ? DesignTokens.ink : DesignTokens.surface, in: Capsule())
@@ -311,12 +316,12 @@ struct LibraryView: View {
     }
 
     private var supportFooter: some View {
-        Button { query = ""; filter = .support } label: {
+        NavigationLink { SupportView(language: language) } label: {
             HStack(spacing: 13) {
                 Image(systemName: "heart").font(.title3).foregroundStyle(DesignTokens.accent)
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(language.text("Apoie", "Support the archive")).font(.system(.headline, design: .serif, weight: .semibold)).foregroundStyle(DesignTokens.ink)
-                    Text(language.text("Ajude a preservar este acervo", "Help preserve this collection")).font(.subheadline).foregroundStyle(DesignTokens.muted)
+                    Text(language.text("Apoie", "Support")).font(.system(.headline, design: .serif, weight: .semibold)).foregroundStyle(DesignTokens.ink)
+                    Text(language.text("Escolha como apoiar", "Choose how to support")).font(.subheadline).foregroundStyle(DesignTokens.muted)
                 }
                 Spacer()
                 Image(systemName: "chevron.right").font(.caption.weight(.semibold)).foregroundStyle(DesignTokens.muted)
@@ -324,6 +329,18 @@ struct LibraryView: View {
                 .background(DesignTokens.surface, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
                 .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).stroke(DesignTokens.rule, lineWidth: 1))
         }.buttonStyle(.plain)
+    }
+
+    private var privacyFooter: some View {
+        NavigationLink { PrivacyPolicyView(language: language) } label: {
+            Text(PrivacyPolicyCopy.forLanguage(language).title)
+                .font(.footnote)
+                .foregroundStyle(DesignTokens.muted.opacity(0.8))
+                .frame(maxWidth: .infinity)
+                .frame(minHeight: 44)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
     }
 
     private var savedPreview: some View {
@@ -413,6 +430,11 @@ struct LibraryView: View {
             Image(systemName: "magnifyingglass").foregroundStyle(DesignTokens.muted)
             TextField(language.text("Buscar autores e textos", "Search writers and works"), text: $query)
                 .textInputAutocapitalization(.never).autocorrectionDisabled()
+                .onSubmit {
+                    if !query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                        Analytics.track(.searchUsed)
+                    }
+                }
             if !query.isEmpty {
                 Button { query = "" } label: { Image(systemName: "xmark.circle.fill").foregroundStyle(DesignTokens.muted) }
                     .accessibilityLabel(language.text("Limpar busca", "Clear search"))
@@ -606,7 +628,7 @@ struct LibraryView: View {
 }
 
 enum LibraryFilter: String, CaseIterable, Identifiable {
-    case all, saved, writers, works, readingHistory, topics, history, figures, countries, popular, support
+    case all, saved, writers, works, readingHistory, topics, history, figures, countries, popular
     var id: String { rawValue }
     func title(_ language: Language) -> String {
         switch self {
@@ -620,7 +642,6 @@ enum LibraryFilter: String, CaseIterable, Identifiable {
         case .figures: language.text("Figuras", "People")
         case .countries: language.text("Países", "Countries")
         case .popular: language.text("Populares", "Popular")
-        case .support: language.text("Apoie", "Support")
         }
     }
 }
@@ -684,8 +705,8 @@ struct AuthorArtwork: View {
                 if let url {
                     AsyncImage(url: url) { phase in
                         if let image = phase.image {
-                            image.resizable().scaledToFill()
-                                .frame(width: proxy.size.width, height: proxy.size.height).clipped()
+                            image.resizable().scaledToFit()
+                                .frame(width: proxy.size.width, height: proxy.size.height, alignment: .center)
                         } else { monogram }
                     }
                 } else { monogram }
@@ -776,6 +797,7 @@ struct AuthorView: View {
         .navigationTitle(author.name).navigationBarTitleDisplayMode(.inline)
         .scrollContentBackground(.hidden).background(DesignTokens.paper.ignoresSafeArea())
         .toolbarBackground(DesignTokens.paper, for: .navigationBar)
+        .onAppear { Analytics.track(.authorProfileOpened) }
     }
 }
 
@@ -825,36 +847,176 @@ struct CollectionDetailView: View {
 
 struct SupportView: View {
     let language: Language
-    @State private var copied = false
-    private let pixCode = "00020126580014BR.GOV.BCB.PIX01362c20f9f8-d517-4cb0-952f-a544ff2750435204000053039865802BR5924Osorio Lopes Feijo Filho6009SAO PAULO62140510L6iN9201SS6304C25B"
-    private var qrCode: UIImage? {
-        let filter = CIFilter.qrCodeGenerator(); filter.message = Data(pixCode.utf8); filter.correctionLevel = "M"
-        guard let output = filter.outputImage, let cgImage = CIContext().createCGImage(output.transformed(by: CGAffineTransform(scaleX: 7, y: 7)), from: output.extent.applying(CGAffineTransform(scaleX: 7, y: 7))) else { return nil }
-        return UIImage(cgImage: cgImage)
-    }
+    private let koFiURL: URL? = nil
+    private let archiveDonationURL = URL(string: "https://www.marxists.org/admin/donate/index.htm")!
+    private let volunteerURL = URL(string: "https://www.marxists.org/admin/volunteers/index.htm")!
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 18) {
-            Image(systemName: "heart.text.square").font(.system(size: 40)).foregroundStyle(DesignTokens.accent)
-            Text(language.text("Apoie o arquivo", "Support the archive")).font(.system(.largeTitle, design: .serif, weight: .medium))
-            Text(language.text("O Marxists Internet Archive é mantido por voluntários. Sua contribuição ajuda a preservar e compartilhar este acervo.", "The Marxists Internet Archive is maintained by volunteers. Your support helps preserve and share this collection."))
-                .font(.body).foregroundStyle(DesignTokens.muted)
-            if let qrCode {
-                Image(uiImage: qrCode).interpolation(.none).resizable().scaledToFit().frame(maxWidth: 220).padding(14)
-                    .background(.white, in: RoundedRectangle(cornerRadius: 16))
-                    .frame(maxWidth: .infinity)
-                Button {
-                    UIPasteboard.general.string = pixCode; copied = true
-                } label: {
-                    Label(copied ? language.text("Código copiado", "Code copied") : language.text("Copiar código Pix", "Copy Pix code"), systemImage: copied ? "checkmark" : "doc.on.doc")
-                        .frame(maxWidth: .infinity).padding(14)
-                }.buttonStyle(.borderedProminent)
-                Text(language.text("No app do seu banco, escolha Pix → Pix Copia e Cola e cole o código.", "In a Brazilian banking app, choose Pix → Copy and Paste and paste the code."))
-                    .font(.caption).foregroundStyle(DesignTokens.muted)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 22) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Image(systemName: "heart.text.square").font(.system(size: 38)).foregroundStyle(DesignTokens.accent)
+                    Text(language.text("Apoie", "Support")).font(.system(.largeTitle, design: .serif, weight: .medium))
+                    Text(language.text("Escolha como apoiar", "Choose how to support")).font(.body).foregroundStyle(DesignTokens.muted)
+                }
+
+                VStack(alignment: .leading, spacing: 12) {
+                    Text(language.text("Apoie este app", "Support this app"))
+                        .font(.system(.title3, design: .serif, weight: .semibold))
+                    Text(language.text("Ajude a manter o leitor gratuito e em evolução.", "Help keep the reader free and improving."))
+                        .font(.subheadline).foregroundStyle(DesignTokens.muted)
+                    if let koFiURL {
+                        supportLink(to: koFiURL, title: "Ko-fi", action: language.text("Apoiar no Ko-fi", "Support on Ko-fi"), icon: "cup.and.saucer.fill")
+                    } else {
+                        supportCard(title: "Ko-fi", action: language.text("Apoiar no Ko-fi", "Support on Ko-fi"), detail: language.text("Adicione o link do perfil para ativar.", "Ko-fi profile link pending"), icon: "cup.and.saucer.fill")
+                    }
+                }
+
+                VStack(alignment: .leading, spacing: 12) {
+                    Text(language.text("Apoie o Marxists.org", "Support Marxists.org"))
+                        .font(.system(.title3, design: .serif, weight: .semibold))
+                    Text(language.text("Ajude a preservar o Marxists Internet Archive.", "Help preserve the Marxists Internet Archive."))
+                        .font(.subheadline).foregroundStyle(DesignTokens.muted)
+                    supportLink(to: archiveDonationURL, title: "Marxists.org", action: language.text("Doar ao Marxists.org", "Donate to Marxists.org"), icon: "books.vertical.fill")
+                    Link(destination: volunteerURL) {
+                        Label(language.text("Conheça outras formas de ajudar", "Volunteer with the archive"), systemImage: "person.2")
+                            .font(.subheadline.weight(.medium)).foregroundStyle(DesignTokens.accent)
+                    }
+                    .simultaneousGesture(TapGesture().onEnded {
+                        Analytics.track(.supportDestinationOpened(.volunteer))
+                    })
+                    .padding(.top, 2)
+                }
             }
-            Link(destination: URL(string: "https://www.marxists.org/admin/volunteers/index.htm")!) {
-                Label(language.text("Conheça outras formas de ajudar", "Other ways to help"), systemImage: "arrow.up.right")
-            }.padding(.top, 4)
-        }.padding(.vertical, 8).background(DesignTokens.paper)
+            .padding(20)
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .navigationTitle(language.text("Apoie", "Support"))
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.visible, for: .navigationBar)
+        .background(DesignTokens.paper.ignoresSafeArea())
+        .onAppear { Analytics.track(.supportPageOpened) }
+    }
+
+    private func supportLink(to url: URL, title: String, action: String, icon: String) -> some View {
+        Link(destination: url) {
+            supportCard(title: title, action: action, detail: nil, icon: icon)
+        }
+        .buttonStyle(.plain)
+        .simultaneousGesture(TapGesture().onEnded {
+            let destination: SupportDestination = title == "Ko-fi" ? .kofi : .archive
+            Analytics.track(.supportDestinationOpened(destination))
+        })
+    }
+
+    private func supportCard(title: String, action: String, detail: String?, icon: String) -> some View {
+        HStack(spacing: 14) {
+            Image(systemName: icon).font(.title3).foregroundStyle(DesignTokens.accent)
+                .frame(width: 42, height: 42).background(DesignTokens.paper, in: Circle())
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title).font(.system(.headline, design: .serif, weight: .semibold)).foregroundStyle(DesignTokens.ink)
+                if let detail { Text(detail).font(.caption).foregroundStyle(DesignTokens.muted) }
+                Text(action).font(.subheadline.weight(.medium)).foregroundStyle(DesignTokens.accent)
+            }
+            Spacer(minLength: 4)
+            Image(systemName: "arrow.up.right").font(.caption.weight(.semibold)).foregroundStyle(DesignTokens.muted)
+        }
+        .padding(16)
+        .background(DesignTokens.surface, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).stroke(DesignTokens.rule, lineWidth: 1))
+    }
+}
+
+struct PrivacyPolicyView: View {
+    let language: Language
+    @AppStorage("analyticsConsent") private var analyticsConsent = false
+
+    private var copy: PrivacyPolicyCopy { .forLanguage(language) }
+    private let telemetryDeckPrivacyURL = URL(string: "https://telemetrydeck.com/docs/guides/privacy-faq/")!
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 22) {
+                Text(copy.intro)
+                    .font(.body)
+                    .foregroundStyle(DesignTokens.ink)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                policySection(copy.onDeviceTitle, body: copy.onDeviceBody)
+                policySection(copy.archiveTitle, body: copy.archiveBody)
+
+                VStack(alignment: .leading, spacing: 10) {
+                    policyHeading(copy.analyticsTitle)
+                    Text(copy.analyticsBody)
+                        .font(.subheadline)
+                        .foregroundStyle(DesignTokens.ink)
+                        .fixedSize(horizontal: false, vertical: true)
+                    if Analytics.isAvailable {
+                        Toggle(isOn: $analyticsConsent) {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(copy.analyticsConsentTitle)
+                                    .font(.subheadline.weight(.medium))
+                                    .foregroundStyle(DesignTokens.ink)
+                                Text(copy.analyticsConsentDetail)
+                                    .font(.footnote)
+                                    .foregroundStyle(DesignTokens.muted)
+                            }
+                        }
+                        .tint(DesignTokens.accent)
+                        .accessibilityHint(copy.analyticsConsentDetail)
+                        .onChange(of: analyticsConsent) { _, enabled in
+                            Analytics.setConsent(enabled)
+                        }
+                    } else {
+                        Text(copy.analyticsUnavailable)
+                            .font(.footnote)
+                            .foregroundStyle(DesignTokens.muted)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    Link(copy.analyticsPolicyLink, destination: telemetryDeckPrivacyURL)
+                        .font(.footnote.weight(.medium))
+                        .foregroundStyle(DesignTokens.accent)
+                }
+
+                policySection(copy.thirdPartyTitle, body: copy.thirdPartyBody)
+                policySection(copy.retentionTitle, body: copy.retentionBody)
+
+                VStack(alignment: .leading, spacing: 7) {
+                    policyHeading(copy.contactTitle)
+                    Text(copy.contactBody)
+                        .font(.subheadline)
+                        .foregroundStyle(DesignTokens.ink)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Link(copy.contactEmail, destination: URL(string: "mailto:\(copy.contactEmail)")!)
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(DesignTokens.accent)
+                }
+            }
+            .padding(20)
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .navigationTitle(copy.title)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.visible, for: .navigationBar)
+        .toolbarBackground(DesignTokens.paper, for: .navigationBar)
+        .background(DesignTokens.paper.ignoresSafeArea())
+    }
+
+    private func policySection(_ title: String, body: String) -> some View {
+        VStack(alignment: .leading, spacing: 7) {
+            policyHeading(title)
+            Text(body)
+                .font(.subheadline)
+                .foregroundStyle(DesignTokens.ink)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    private func policyHeading(_ title: String) -> some View {
+        Text(title.uppercased())
+            .font(.caption.weight(.semibold))
+            .tracking(1)
+            .foregroundStyle(DesignTokens.muted)
     }
 }
 
@@ -1003,6 +1165,7 @@ struct ReaderView: View {
                 ToolbarItem(placement: .primaryAction) {
                     Button { showAppearance = true } label: { Image(systemName: "textformat.size") }
                         .accessibilityLabel(language.text("Aparência do texto", "Text appearance"))
+                        .simultaneousGesture(TapGesture().onEnded { Analytics.track(.readerAppearanceOpened) })
                 }
             }
             ToolbarItem(placement: .primaryAction) {
@@ -1013,12 +1176,14 @@ struct ReaderView: View {
                 ToolbarItem(placement: .primaryAction) {
                     Link(destination: sourceURL) { Image(systemName: "safari") }
                         .accessibilityLabel(language.text("Abrir fonte", "Open source"))
+                        .simultaneousGesture(TapGesture().onEnded { Analytics.track(.archiveSourceOpened) })
                 }
             }
         }
         .sheet(isPresented: $showAppearance) { ReaderAppearanceView(appearance: $appearance, language: language).presentationDetents([.medium, .large]) }
         .onChange(of: appearance) { _, updated in appearanceData = updated.encoded }
         .task(id: work.path + language.rawValue) { await load() }
+        .onAppear { Analytics.track(.workOpened) }
     }
     private func load() async {
         guard let sourceURL, sourceURL.host == "www.marxists.org" else { failed = true; return }
@@ -1045,6 +1210,7 @@ struct ReaderView: View {
         if paths.contains(work.path) { paths.removeAll { $0 == work.path } }
         else { paths.insert(work.path, at: 0) }
         savedWorkPaths = String(data: (try? JSONEncoder().encode(paths)) ?? Data("[]".utf8), encoding: .utf8) ?? "[]"
+        Analytics.track(.bookmarkChanged(isSaved: paths.contains(work.path)))
     }
     private func saveProgress(_ progress: Double) {
         var entries = (try? JSONDecoder().decode([ReadingProgress].self, from: Data(recentReadings.utf8))) ?? []

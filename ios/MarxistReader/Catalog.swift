@@ -37,6 +37,11 @@ enum Language: String, CaseIterable, Identifiable {
         "Recently read": "Leído recientemente", "Full history": "Historial completo", "Reading history": "Historial de lectura",
         "Read more": "Leer más", "Read less": "Leer menos", "Full biography": "Biografía completa", "Biography": "Biografía",
         "Open in archive": "Abrir en el archivo", "Support the archive": "Apoya el archivo",
+        "Support this app": "Apoya esta app", "Choose how to support": "Elige cómo apoyar",
+        "Help keep the reader free and improving.": "Ayuda a mantener gratis y mejorar el lector.",
+        "Support on Ko-fi": "Apoyar en Ko-fi", "Ko-fi profile link pending": "Enlace del perfil de Ko-fi pendiente",
+        "Support Marxists.org": "Apoya Marxists.org", "Help preserve the Marxists Internet Archive.": "Ayuda a preservar el Archivo Marxists Internet.",
+        "Donate to Marxists.org": "Donar a Marxists.org", "Volunteer with the archive": "Colabora como voluntario del archivo",
         "From the library": "De la biblioteca", "Estimated editorial ranking": "Clasificación editorial estimada", "Popular texts": "Textos populares", "Popular": "Popular",
         "The Marxists Internet Archive is maintained by volunteers. Your support helps preserve and share this collection.": "El Archivo Marxists Internet está mantenido por voluntarios. Tu apoyo ayuda a preservar y compartir esta colección.",
         "Code copied": "Código copiado", "Copy Pix code": "Copiar código Pix",
@@ -53,6 +58,99 @@ enum Language: String, CaseIterable, Identifiable {
         "Decrease text size": "Reducir tamaño del texto", "Increase text size": "Aumentar tamaño del texto", "Reset text size": "Restablecer tamaño",
         "Remove from saved": "Quitar de guardados", "Save work": "Guardar texto"
     ]
+}
+
+struct PrivacyPolicyCopy {
+    let title: String
+    let intro: String
+    let onDeviceTitle: String
+    let onDeviceBody: String
+    let archiveTitle: String
+    let archiveBody: String
+    let analyticsTitle: String
+    let analyticsBody: String
+    let analyticsUnavailable: String
+    let analyticsConsentTitle: String
+    let analyticsConsentDetail: String
+    let analyticsPolicyLink: String
+    let thirdPartyTitle: String
+    let thirdPartyBody: String
+    let retentionTitle: String
+    let retentionBody: String
+    let contactTitle: String
+    let contactBody: String
+    let contactEmail: String
+
+    static func forLanguage(_ language: Language) -> PrivacyPolicyCopy {
+        switch language {
+        case .pt:
+            PrivacyPolicyCopy(
+                title: "Privacidade",
+                intro: "O Leitor Marxista não exige uma conta. Não vendemos dados nem usamos anúncios. Seus dados de leitura ficam no aparelho, salvo quando você autoriza o envio opcional de análises descrito abaixo.",
+                onDeviceTitle: "No seu aparelho",
+                onDeviceBody: "Favoritos, histórico, posição de leitura, idioma, ordenação e aparência são guardados no armazenamento do app para manter sua biblioteca como você deixou. Textos e PDFs abertos também podem ficar no cache local, limitado a 100 MB. Esses dados não são enviados à equipe do app.",
+                archiveTitle: "Conteúdo do arquivo",
+                archiveBody: "Ao abrir um texto ou PDF, ou ao carregar um retrato, o app solicita esse conteúdo diretamente a marxists.org. O servidor do arquivo pode ver qual página ou arquivo foi solicitado e recebe dados técnicos da conexão, como seu endereço IP. O app não controla as práticas de privacidade do arquivo.",
+                analyticsTitle: "Análises opcionais",
+                analyticsBody: "Quando ativas e autorizadas, as análises enviam eventos gerais ao TelemetryDeck: filtros escolhidos, uso da busca, abertura de autores e textos, favoritos, controles de leitura e toques em links de apoio. A busca é registrada sem o termo digitado. Não enviamos títulos, nomes de autores, caminhos do arquivo ou posição de leitura. O SDK também envia um identificador pseudônimo desta instalação, ID da sessão, data e hora e dados do app e aparelho, como versão, versão do iOS, modelo do aparelho, idioma, região e fuso horário. O TelemetryDeck informa que não armazena endereços IP. Esses dados são usados para entender o uso do app, não para publicidade ou rastreamento entre apps.",
+                analyticsUnavailable: "As análises ainda não estão ativas nesta versão. Nenhum dado de uso está sendo enviado.",
+                analyticsConsentTitle: "Compartilhar dados de uso",
+                analyticsConsentDetail: "Opcional e desativado por padrão. Você pode mudar esta escolha a qualquer momento.",
+                analyticsPolicyLink: "Política de privacidade do TelemetryDeck",
+                thirdPartyTitle: "Serviços externos",
+                thirdPartyBody: "Links de apoio podem abrir sites como Ko-fi ou Marxists.org. Ao sair do app, valem as políticas desses serviços. O TelemetryDeck recebe análises somente quando você ativa a opção acima.",
+                retentionTitle: "Armazenamento e remoção",
+                retentionBody: "As preferências e o histórico ficam no armazenamento local do app até você apagar o app. O cache apaga arquivos antigos quando passa de 100 MB. Desative as análises acima para interromper o envio de novos eventos. Eventos já recebidos pelo TelemetryDeck seguem a retenção do plano; no plano gratuito atual, são três meses. O serviço permite excluir dados por mês, mas não localizar e excluir os dados de uma instalação específica. Consulte a política do serviço para detalhes.",
+                contactTitle: "Contato",
+                contactBody: "Para dúvidas ou solicitações sobre privacidade, escreva para:",
+                contactEmail: "guifrancoabreu@gmail.com"
+            )
+        case .en:
+            PrivacyPolicyCopy(
+                title: "Privacy",
+                intro: "Marxist Reader does not require an account. We do not sell data or use ads. Reading data stays on your device unless you choose to share the optional analytics described below.",
+                onDeviceTitle: "On your device",
+                onDeviceBody: "Saved works, reading history, reading position, language, sorting, and reader appearance are stored in the app so your library stays as you left it. Opened texts and PDFs may also be kept in a local cache capped at 100 MB. This data is not sent to the app team.",
+                archiveTitle: "Archive content",
+                archiveBody: "When you open a text or PDF, or when a portrait loads, the app requests that content directly from marxists.org. The archive’s server can see which page or file was requested and receives connection details such as your IP address. The app does not control the archive’s privacy practices.",
+                analyticsTitle: "Optional analytics",
+                analyticsBody: "When enabled and authorized, analytics send general events to TelemetryDeck: selected filters, search use, author and work openings, bookmarks, reader controls, and support-link taps. Search is recorded without the query. We do not send titles, author names, archive paths, or reading positions. The SDK also sends a pseudonymous identifier for this installation, a session ID, date and time, and app and device details such as app version, iOS version, device model, language, region, and time zone. TelemetryDeck says it does not store IP addresses. This data helps us understand app usage; it is not used for advertising or cross-app tracking.",
+                analyticsUnavailable: "Analytics are not active in this version yet. No usage data is being sent.",
+                analyticsConsentTitle: "Share app usage data",
+                analyticsConsentDetail: "Optional and off by default. You can change this choice at any time.",
+                analyticsPolicyLink: "TelemetryDeck privacy policy",
+                thirdPartyTitle: "External services",
+                thirdPartyBody: "Support links may open sites such as Ko-fi or Marxists.org. Their policies apply after you leave the app. TelemetryDeck receives analytics only when you turn on the option above.",
+                retentionTitle: "Storage and deletion",
+                retentionBody: "Preferences and reading history stay in the app’s local storage until you delete the app. The cache removes older files when it exceeds 100 MB. Turn off analytics above to stop new events from being sent. Events received by TelemetryDeck follow your plan’s retention period; the current free plan keeps them for three months. The service lets customers delete data by month, but it cannot locate and delete data from one specific installation. See its policy for details.",
+                contactTitle: "Contact",
+                contactBody: "For privacy questions or requests, email:",
+                contactEmail: "guifrancoabreu@gmail.com"
+            )
+        case .es:
+            PrivacyPolicyCopy(
+                title: "Privacidad",
+                intro: "Lector Marxista no requiere una cuenta. No vendemos datos ni usamos anuncios. Los datos de lectura permanecen en tu dispositivo, salvo que aceptes compartir las analíticas opcionales descritas abajo.",
+                onDeviceTitle: "En tu dispositivo",
+                onDeviceBody: "Los textos guardados, el historial, la posición de lectura, el idioma, el orden y la apariencia del lector se guardan en la app para conservar tu biblioteca. Los textos y PDF abiertos también pueden permanecer en una caché local limitada a 100 MB. Estos datos no se envían al equipo de la app.",
+                archiveTitle: "Contenido del archivo",
+                archiveBody: "Al abrir un texto o PDF, o al cargar un retrato, la app solicita ese contenido directamente a marxists.org. El servidor del archivo puede ver qué página o archivo se solicitó y recibe datos técnicos de conexión, como tu dirección IP. La app no controla las prácticas de privacidad del archivo.",
+                analyticsTitle: "Analíticas opcionales",
+                analyticsBody: "Cuando están activas y las aceptas, las analíticas envían eventos generales a TelemetryDeck: filtros elegidos, uso de búsqueda, apertura de autores y textos, marcadores, controles de lectura y toques en enlaces de apoyo. La búsqueda se registra sin el texto consultado. No enviamos títulos, nombres de autores, rutas del archivo ni posiciones de lectura. El SDK también envía un identificador seudónimo de esta instalación, un ID de sesión, fecha y hora, y datos de la app y el dispositivo, como versiones, modelo, idioma, región y zona horaria. TelemetryDeck indica que no almacena direcciones IP. Estos datos ayudan a entender el uso de la app; no se usan para publicidad ni seguimiento entre apps.",
+                analyticsUnavailable: "Las analíticas aún no están activas en esta versión. No se envían datos de uso.",
+                analyticsConsentTitle: "Compartir datos de uso",
+                analyticsConsentDetail: "Opcional y desactivado por defecto. Puedes cambiar esta elección cuando quieras.",
+                analyticsPolicyLink: "Política de privacidad de TelemetryDeck",
+                thirdPartyTitle: "Servicios externos",
+                thirdPartyBody: "Los enlaces de apoyo pueden abrir sitios como Ko-fi o Marxists.org. Al salir de la app, se aplican las políticas de esos servicios. TelemetryDeck recibe analíticas solo si activas la opción anterior.",
+                retentionTitle: "Almacenamiento y eliminación",
+                retentionBody: "Las preferencias y el historial permanecen en el almacenamiento local de la app hasta que borres la app. La caché elimina archivos antiguos al superar 100 MB. Desactiva las analíticas arriba para detener el envío de nuevos eventos. Los eventos recibidos por TelemetryDeck siguen la retención de tu plan; el plan gratuito actual los conserva durante tres meses. El servicio permite borrar datos por mes, pero no localizar y borrar los datos de una instalación específica. Consulta su política para más detalles.",
+                contactTitle: "Contacto",
+                contactBody: "Para consultas o solicitudes sobre privacidad, escribe a:",
+                contactEmail: "guifrancoabreu@gmail.com"
+            )
+        }
+    }
 }
 
 enum CatalogSort: String, CaseIterable, Identifiable {
