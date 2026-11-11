@@ -15,6 +15,7 @@
 		A0000000000000000000001A /* Praxis/DesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000019 /* Praxis/DesignSystem.swift */; };
 		A0000000000000000000001E /* TelemetryDeck in Frameworks */ = {isa = PBXBuildFile; productRef = A0000000000000000000001D /* TelemetryDeck */; };
 		A0000000000000000000001F /* Praxis/Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000001B /* Praxis/Analytics.swift */; };
+		A00000000000000000000020 /* Praxis/PortraitCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000021 /* Praxis/PortraitCache.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,7 @@
 		A00000000000000000000017 /* Praxis/Resources/catalog-es.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "Praxis/Resources/catalog-es.json"; sourceTree = "<group>"; };
 		A00000000000000000000019 /* Praxis/DesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Praxis/DesignSystem.swift; sourceTree = "<group>"; };
 		A0000000000000000000001B /* Praxis/Analytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Praxis/Analytics.swift; sourceTree = "<group>"; };
+		A00000000000000000000021 /* Praxis/PortraitCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Praxis/PortraitCache.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -45,6 +47,7 @@
 			children = (
 				A0000000000000000000000B /* Praxis/PraxisApp.swift */,
 				A00000000000000000000015 /* Praxis/Catalog.swift */,
+				A00000000000000000000021 /* Praxis/PortraitCache.swift */,
 				A00000000000000000000019 /* Praxis/DesignSystem.swift */,
 				A0000000000000000000001B /* Praxis/Analytics.swift */,
 				A0000000000000000000000C /* Praxis/Resources/catalog-pt.json */,
@@ -141,6 +144,7 @@
 			files = (
 				A0000000000000000000000E /* Praxis/PraxisApp.swift in Sources */,
 				A00000000000000000000016 /* Praxis/Catalog.swift in Sources */,
+				A00000000000000000000020 /* Praxis/PortraitCache.swift in Sources */,
 				A0000000000000000000001A /* Praxis/DesignSystem.swift in Sources */,
 				A0000000000000000000001F /* Praxis/Analytics.swift in Sources */,
 			);
@@ -168,13 +172,16 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "Praxis-logo.png";
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = GY86582FQG;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Praxis;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				PRODUCT_BUNDLE_IDENTIFIER = br.praxis.ios;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -185,13 +192,16 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "Praxis-logo.png";
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = GY86582FQG;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Praxis;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				PRODUCT_BUNDLE_IDENTIFIER = br.praxis.ios;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

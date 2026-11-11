@@ -190,7 +190,6 @@ struct LibraryView: View {
                         LazyVStack(alignment: .leading, spacing: 24) {
                             header
                             filterBar
-                            searchField
                             if query.isEmpty && filter == .all {
                                 if hasReadingProgress {
                                     continueReadingShelf(recentEntries)
@@ -252,6 +251,13 @@ struct LibraryView: View {
                         .padding(.bottom, 28)
                     }
                     .id(filter)
+                    .safeAreaInset(edge: .bottom, spacing: 0) {
+                        searchField
+                            .padding(.horizontal, 20)
+                            .padding(.top, 8)
+                            .padding(.bottom, 8)
+                    }
+                    .scrollDismissesKeyboard(.interactively)
                     .background(DesignTokens.paper.ignoresSafeArea())
                 } else if error {
                     ContentUnavailableView(language.text("Catálogo indisponível", "Catalog unavailable"), systemImage: "books.vertical", description: Text(language.text("Não foi possível abrir o catálogo.", "The catalog could not be opened.")))
@@ -298,7 +304,7 @@ struct LibraryView: View {
                         withAnimation(.easeOut(duration: 0.18)) { filter = item }
                     } label: {
                         Text(item.title(language)).font(.subheadline.weight(.medium))
-                            .padding(.horizontal, 15).padding(.vertical, 9)
+                            .padding(.horizontal, 15).frame(minHeight: 44)
                             .background(filter == item ? DesignTokens.ink : DesignTokens.filterSurface, in: Capsule())
                             .foregroundStyle(filter == item ? DesignTokens.paper : DesignTokens.ink)
                     }.buttonStyle(.plain)
@@ -348,7 +354,7 @@ struct LibraryView: View {
 
     private var savedPreview: some View {
         VStack(alignment: .leading, spacing: 8) {
-            HStack { sectionHeading(language.text("Salvos", "Saved")); Spacer(); Button(language.text("Ver todos", "See all")) { filter = .saved }.font(.subheadline.weight(.medium)).foregroundStyle(DesignTokens.accent) }
+            HStack { sectionHeading(language.text("Salvos", "Saved")); Spacer(); Button(language.text("Ver todos", "See all")) { filter = .saved }.font(.subheadline.weight(.medium)).foregroundStyle(DesignTokens.accent).frame(minHeight: 44).contentShape(Rectangle()) }
             ForEach(Array(savedWorks.prefix(4)), id: \.1.id) { author, work in
                 NavigationLink { ReaderView(work: work, authorName: author.full, language: language) } label: { WorkListRow(work: work, author: author.full) }
                     .buttonStyle(.plain).foregroundStyle(DesignTokens.ink)
@@ -358,7 +364,7 @@ struct LibraryView: View {
 
     private func popularWorkList(_ works: [(Author, Work)], title: String, showAll: Bool = false) -> some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack { sectionHeading(title); Spacer(); if showAll { Button(language.text("Ver todos", "See all")) { filter = .popular }.font(.subheadline.weight(.medium)).foregroundStyle(DesignTokens.accent) } }
+            HStack { sectionHeading(title); Spacer(); if showAll { Button(language.text("Ver todos", "See all")) { filter = .popular }.font(.subheadline.weight(.medium)).foregroundStyle(DesignTokens.accent).frame(minHeight: 44).contentShape(Rectangle()) } }
             Text(language.text("Ranking editorial estimado", "Estimated editorial ranking"))
                 .font(.caption).foregroundStyle(DesignTokens.muted)
             LazyVStack(spacing: 0) {
@@ -440,12 +446,13 @@ struct LibraryView: View {
                 }
             if !query.isEmpty {
                 Button { query = "" } label: { Image(systemName: "xmark.circle.fill").foregroundStyle(DesignTokens.muted) }
+                    .frame(minWidth: 44, minHeight: 44)
+                    .contentShape(Rectangle())
                     .accessibilityLabel(language.text("Limpar busca", "Clear search"))
             }
         }
-        .font(.body).padding(.horizontal, 15).frame(height: 50)
-        .background(DesignTokens.surface, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).stroke(DesignTokens.rule, lineWidth: 1))
+        .font(.body).padding(.horizontal, 18).frame(minHeight: 54)
+        .modifier(SearchGlass())
     }
 
     private func continueReadingShelf(_ entries: [ReadingProgress]) -> some View {
@@ -454,7 +461,7 @@ struct LibraryView: View {
                 sectionHeading(language.text("Continue lendo", "Continue reading"))
                 Spacer()
                 Button(language.text("Ver histórico", "Full history")) { filter = .readingHistory }
-                    .font(.subheadline.weight(.medium)).foregroundStyle(DesignTokens.accent)
+                    .font(.subheadline.weight(.medium)).foregroundStyle(DesignTokens.accent).frame(minHeight: 44).contentShape(Rectangle())
             }
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(alignment: .top, spacing: 12) {
@@ -465,16 +472,16 @@ struct LibraryView: View {
                                     VStack(alignment: .leading, spacing: 5) {
                                         Text(entry.title)
                                             .font(.system(.headline, design: .serif, weight: .semibold))
-                                            .lineLimit(3).multilineTextAlignment(.leading)
+                                            .multilineTextAlignment(.leading)
                                             .frame(maxWidth: .infinity, alignment: .leading)
-                                        Text(entry.author).font(.caption).foregroundStyle(DesignTokens.muted).lineLimit(2)
+                                        Text(entry.author).font(.caption).foregroundStyle(DesignTokens.muted)
                                         Spacer(minLength: 2)
                                         ProgressView(value: entry.progress).tint(DesignTokens.accent)
                                         Text(language.readingProgress(Int(entry.progress * 100)))
                                             .font(.caption).foregroundStyle(DesignTokens.muted)
                                     }
                                     .frame(maxWidth: .infinity, alignment: .leading)
-                                    .frame(height: 86, alignment: .topLeading)
+                                    .frame(minHeight: 86, alignment: .topLeading)
                                 }
                             .padding(12).frame(width: 236, alignment: .leading)
                             .background(DesignTokens.surface, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
@@ -494,10 +501,8 @@ struct LibraryView: View {
                 HStack(spacing: 15) {
                     BookCover(title: item.1.title, compact: false).frame(width: 76, height: 104)
                     VStack(alignment: .leading, spacing: 7) {
-                        Text(language.text("CLÁSSICO DO ARQUIVO", "FROM THE ARCHIVE"))
-                            .font(.caption2.weight(.semibold)).tracking(1).foregroundStyle(DesignTokens.muted)
-                        Text(item.1.title).font(.system(.title3, design: .serif, weight: .semibold)).lineLimit(3).multilineTextAlignment(.leading)
-                        Text(item.0.full).font(.subheadline).foregroundStyle(DesignTokens.muted).lineLimit(1)
+                        Text(item.1.title).font(.system(.title3, design: .serif, weight: .semibold)).multilineTextAlignment(.leading)
+                        Text(item.0.full).font(.subheadline).foregroundStyle(DesignTokens.muted)
                         Text(language.text("Começar a ler", "Start reading"))
                             .font(.subheadline.weight(.semibold)).foregroundStyle(DesignTokens.accent).padding(.top, 2)
                     }
@@ -513,7 +518,7 @@ struct LibraryView: View {
     private func writerShelf(_ authors: [Author], title: String) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             VStack(alignment: .leading, spacing: 3) {
-                HStack { sectionHeading(title); Spacer(); Button(language.text("Ver todos", "See all")) { filter = .writers }.font(.subheadline.weight(.medium)).foregroundStyle(DesignTokens.accent) }
+                HStack { sectionHeading(title); Spacer(); Button(language.text("Ver todos", "See all")) { filter = .writers }.font(.subheadline.weight(.medium)).foregroundStyle(DesignTokens.accent).frame(minHeight: 44).contentShape(Rectangle()) }
                 if title == language.text("Autores populares", "Popular writers") {
                     Text(language.text("Seleção editorial", "Editorial selection"))
                         .font(.caption).foregroundStyle(DesignTokens.muted)
@@ -525,7 +530,7 @@ struct LibraryView: View {
                         NavigationLink { AuthorView(author: author, language: language) } label: {
                             VStack(alignment: .leading, spacing: 8) {
                                 AuthorArtwork(author: author, language: language).frame(width: 126, height: 116)
-                                Text(author.full).font(.system(.subheadline, design: .serif, weight: .semibold)).lineLimit(2).multilineTextAlignment(.leading)
+                                Text(author.full).font(.system(.subheadline, design: .serif, weight: .semibold)).multilineTextAlignment(.leading)
                                 Text(language.workCount(author.works.count))
                                     .font(.caption).foregroundStyle(DesignTokens.muted)
                             }.frame(width: 126, alignment: .leading)
@@ -570,9 +575,9 @@ struct LibraryView: View {
                 HStack(spacing: 13) {
                     AuthorArtwork(author: author, language: language).frame(width: 52, height: 58)
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(author.full).font(.system(.headline, design: .serif, weight: .medium)).lineLimit(2)
+                        Text(author.full).font(.system(.headline, design: .serif, weight: .medium))
                                 Text([author.dates, language.workCount(author.works.count)].filter { !$0.isEmpty }.joined(separator: " · "))
-                            .font(.subheadline).foregroundStyle(DesignTokens.muted).lineLimit(1)
+                            .font(.subheadline).foregroundStyle(DesignTokens.muted)
                     }
                     Spacer(minLength: 4)
                     Image(systemName: "chevron.right").font(.caption.weight(.semibold)).foregroundStyle(DesignTokens.muted)
@@ -585,7 +590,7 @@ struct LibraryView: View {
     private func workList(_ works: [(Author, Work)], title: String, showAll: Bool = false) -> some View {
         let works = sortedWorks(works)
         return VStack(alignment: .leading, spacing: 12) {
-            HStack { sectionHeading(title); Spacer(); sortMenu; if showAll { Button(language.text("Ver todos", "See all")) { filter = .works }.font(.subheadline.weight(.medium)).foregroundStyle(DesignTokens.accent) } }
+            HStack { sectionHeading(title); Spacer(); sortMenu; if showAll { Button(language.text("Ver todos", "See all")) { filter = .works }.font(.subheadline.weight(.medium)).foregroundStyle(DesignTokens.accent).frame(minHeight: 44).contentShape(Rectangle()) } }
             LazyVStack(spacing: 0) {
                 ForEach(works, id: \.1.id) { author, work in
                     NavigationLink { ReaderView(work: work, authorName: author.full, language: language) } label: {
@@ -612,11 +617,14 @@ struct LibraryView: View {
             Label(catalogSort.title(language), systemImage: "arrow.up.arrow.down")
                 .font(.subheadline.weight(.medium)).foregroundStyle(DesignTokens.accent)
         }
+        .frame(minHeight: 44)
+        .contentShape(Rectangle())
         .accessibilityLabel(language.text("Ordenar", "Sort"))
     }
 
     private func sectionHeading(_ title: String) -> some View {
         Text(title.uppercased()).font(.subheadline.weight(.semibold)).tracking(0.8).foregroundStyle(DesignTokens.muted)
+            .accessibilityAddTraits(.isHeader)
     }
 
     private func emptyState(title: String, detail: String) -> some View {
@@ -724,8 +732,9 @@ struct AuthorArtwork: View {
         .task(id: url) {
             portrait = nil
             faceCenter = nil
-            guard let url, let (data, _) = try? await URLSession.shared.data(from: url),
+            guard let url, let data = try? await PortraitCache.shared.data(for: url, validate: { UIImage(data: $0) != nil }),
                   !Task.isCancelled, let image = UIImage(data: data), image.size.width > 0, image.size.height > 0 else { return }
+            portrait = image
             let center = await Task.detached(priority: .utility) { () -> CGPoint? in
                 guard let cgImage = image.cgImage else { return nil }
                 let orientation: CGImagePropertyOrientation
@@ -747,7 +756,6 @@ struct AuthorArtwork: View {
             }.value
             guard !Task.isCancelled else { return }
             faceCenter = center
-            portrait = image
         }
     }
     private var monogram: some View {
@@ -763,8 +771,8 @@ struct WorkListRow: View {
         HStack(spacing: 13) {
             BookCover(title: work.title).frame(width: 50, height: 68)
             VStack(alignment: .leading, spacing: 5) {
-                Text(work.title).font(.system(.headline, design: .serif, weight: .medium)).lineLimit(2).multilineTextAlignment(.leading)
-                Text(author).font(.subheadline).foregroundStyle(DesignTokens.muted).lineLimit(1)
+                Text(work.title).font(.system(.headline, design: .serif, weight: .medium)).multilineTextAlignment(.leading)
+                Text(author).font(.subheadline).foregroundStyle(DesignTokens.muted)
                 if !work.date.isEmpty { Text(work.date).font(.caption).foregroundStyle(DesignTokens.muted) }
             }
             Spacer(minLength: 4)
@@ -781,7 +789,7 @@ struct LibraryRow: View {
         VStack(alignment: .leading, spacing: DesignTokens.rowSpacing) {
             Text(title).font(.system(.headline, design: .serif, weight: .medium))
             if !subtitle.isEmpty { Text(subtitle).font(.subheadline).foregroundStyle(DesignTokens.muted) }
-        }.padding(.vertical, 5)
+        }.padding(.vertical, 5).frame(minHeight: 44, alignment: .leading)
     }
 }
 
@@ -883,7 +891,6 @@ struct SupportView: View {
     let language: Language
     private let koFiURL: URL? = nil
     private let archiveDonationURL = URL(string: "https://www.marxists.org/admin/donate/index.htm")!
-    private let volunteerURL = URL(string: "https://www.marxists.org/admin/volunteers/index.htm")!
 
     var body: some View {
         ScrollView {
@@ -912,13 +919,6 @@ struct SupportView: View {
                     Text(language.text("Ajude a preservar o Marxists Internet Archive.", "Help preserve the Marxists Internet Archive."))
                         .font(.subheadline).foregroundStyle(DesignTokens.muted)
                     supportLink(to: archiveDonationURL, title: "Marxists.org", action: language.text("Doar ao Marxists.org", "Donate to Marxists.org"), icon: "books.vertical.fill")
-                    Link(destination: volunteerURL) {
-                        Label(language.text("Conheça outras formas de ajudar", "Volunteer with the archive"), systemImage: "person.2")
-                            .font(.subheadline.weight(.medium)).foregroundStyle(DesignTokens.accent)
-                    }
-                    .simultaneousGesture(TapGesture().onEnded {
-                        Analytics.track(.supportDestinationOpened(.volunteer))
-                    })
                     .padding(.top, 2)
                 }
             }
@@ -1054,30 +1054,6 @@ struct PrivacyPolicyView: View {
     }
 }
 
-struct ReaderAppearance: Codable, Equatable {
-    var font = "serif"
-    var size = 19
-    var lineSpacing = 1.6
-    var margin = 18
-    var alignment = "left"
-    var theme = "light"
-    var background = "#fbfaf7"
-    var foreground = "#1d1b19"
-    var link = "#b3121d"
-    var encoded: String { (try? String(data: JSONEncoder().encode(self), encoding: .utf8)) ?? "" }
-    static func decode(_ data: String) -> ReaderAppearance {
-        (try? JSONDecoder().decode(ReaderAppearance.self, from: Data(data.utf8))) ?? ReaderAppearance()
-    }
-    mutating func setTheme(_ value: String) {
-        theme = value
-        let palette: [String: (String, String, String)] = [
-            "light": ("#fbfaf7", "#1d1b19", "#b3121d"), "sepia": ("#f4ecd8", "#3b2f22", "#9c2a12"),
-            "gray": ("#d9d9d6", "#202020", "#8e0d16"), "dark": ("#1c1c1e", "#dedede", "#ff8a80"),
-            "black": ("#000000", "#c9c9c9", "#ff6e6e"), "red": ("#4a0808", "#fbe9d0", "#ffcc00")
-        ]
-        if let colors = palette[value] { background = colors.0; foreground = colors.1; link = colors.2 }
-    }
-}
 
 struct ReaderAppearanceView: View {
     @Binding var appearance: ReaderAppearance
@@ -1096,10 +1072,16 @@ struct ReaderAppearanceView: View {
                     }
                     LabeledContent(language.text("Tamanho", "Size"), value: "\(appearance.size) px")
                     Slider(value: Binding(get: { Double(appearance.size) }, set: { appearance.size = Int($0.rounded()) }), in: 13...34, step: 1)
+                        .accessibilityLabel(language.text("Tamanho", "Size"))
+                        .accessibilityValue("\(appearance.size) px")
                     LabeledContent(language.text("Espaçamento", "Line spacing"), value: appearance.lineSpacing.formatted(.number.precision(.fractionLength(1))))
                     Slider(value: $appearance.lineSpacing, in: 1.2...2.4, step: 0.1)
+                        .accessibilityLabel(language.text("Espaçamento", "Line spacing"))
+                        .accessibilityValue(appearance.lineSpacing.formatted(.number.precision(.fractionLength(1))))
                     LabeledContent(language.text("Margens", "Margins"), value: "\(appearance.margin) px")
                     Slider(value: Binding(get: { Double(appearance.margin) }, set: { appearance.margin = Int($0.rounded()) }), in: 8...48, step: 2)
+                        .accessibilityLabel(language.text("Margens", "Margins"))
+                        .accessibilityValue("\(appearance.margin) px")
                     Picker(language.text("Alinhamento", "Alignment"), selection: $appearance.alignment) {
                         Text(language.text("À esquerda", "Left")).tag("left")
                         Text(language.text("Justificado", "Justified")).tag("justified")
@@ -1119,6 +1101,7 @@ struct ReaderAppearanceView: View {
                         ColorPicker(language.text("Fundo", "Background"), selection: hexColor(\.background))
                         ColorPicker(language.text("Texto", "Text"), selection: hexColor(\.foreground))
                         ColorPicker(language.text("Links", "Links"), selection: hexColor(\.link))
+                        contrastStatus
                     } else {
                         Button(language.text("Personalizar cores", "Customize colours")) { appearance.theme = "custom" }
                     }
@@ -1131,6 +1114,17 @@ struct ReaderAppearanceView: View {
             .navigationBarTitleDisplayMode(.inline)
         }
         .tint(DesignTokens.accent)
+    }
+    private var contrastStatus: some View {
+        let textRatio = ColorContrast.ratio(appearance.foreground, appearance.background) ?? 0
+        let linkRatio = ColorContrast.ratio(appearance.link, appearance.background) ?? 0
+        return VStack(alignment: .leading, spacing: 4) {
+            Text(language.text("Contraste do texto", "Text contrast") + ": " + textRatio.formatted(.number.precision(.fractionLength(1))) + ":1")
+            Text(language.text("Contraste dos links", "Link contrast") + ": " + linkRatio.formatted(.number.precision(.fractionLength(1))) + ":1")
+            Text(textRatio >= 4.5 && linkRatio >= 4.5
+                 ? language.text("O contraste atende ao mínimo AA.", "Contrast meets the AA minimum.")
+                 : language.text("Use cores com contraste de pelo menos 4,5:1 para texto e links.", "Use colors with at least 4.5:1 contrast for text and links."))
+        }.font(.footnote).foregroundStyle(DesignTokens.muted)
     }
     private func hexColor(_ keyPath: WritableKeyPath<ReaderAppearance, String>) -> Binding<Color> {
         Binding(get: { Color(hex: appearance[keyPath: keyPath]) }, set: { appearance[keyPath: keyPath] = $0.hexString; appearance.theme = "custom" })
@@ -1357,6 +1351,12 @@ struct PDFReaderView: UIViewRepresentable {
 }
 
 struct ReaderWebView: UIViewRepresentable {
+    @ScaledMetric(relativeTo: .body) private var textScale: CGFloat = 1
+    private var scaledAppearance: ReaderAppearance {
+        var result = appearance
+        result.size = Int((CGFloat(appearance.size) * textScale).rounded())
+        return result
+    }
     let html: String
     let sourceURL: URL
     let appearance: ReaderAppearance
@@ -1367,7 +1367,7 @@ struct ReaderWebView: UIViewRepresentable {
         let configuration = WKWebViewConfiguration()
         configuration.defaultWebpagePreferences.allowsContentJavaScript = false
         configuration.userContentController.add(context.coordinator, name: "readerProgress")
-        let config = (try? String(data: JSONEncoder().encode(appearance), encoding: .utf8)) ?? "{}"
+        let config = (try? String(data: JSONEncoder().encode(scaledAppearance), encoding: .utf8)) ?? "{}"
         let script = Self.cleanup
             .replacingOccurrences(of: "__INITIAL_PROGRESS__", with: String(min(1, max(0, initialProgress))))
             .replacingOccurrences(of: "__INITIAL_APPEARANCE__", with: config)
@@ -1380,7 +1380,7 @@ struct ReaderWebView: UIViewRepresentable {
     }
     func updateUIView(_ view: WKWebView, context: Context) {
         context.coordinator.onProgress = onProgress
-        let json = (try? String(data: JSONEncoder().encode(appearance), encoding: .utf8)) ?? "{}"
+        let json = (try? String(data: JSONEncoder().encode(scaledAppearance), encoding: .utf8)) ?? "{}"
         view.evaluateJavaScript("window.setReaderAppearance && window.setReaderAppearance(\(json))")
     }
     final class Coordinator: NSObject, WKScriptMessageHandler {
@@ -1394,7 +1394,7 @@ struct ReaderWebView: UIViewRepresentable {
     static let cleanup = """
     document.querySelectorAll('script,style,link,meta,iframe,form,input,button,select,noscript,object,embed,map,.toplink,.toplink-centro,img.logo,img.logodic,nav,p.title').forEach(e => e.remove());
     document.querySelectorAll('*').forEach(e => { for (const a of [...e.attributes]) { if (a.name.toLowerCase().startsWith('on') || ['style','align','bgcolor','color','face','size','background','border','cellpadding','cellspacing','valign','width','height'].includes(a.name.toLowerCase())) e.removeAttribute(a.name); } });
-    const style = document.createElement('style'); style.textContent = 'html { -webkit-text-size-adjust: 100%; } body { --reader-bg:#fbfaf7; --reader-ink:#1d1b19; --reader-link:#b3121d; --reader-size:19px; --reader-line:1.6; --reader-margin:18px; --reader-align:left; --reader-font:Georgia, serif; max-width:40rem; margin:auto; padding:26px var(--reader-margin) 64px; background:var(--reader-bg); color:var(--reader-ink); font-family:var(--reader-font); font-size:var(--reader-size); line-height:var(--reader-line); text-align:var(--reader-align); overflow-wrap:anywhere; } h1 { line-height:1.25; letter-spacing:-.025em; margin:.7em 0 .45em; } h2 { line-height:1.3; margin:1.5em 0 .6em; } blockquote { border-left:2px solid var(--reader-link); opacity:.8; margin:1.4em 0; padding-left:1em; } img, table { max-width:100%; height:auto; } a { color:var(--reader-link); }'; document.head.appendChild(style);
+    const style = document.createElement('style'); style.textContent = 'html { -webkit-text-size-adjust: 100%; } body { --reader-bg:#fbfaf7; --reader-ink:#1d1b19; --reader-link:#b3121d; --reader-size:19px; --reader-line:1.6; --reader-margin:18px; --reader-align:left; --reader-font:Georgia, serif; max-width:40rem; margin:auto; padding:26px var(--reader-margin) 64px; background:var(--reader-bg); color:var(--reader-ink); font-family:var(--reader-font); font-size:var(--reader-size); line-height:var(--reader-line); text-align:var(--reader-align); overflow-wrap:anywhere; } h1 { line-height:1.25; letter-spacing:-.025em; margin:.7em 0 .45em; } h2 { line-height:1.3; margin:1.5em 0 .6em; } blockquote { border-left:2px solid var(--reader-link); opacity:.8; margin:1.4em 0; padding-left:1em; } img, table { max-width:100%; height:auto; } a { color:var(--reader-link); text-decoration:underline; }'; document.head.appendChild(style);
     window.setReaderAppearance = (p) => { const b=document.body; const fonts={serif:'Georgia, serif',sans:'system-ui, sans-serif',book:'Palatino, serif',condensed:'\"Arial Narrow\", sans-serif',mono:'monospace',casual:'\"Comic Sans MS\", cursive'}; b.style.setProperty('--reader-bg',p.background||'#fbfaf7'); b.style.setProperty('--reader-ink',p.foreground||'#1d1b19'); b.style.setProperty('--reader-link',p.link||'#b3121d'); b.style.setProperty('--reader-size',(p.size||19)+'px'); b.style.setProperty('--reader-line',p.lineSpacing||1.6); b.style.setProperty('--reader-margin',(p.margin||18)+'px'); b.style.setProperty('--reader-align',p.alignment==='justified'?'justify':'left'); b.style.setProperty('--reader-font',fonts[p.font]||fonts.serif); };
     window.setReaderAppearance(__INITIAL_APPEARANCE__);
     const initialProgress = __INITIAL_PROGRESS__;
@@ -1404,4 +1404,15 @@ struct ReaderWebView: UIViewRepresentable {
     window.addEventListener('scroll', report, { passive: true }); window.addEventListener('load', () => setTimeout(restore, 120)); setTimeout(restore, 350); setTimeout(restore, 1000);
     const viewport = document.createElement('meta'); viewport.name = 'viewport'; viewport.content = 'width=device-width, initial-scale=1'; document.head.appendChild(viewport);
     """
+}
+
+private struct SearchGlass: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(iOS 26.0, *) {
+            content.glassEffect(.regular.interactive(), in: Capsule())
+        } else {
+            content.background(.regularMaterial, in: Capsule())
+                .overlay(Capsule().strokeBorder(DesignTokens.rule.opacity(0.5), lineWidth: 1))
+        }
+    }
 }

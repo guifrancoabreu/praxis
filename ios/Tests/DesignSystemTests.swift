@@ -25,4 +25,18 @@ final class DesignSystemTests: XCTestCase {
             XCTAssertGreaterThanOrEqual(contrast(foreground, background), 4.5)
         }
     }
+
+    func testActiveReaderThemesMeetNormalTextContrast() throws {
+        var appearance = ReaderAppearance()
+        for theme in ReaderAppearance.builtInThemes {
+            appearance.setTheme(theme)
+            XCTAssertGreaterThanOrEqual(try XCTUnwrap(ColorContrast.ratio(appearance.foreground, appearance.background)), 4.5, theme)
+            XCTAssertGreaterThanOrEqual(try XCTUnwrap(ColorContrast.ratio(appearance.link, appearance.background)), 4.5, theme)
+        }
+    }
+
+    func testContrastDetectsInsufficientAndInvalidColors() throws {
+        XCTAssertLessThan(try XCTUnwrap(ColorContrast.ratio("#aaaaaa", "#ffffff")), 4.5)
+        XCTAssertNil(ColorContrast.ratio("invalid", "#ffffff"))
+    }
 }
