@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Marxist Reader</string>
+    <string name="title_activity_main">Marxist Reader</string>
+    <string name="package_name">br.leitormarxista.en</string>
+    <string name="custom_url_scheme">br.leitormarxista.en</string>
+</resources>

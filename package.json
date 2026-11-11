@@ -1,0 +1,23 @@
+{
+  "name": "leitor-marxista",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Apps Android para ler o Arquivo Marxista na Internet (marxists.org) em português e em inglês.",
+  "scripts": {
+    "catalogo": "python tools/build_catalog.py && python tools/build_catalog_en.py",
+    "servidor": "python tools/devserver.py",
+    "preparar": "python tools/preparar.py pt en",
+    "apk:pt": "python tools/preparar.py pt && cd apps/pt && npx cap sync android && cd android && gradlew.bat assembleDebug",
+    "apk:en": "python tools/preparar.py en && cd apps/en && npx cap sync android && cd android && gradlew.bat assembleDebug"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.0.0",
+    "@capacitor/app": "^7.0.0",
+    "@capacitor/browser": "^7.0.0",
+    "@capacitor/core": "^7.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^7.0.0"
+  }
+}
