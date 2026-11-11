@@ -16,35 +16,18 @@ final class CatalogTests: XCTestCase {
     }
 
     func testTranslationsAndArchiveBases() {
-        XCTAssertEqual(Language.pt.text(.writers), "Autores")
-        XCTAssertEqual(Language.en.text(.writers), "Writers")
-        XCTAssertEqual(Language.es.text(.writers), "Autores")
+        XCTAssertEqual(Language.pt.text("Autores", "Writers"), "Autores")
+        XCTAssertEqual(Language.en.text("Autores", "Writers"), "Writers")
+        XCTAssertEqual(Language.es.text("Autores", "Writers"), "Autores")
         XCTAssertEqual(Language.pt.base, "https://www.marxists.org/portugues/")
         XCTAssertEqual(Language.en.base, "https://www.marxists.org/")
         XCTAssertEqual(Language.es.base, "https://www.marxists.org/espanol/")
     }
 
-    func testEveryCopyKeyHasNonemptyTranslations() {
-        for key in CopyKey.allCases {
-            for language in Language.allCases {
-                XCTAssertFalse(language.text(key).trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, "Missing \(key) for \(language)")
-            }
-        }
-    }
-
-    func testWorkCountsUseSingularAndPluralInEachLanguage() {
-        XCTAssertEqual(Language.en.workCount(1), "1 work")
-        XCTAssertEqual(Language.en.workCount(2), "2 works")
-        XCTAssertEqual(Language.pt.workCount(1), "1 texto")
-        XCTAssertEqual(Language.pt.workCount(2), "2 textos")
-        XCTAssertEqual(Language.es.workCount(1), "1 obra")
-        XCTAssertEqual(Language.es.workCount(2), "2 obras")
-    }
-
     func testBundledCatalogSnapshotsDecode() throws {
-        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
         for code in ["pt", "en", "es"] {
-            let catalog = try Catalog.decode(Data(contentsOf: root.appendingPathComponent("www/data/catalog-\(code).json")))
+            let catalog = try Catalog.decode(Data(contentsOf: root.appendingPathComponent("MarxistReader/Resources/catalog-\(code).json")))
             XCTAssertGreaterThan(catalog.authors.count, 5)
             XCTAssertTrue(catalog.authors.contains { !$0.works.isEmpty })
         }

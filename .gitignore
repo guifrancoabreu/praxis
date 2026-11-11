@@ -1,5 +1,4 @@
-# dependências e caches
-node_modules/
+# Python catalog-builder caches
 tools/.cache/
 tools/.cache-en/
 tools/.cache-es/
@@ -7,28 +6,12 @@ tools/.cache-proxy/
 tools/*.log
 __pycache__/
 
-# gerado por tools/preparar.py e pelo Capacitor
-apps/*/www/
-apps/*/android/app/src/main/assets/public/
-apps/*/android/app/src/main/assets/capacitor.config.json
-apps/*/android/app/src/main/assets/capacitor.plugins.json
-apps/*/android/capacitor-cordova-android-plugins/
-
-# builds do Android
-apps/*/android/.gradle/
-apps/*/android/build/
-apps/*/android/app/build/
-apps/*/android/local.properties
-apps/*/android/.idea/
-*.apk
-*.aab
-release/
-
-# configuração local
+# Local configuration
 .claude/
 
-# iOS local build and Xcode state
+# Swift package and Xcode state
 ios/.build/
 ios/.swiftpm/
 *.xcuserstate
 xcuserdata/
+DerivedData/

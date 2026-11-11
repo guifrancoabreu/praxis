@@ -41,9 +41,32 @@ import UIKit
 extension DesignTokens {
     static let accent = Color(uiColor: UIColor { traits in
         traits.userInterfaceStyle == .dark
-            ? UIColor(red: 1, green: 0.61, blue: 0.59, alpha: 1)
+            ? UIColor(red: 1, green: 0.48, blue: 0.48, alpha: 1)
             : UIColor(red: 0.58, green: 0, blue: 0.03, alpha: 1)
     })
+    static let paper = Color(uiColor: UIColor { traits in
+        traits.userInterfaceStyle == .dark
+            ? UIColor(red: 0.10, green: 0.095, blue: 0.09, alpha: 1)
+            : UIColor(red: 0.984, green: 0.98, blue: 0.969, alpha: 1)
+    })
+    static let surface = Color(uiColor: UIColor { traits in
+        traits.userInterfaceStyle == .dark
+            ? UIColor(red: 0.15, green: 0.14, blue: 0.13, alpha: 1)
+            : UIColor(red: 1, green: 0.998, blue: 0.989, alpha: 1)
+    })
+    static let muted = Color(uiColor: .secondaryLabel)
+    static let ink = Color(uiColor: .label)
+    static let rule = Color(uiColor: .separator).opacity(0.45)
+    static let coverOchre = Color(red: 0.54, green: 0.36, blue: 0.15)
+    static let coverRust = Color(red: 0.52, green: 0.22, blue: 0.18)
+    static let coverOlive = Color(red: 0.30, green: 0.35, blue: 0.24)
+    static let coverBlue = Color(red: 0.21, green: 0.34, blue: 0.41)
+    static let coverStone = Color(uiColor: UIColor { traits in
+        traits.userInterfaceStyle == .dark
+            ? UIColor(red: 0.19, green: 0.17, blue: 0.15, alpha: 1)
+            : UIColor(red: 0.91, green: 0.87, blue: 0.80, alpha: 1)
+    })
+    static let rowSpacing: CGFloat = 4
 }
 
 /// A neutral list label; NavigationLink supplies the interaction and accessibility role.

@@ -14,9 +14,9 @@
   A00000000000000000000019 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarxistReader/DesignSystem.swift; sourceTree = "<group>";};
   A0000000000000000000001A = {isa = PBXBuildFile; fileRef = A00000000000000000000019;};
   A00000000000000000000016 = {isa = PBXBuildFile; fileRef = A00000000000000000000015;};
-  A0000000000000000000000C = {isa = PBXFileReference; lastKnownFileType = text.json; path = "../www/data/catalog-pt.json"; sourceTree = "<group>";};
-  A0000000000000000000000D = {isa = PBXFileReference; lastKnownFileType = text.json; path = "../www/data/catalog-en.json"; sourceTree = "<group>";};
-  A00000000000000000000017 = {isa = PBXFileReference; lastKnownFileType = text.json; path = "../www/data/catalog-es.json"; sourceTree = "<group>";};
+  A0000000000000000000000C = {isa = PBXFileReference; lastKnownFileType = text.json; path = "MarxistReader/Resources/catalog-pt.json"; sourceTree = "<group>";};
+  A0000000000000000000000D = {isa = PBXFileReference; lastKnownFileType = text.json; path = "MarxistReader/Resources/catalog-en.json"; sourceTree = "<group>";};
+  A00000000000000000000017 = {isa = PBXFileReference; lastKnownFileType = text.json; path = "MarxistReader/Resources/catalog-es.json"; sourceTree = "<group>";};
   A00000000000000000000018 = {isa = PBXBuildFile; fileRef = A00000000000000000000017;};
   A0000000000000000000000E = {isa = PBXBuildFile; fileRef = A0000000000000000000000B;};
   A0000000000000000000000F = {isa = PBXBuildFile; fileRef = A0000000000000000000000C;};

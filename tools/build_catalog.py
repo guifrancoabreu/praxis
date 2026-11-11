@@ -1,4 +1,4 @@
-"""Monta www/data/catalog-pt.json a partir da seção em português do marxists.org.
+"""Monta o catálogo iOS em português a partir da seção portuguesa do MIA.
 
 Uso:  python tools/build_catalog.py
 As páginas baixadas ficam em tools/.cache, então rodar de novo é rápido.
@@ -18,7 +18,7 @@ from urllib.parse import urljoin
 BASE = "https://www.marxists.org/portugues/"
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CACHE = os.path.join(ROOT, "tools", ".cache")
-OUT = os.path.join(ROOT, "www", "data", "catalog-pt.json")
+OUT = os.path.join(ROOT, "ios", "MarxistReader", "Resources", "catalog-pt.json")
 DELAY = 0.35  # pausa entre downloads, para não sobrecarregar o site
 UA = "LeitorMarxista-catalogo/1.0 (app de leitura; uso pessoal)"
 
@@ -153,6 +153,32 @@ def parse_works(page_html, base_dir, skip_other_dirs):
         seen.add(key)
         out.append((title, path, date, sec))
     return out
+
+
+def author_portrait(page_html, base_dir, author_name):
+    """Return a clearly author-specific portrait image from an author page."""
+    name_parts = [part.lower() for part in re.findall(r"[\w-]+", author_name) if len(part) > 3]
+    candidates = []
+    for tag in re.findall(r"<img\b[^>]*>", page_html, re.I):
+        if re.search(r"\busemap\s*=", tag, re.I):
+            continue
+        src = re.search(r"\bsrc\s*=\s*['\"]([^'\"]+)['\"]", tag, re.I)
+        if not src:
+            continue
+        path = src.group(1).strip()
+        basename = path.rsplit("/", 1)[-1].lower()
+        if not basename.split("?")[0].endswith((".jpg", ".jpeg", ".png", ".webp")):
+            continue
+        if any(term in basename for term in ("logo", "banner", "header", "index", "button", "espan")):
+            continue
+        alt = re.search(r"\balt\s*=\s*['\"]([^'\"]*)['\"]", tag, re.I)
+        description = (basename + " " + (alt.group(1).lower() if alt else ""))
+        score = sum(part in description for part in name_parts)
+        if score:
+            normalized = norm(base_dir, path)
+            if normalized:
+                candidates.append((score, normalized))
+    return max(candidates, default=(0, None), key=lambda item: item[0])[1]
 
 
 # ------------------------------------------------------------------ países

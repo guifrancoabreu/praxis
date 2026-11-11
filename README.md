@@ -1,80 +1,54 @@
-# Leitor Marxista · Marxist Reader
+# Leitor Marxista for iOS
 
-Aplicativos Android para ler o **Arquivo Marxista na Internet** ([marxists.org](https://www.marxists.org)).
-Android apps for reading the **Marxists Internet Archive**.
+Native SwiftUI reader for the Marxists Internet Archive (MIA). The app runs on iOS 17 and later and supports Portuguese, English, and Spanish catalogs.
 
-| App | Idioma | Organização |
-|---|---|---|
-| **Leitor Marxista** | Português ([marxists.org/portugues](https://www.marxists.org/portugues/)) | Autores · Países · Temas · Figuras históricas |
-| **Marxist Reader** | English ([marxists.org](https://www.marxists.org/archive/index.htm)) | Writers (by movement) · History · Subjects · Glossary of People |
+## Open and run
 
-**Baixe os APKs na aba [Releases](../../releases).** · **Download the APKs from [Releases](../../releases).**
+1. Open `ios/MarxistReader.xcodeproj` in Xcode.
+2. Select the `MarxistReader` scheme and an iOS simulator.
+3. Run the app.
 
-## Recursos / Features
+For a physical device, choose a development team in **Signing & Capabilities** and set a bundle identifier if needed.
 
-- Texto limpo, sem os menus do site — clean text, without site navigation
-- Fonte, tamanho da letra, cores (6 temas + cores livres), espaçamento, margens e alinhamento
-  — font, size, colours (6 themes + custom), line spacing, margins, alignment
-- Busca, favoritos, histórico, "continuar lendo" e leitura offline dos textos já abertos
-  — search, favourites, history, resume reading and offline reading of opened texts
-- Aba **Apoie / Support** com QR Code Pix
+## Project structure
 
-## Instalar no Android
-
-1. Baixe o `.apk` em Releases no celular.
-2. Toque no arquivo e permita "instalar apps de fontes desconhecidas".
-3. Toque em **Instalar**.
-
-## Estrutura
-
-```
-www/                  app (HTML/CSS/JS), comum aos dois idiomas
-  js/i18n.js          textos da interface (pt / en)
-  data/catalog-*.json catálogos gerados a partir do site
-apps/pt, apps/en      projetos Capacitor/Android de cada app
-assets/               ícones (foice e martelo) para o Android
+```text
+ios/
+  MarxistReader.xcodeproj/       Xcode project and app scheme
+  MarxistReader/
+    MarxistReaderApp.swift       SwiftUI screens, reader, and app entry point
+    Catalog.swift                Catalog models, loading, and language metadata
+    Resources/                   Bundled Portuguese, English, and Spanish catalogs
+  Tests/                         Catalog and core behavior tests
+  Package.swift                  Swift package for the testable core
 tools/
-  build_catalog.py    catálogo em português
-  build_catalog_en.py catálogo em inglês (segue a organização do site em inglês)
-  preparar.py         copia www/ para apps/<idioma>/www com o idioma fixo
-  devserver.py        servidor de teste no computador
-  gerar_icones.py     gera os PNGs do ícone
+  build_catalog.py               Refresh the Portuguese catalog
+  build_catalog_en.py            Refresh the English catalog
+  build_catalog_es.py            Refresh the Spanish starter catalog
 ```
 
-## Testar no computador
+## Catalogs
 
-```
-python tools/devserver.py
-```
+The app bundles catalog snapshots, so browsing author and topic indexes does not require a catalog API. To refresh them, run the corresponding script from the repository root:
 
-Português: http://localhost:8765 · English: http://localhost:8765/?lang=en
-
-## Gerar os APKs
-
-Requisitos: Node.js 20+, Java 21, Android SDK 35, Python 3.
-
-```
-npm install
-python tools/preparar.py pt en
-cd apps/pt && npx cap sync android && cd android && gradlew.bat assembleDebug
-cd ../../en && npx cap sync android && cd android && gradlew.bat assembleDebug
+```sh
+python3 tools/build_catalog.py
+python3 tools/build_catalog_en.py
+python3 tools/build_catalog_es.py
 ```
 
-O APK sai em `apps/<idioma>/android/app/build/outputs/apk/debug/app-debug.apk`.
-No Windows, se a pasta tiver caminho muito longo, use `subst L: "C:\caminho\do\projeto"` e trabalhe a partir de `L:\`.
+The scripts write JSON files to `ios/MarxistReader/Resources/`. They fetch data from the corresponding MIA archive section; an internet connection is required. The Spanish catalog is a starter selection, not a complete mirror of the Spanish archive.
 
-## Atualizar os catálogos
+## Tests
 
+Run the catalog and core tests with:
+
+```sh
+swift test --package-path ios
 ```
-python tools/build_catalog.py      # português
-python tools/build_catalog_en.py   # English
-```
 
-## Sobre o conteúdo / About the content
+These tests do not replace running the app and checking reader behavior on an iOS simulator or device.
 
-Todos os textos pertencem ao Arquivo Marxista na Internet e a seus tradutores; o app apenas
-os exibe, sempre com a fonte. A maior parte do acervo é distribuída sob licença Creative Commons
-(Atribuição-CompartilhaIgual). Apoie o MIA: [marxists.org](https://www.marxists.org/admin/volunteers/index.htm).
+## Content and attribution
 
-All texts belong to the Marxists Internet Archive and its translators; this app only displays
-them, always linking to the source.
+Texts belong to the Marxists Internet Archive and their translators. The app displays archive content with source attribution. [Support the MIA](https://www.marxists.org/admin/volunteers/index.htm).

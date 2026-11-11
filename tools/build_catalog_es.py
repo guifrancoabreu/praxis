@@ -11,7 +11,7 @@ import build_catalog as b
 
 b.BASE = "https://www.marxists.org/espanol/"
 b.CACHE = os.path.join(b.ROOT, "tools", ".cache-es")
-OUT = os.path.join(b.ROOT, "www", "data", "catalog-es.json")
+OUT = os.path.join(b.ROOT, "ios", "MarxistReader", "Resources", "catalog-es.json")
 
 def main():
     index = b.fetch("marxistas.htm")
@@ -27,12 +27,16 @@ def main():
         if not page:
             continue
         base_dir = path.rsplit("/", 1)[0] + "/" if "/" in path else ""
+        photo = b.author_portrait(page, base_dir, name)
         sections, works = [], []
         for title, work_path, date, section in b.parse_works(page, base_dir, skip_other_dirs=True):
             if section not in sections:
                 sections.append(section)
             works.append([title, work_path, date, sections.index(section)])
-        authors.append({"id": path, "name": name, "sections": sections, "works": works})
+        author = {"id": path, "name": name, "sections": sections, "works": works}
+        if photo:
+            author["photo"] = photo
+        authors.append(author)
     if not authors or not any(a["works"] for a in authors):
         raise RuntimeError("Spanish index produced no works; check source format")
     with open(OUT, "w", encoding="utf-8") as f:

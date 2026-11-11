@@ -1,4 +1,4 @@
-"""Monta www/data/catalog-en.json a partir da seção em inglês do marxists.org,
+"""Monta o catálogo iOS em inglês a partir da seção inglesa do MIA,
 seguindo a organização do próprio site:
 
 - Writers:  archive/index.htm  (escritores agrupados por movimento)
@@ -19,7 +19,7 @@ import build_catalog as b  # noqa: E402  (reaproveita download, cache e parser)
 
 b.BASE = "https://www.marxists.org/"
 b.CACHE = os.path.join(b.ROOT, "tools", ".cache-en")
-OUT = os.path.join(b.ROOT, "www", "data", "catalog-en.json")
+OUT = os.path.join(b.ROOT, "ios", "MarxistReader", "Resources", "catalog-en.json")
 
 SKIP = ("admin/", "css/", "ebooks/", "audiobooks/", "xlang/", "img/", "images/", "search")
 

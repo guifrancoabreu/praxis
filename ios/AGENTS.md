@@ -1,6 +1,6 @@
 # iOS development guide
 
-For design-system work, consult `/Users/guilhermefranco/coding/monorepo/docs/design/DESIGNING_APPS.md` and `ACCESSIBILITY.md` as guiding references. Adapt their principles to this small SwiftUI app; do not import the monorepo’s organizational or tooling complexity. Prefer native platform APIs and add abstractions only when a current feature needs them. The existing Android app remains separate.
+This repository contains one iOS app built with SwiftUI. Keep product code and platform-specific tooling focused on iOS; catalog-generation scripts may use Python.
 
 ## Organization and design
 
@@ -22,4 +22,4 @@ For design-system work, consult `/Users/guilhermefranco/coding/monorepo/docs/des
 
 ## Current gaps
 
-The MVP has a small token/component layer documented in DESIGN_SYSTEM.md, typed localization keys, and core catalog, localization, and palette tests. It does not yet meet the complete component, networking, reader, UI, or accessibility test expectations above. The Spanish catalog is a limited starter selection, not the full Spanish archive.
+The MVP has a starter token/component layer, a temporary localization helper, and core catalog tests. It does not yet meet the complete localization, component, networking, reader, UI, or accessibility test expectations above. The Spanish catalog is a limited starter selection, not the full Spanish archive.
