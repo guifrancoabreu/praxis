@@ -85,12 +85,58 @@ def build_writers():
             print(f"  {i}/{len(writers)}", flush=True)
         page = b.fetch(w["entry"].split("#")[0])
         base_dir = w["entry"].rsplit("/", 1)[0] + "/"
-        works = [x for x in b.parse_works(page, base_dir, skip_other_dirs=True) if not x[1].startswith(SKIP)]
+        navigation_titles = {"date index", "subject index", "biography", "library", "photo archive", "table of contents"}
+        works = [x for x in b.parse_works(page, base_dir, skip_other_dirs=True)
+                 if not x[1].startswith(SKIP)
+                 and not (x[0].strip().lower() in navigation_titles
+                          and x[1].lower().split("#")[0].endswith(("/index.htm", "/index.html")))]
+        credits = {}
+        if w["id"] == "archive/weisbord":
+            for match in re.finditer(r'<a\b[^>]*href="([^"]+)"[^>]*>.*?</a>(.*?)(?=<br\s*/?>|<a\b|$)', page, re.I | re.S):
+                context = b.clean(match.group(2))
+                names = []
+                if re.search(r"\bAlbert\s+Weisbord\b", context, re.I):
+                    names.append("Albert Weisbord")
+                if re.search(r"\bVera\s+(?:Buch(?:\s+Weisbord)?|Weisbord)\b", context, re.I):
+                    names.append("Vera Buch Weisbord")
+                if len(names) == 1:
+                    credits[b.norm(base_dir, match.group(1))] = names[0]
         sections, rows = [], []
         for title, path, date, sec in works:
             if sec not in sections:
                 sections.append(sec)
-            rows.append([title, path, date, sections.index(sec)])
+            row = [title, path, date, sections.index(sec)]
+            if w["id"] in ("archive/weisbord", "archive/marx"):
+                row.append(credits.get(path, ""))
+            rows.append(row)
+        # Explicit credits in the source index title identify contributors whose
+        # works appear in another person's archive.
+        source_credits = {
+            "archive/debs/works/1895/950119-bly-debsatwoodstock.pdf": "Nellie Bly",
+            "archive/debs/works/1898/980623-hogan-aplainstatement.pdf": "James Hogan",
+            "archive/debs/works/1900/000327-sdpslp-unionconference.pdf": "Margaret Haile",
+            "archive/debs/works/1901/010728-hillquit-taskoftheconvention.pdf": "Morris Hillquit",
+            "archive/debs/works/1908/X-080712-steffens-interviewwithdebs.pdf": "Lincoln Steffens",
+            "archive/liebknecht-k/bio/jogiches-letter.htm": "Leo Jogiches",
+            "archive/riazanov/bio/bio01.htm": "Boris Souvarine",
+            "archive/baracchi/biography.htm": "Bob Gould",
+            "reference/archive/ravachol/biography.htm": "Mitch Abidor",
+            "reference/archive/makhno-nestor/bibliography.htm": "Alexandre Skirda",
+        }
+        for row in rows:
+            if row[1] in source_credits:
+                row[4:] = [source_credits[row[1]]]
+        # These two index entries point to a thematic page and a work page,
+        # respectively, not an author's list. Preserve only source-credited works.
+        if w["id"] == "history/australia/woman-movement.htm":
+            vida_paths = {
+                "history/australia/1912/woman-voter.htm", "history/australia/1914/kooyong.htm",
+                "history/australia/1916/social-evil.htm", "history/australia/1916/woman-manifesto.htm",
+            }
+            rows = [row[:4] + ["Vida Goldstein et al."] for row in rows if row[1] in vida_paths]
+        elif w["id"] == "subject/women/authors/ehrenreich-barbara/socialist-feminism.htm":
+            sections = [""]
+            rows = [["What is Socialist Feminism?", w["id"], "1976", 0, "Barbara Ehrenreich"]]
         w["sections"], w["works"] = sections, rows
         ph = re.search(r'<img[^>]+src="([^"]+\.(?:jpe?g|png|gif))"', page, re.I)
         if ph:

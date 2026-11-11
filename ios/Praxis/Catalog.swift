@@ -174,7 +174,14 @@ struct Work: Identifiable, Hashable {
     let path: String
     let date: String
     let section: Int
+    var credit: String? = nil
     var id: String { path + title }
+
+    // An archive can include works by other people. Only an explicit source
+    // credit identifies the author of this particular work.
+    func displayCredit(archiveName: String) -> String {
+        credit ?? ""
+    }
 }
 
 struct CatalogItem: Identifiable, Hashable {
@@ -220,6 +227,15 @@ struct Catalog {
     let history: [CatalogCollection]
     let figures: [CatalogItem]
 
+    /// Resolve by exact catalog path only. Conflicting credits are ambiguous.
+    func credit(forPath path: String) -> String? {
+        let credits = Set(authors.flatMap { author in
+            author.works.filter { $0.path == path }.map { $0.displayCredit(archiveName: author.full) }
+        })
+        guard credits.count == 1 else { return nil }
+        return credits.first
+    }
+
     static func load(_ language: Language) throws -> Catalog {
         guard let url = Bundle.main.url(forResource: "catalog-\(language.rawValue)", withExtension: "json") else {
             throw CocoaError(.fileNoSuchFile)
@@ -234,7 +250,7 @@ struct Catalog {
             guard let id = row["id"] as? String, let name = row["name"] as? String else { return nil }
             let works = (row["works"] as? [[Any]] ?? []).compactMap { values -> Work? in
                 guard values.count >= 2, let title = values[0] as? String, let path = values[1] as? String else { return nil }
-                return Work(title: title, path: path, date: values.count > 2 ? values[2] as? String ?? "" : "", section: values.count > 3 ? values[3] as? Int ?? 0 : 0)
+                return Work(title: title, path: path, date: values.count > 2 ? values[2] as? String ?? "" : "", section: values.count > 3 ? values[3] as? Int ?? 0 : 0, credit: values.count > 4 ? values[4] as? String : nil)
             }
             return Author(id: id, name: name, full: row["full"] as? String ?? name,
                           dates: row["dates"] as? String ?? row["years"] as? String ?? "",
@@ -270,30 +286,10 @@ struct Catalog {
               authors[index].full.localizedCaseInsensitiveContains("Friedrich Engels") else { return authors }
 
         let source = authors[index]
-        let engelsOnlyTitles = [
-            "Princípios Básicos do Comunismo", "Progresso do Comunismo na Alemanha", "A Imprensa e os Déspotas Alemães",
-            "Esboço de uma Crítica da Economia Política", "Às classes trabalhadoras da Grã-Bretanha", "As guerras camponesas na Alemanha",
-            "Revolução e Contra-Revolução na Alemanha", "Guerra nas Montanhas no Passado e no Presente", "Lições da Guerra Americana",
-            "A Guerra Civil americana e os navios encouraçados", "Discurso Sobre a Acção Política da Classe Operária",
-            "Para a Questão da Habitação", "Sobre a Autoridade", "Os Bakuninistas em Ação", "Programa dos Refugiados Blanquistas",
-            "Sobre o Papel do Trabalho na Transformação do Macaco em Homem", "Introdução à \"Dialéctica da Natureza\"",
-            "Anti-Dühring", "Do Socialismo Utópico ao Socialismo Cientifico", "Artigo Publicado no Labour Standard",
-            "A Dialética da Natureza", "A Origem da Família, da Propriedade Privada e do Estado",
-            "Bruno Bauer e o Início do Cristianismo", "Ludwig Feuerbach e o Fim da Filosofia Alemã Clássica",
-            "Contribuição Para a História do Cristianismo Primitivo", "A Condição da Classe Operária em Inglaterra"
-        ]
-        let coauthoredTitles = [
-            "Feuerbach. Oposição das Concepções", "Manifesto do Partido Comunista", "Mensagem da Direcção Central à Liga dos Comunistas",
-            "Revolução do século XVII na Inglaterra", "Reunião da Direção Central da Liga dos Comunistas",
-            "Declaração ao Editor do Neue Deutsche Zeitung", "Declaração Pública aos Editores da Imprensa Inglesa",
-            "As Pretensas Cisões na Internacional", "Das Resoluções do Congresso Geral Realizado na Haia",
-            "Carta Circular a A. Bebel, W. Liebknecht"
-        ]
-        func matches(_ work: Work, _ titles: [String]) -> Bool {
-            titles.contains { work.title.localizedCaseInsensitiveContains($0) }
-        }
-        let engelsWorks = source.works.filter { matches($0, engelsOnlyTitles) || matches($0, coauthoredTitles) }
-        let marxWorks = source.works.filter { !matches($0, engelsOnlyTitles) || matches($0, coauthoredTitles) }
+        // The shared archive's index explicitly credits each row. Empty credits
+        // remain unassigned; they must not be guessed from the title.
+        let marxWorks = source.works.filter { $0.credit != "Friedrich Engels" }
+        let engelsWorks = source.works.filter { $0.credit == "Friedrich Engels" || $0.credit == "Karl Marx e Friedrich Engels" }
 
         let marx = Author(id: source.id, name: "Marx, Karl", full: "Karl Marx", dates: "1818–1883",
                           avatar: nil,

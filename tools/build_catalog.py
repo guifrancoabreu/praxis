@@ -352,10 +352,23 @@ def build_authors():
         works = parse_works(h, a["id"] + "/", skip_other_dirs=True)
         sections = []
         rows = []
+        credits = {}
+        if a["id"] == "marx":
+            names = {"Marx": "Karl Marx", "Engels": "Friedrich Engels", "Marx e Engels": "Karl Marx e Friedrich Engels"}
+            for row_html in re.findall(r"<tr\b[^>]*>(.*?)</tr>", h, re.S | re.I):
+                credit = re.search(r'<td\b[^>]*title="(Marx(?: e Engels)?|Engels)"', row_html, re.I)
+                if credit:
+                    for href in re.findall(r'<a\b[^>]*href="([^"]+)"', row_html, re.I):
+                        path = norm("marx/", html.unescape(href))
+                        if path:
+                            credits[path] = names.get(credit.group(1), "")
         for title, path, date, sec in works:
             if sec not in sections:
                 sections.append(sec)
-            rows.append([title, path, date, sections.index(sec)])
+            row = [title, path, date, sections.index(sec)]
+            if a["id"] == "marx":
+                row.append(credits.get(path, ""))
+            rows.append(row)
         a["sections"] = sections
         a["works"] = rows
     return authors

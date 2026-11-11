@@ -114,24 +114,27 @@ struct LibraryView: View {
     private var historyWorks: [(Author, Work)] {
         recentEntries.compactMap { entry in
             if let match = allWorks.first(where: { $0.1.path == entry.path }) { return match }
-            return (Author(id: entry.path, name: entry.author, full: entry.author, dates: "", avatar: nil, bio: "", sections: [], works: [], country: "", groups: [], photo: nil, bioPath: nil), Work(title: entry.title, path: entry.path, date: "", section: 0))
+            return (Author(id: entry.path, name: "", full: "", dates: "", avatar: nil, bio: "", sections: [], works: [], country: "", groups: [], photo: nil, bioPath: nil), Work(title: entry.title, path: entry.path, date: "", section: 0, credit: ""))
         }
     }
     private var hasReadingProgress: Bool { recentEntries.contains { $0.progress > 0 } }
     private var popularWorks: [(Author, Work)] {
         guard let catalog else { return [] }
         let preferred = language == .pt ? Self.popularPortugueseTitles : Self.popularEnglishTitles
-        var sources = catalog.authors.flatMap { author in author.works.map { (author, $0) } }
-        let collectionItems = (catalog.themes + catalog.history).flatMap { $0.groups.flatMap(\.items) }
-        for item in collectionItems where !sources.contains(where: { $0.1.path == item.path }) {
-            if let author = catalog.authors.first(where: { item.path.hasPrefix($0.id + "/") }) {
-                sources.append((author, item.work))
-            }
-        }
+        // Only use works listed under an author; a URL prefix alone is not
+        // evidence of authorship, especially in shared or nested archives.
+        let sources = catalog.authors.flatMap { author in author.works.map { (author, $0) } }
         var chosen: [(Author, Work)] = []
+        let expectedAuthors = language == .pt ? Self.portugueseWorkAuthors : Self.englishWorkAuthors
         for signature in preferred {
-            if let match = sources.first(where: { $0.1.title.localizedCaseInsensitiveContains(signature) }),
-               !chosen.contains(where: { $0.1.path == match.1.path }) { chosen.append(match) }
+            guard let authorID = expectedAuthors[signature] else { continue }
+            if let match = sources.first(where: {
+                $0.0.id == authorID && $0.1.title.localizedCaseInsensitiveCompare(signature) == .orderedSame
+            }) ?? sources.first(where: {
+                $0.0.id == authorID && $0.1.title.lowercased().hasPrefix(signature.lowercased())
+            }), !chosen.contains(where: { $0.1.path == match.1.path }) {
+                chosen.append(match)
+            }
         }
         // The Spanish catalog is a small starter set; fill remaining places from its
         // canonical author pages. This remains a visible editorial estimate.
@@ -149,6 +152,56 @@ struct LibraryView: View {
         }
         return Array(chosen.prefix(50))
     }
+    // Match curated works within their author's catalog to avoid selecting commentary
+    // or another work that happens to contain the same title.
+    private static let portugueseWorkAuthors: [String: String] = [
+        "Manifesto do Partido Comunista": "marx", "O Capital - Crítica": "marx",
+        "O Estado e a Revolução": "lenin", "O Imperialismo, Fase Superior": "lenin",
+        "Reforma ou Revolução": "luxemburgo", "Do Socialismo Utópico": "engels",
+        "A Origem da Família": "engels", "Crítica do Programa de Gotha": "marx",
+        "Que Fazer?": "lenin", "Trabalho Assalariado e Capital": "marx",
+        "A Doença Infantil": "lenin", "O 18 de Brumário": "marx",
+        "Guerra Civil na França": "marx", "A Ideologia Alemã": "marx",
+        "Valor, Preço e Lucro": "marx", "Miséria da Filosofia": "marx",
+        "Manuscritos Econômico-Filosóficos": "marx", "Anti-Dühring": "engels",
+        "Greve de massas": "luxemburgo", "A Acumulação do Capital": "luxemburgo",
+        "A Revolução Traída": "trotsky", "A Revolução Permanente": "trotsky",
+        "Dez Dias que Abalaram o Mundo": "reed", "Teses sobre Feuerbach": "marx",
+        "ABC do Comunismo": "bukharin", "Citações do Presidente Mao": "mao",
+        "Sobre a Prática": "mao", "Sobre a Contradição": "mao",
+        "O Desenvolvimento do Capitalismo na Rússia": "lenin", "A Situação da Classe Trabalhadora": "engels",
+        "A Guerra de Guerrilhas": "lenin", "Três Fontes": "lenin", "A Questão Judaica": "marx",
+        "A Sagrada Família": "marx", "O Programa de Gotha": "marx", "O Direito à Preguiça": "lafargue",
+        "A Revolução Russa": "luxemburgo", "O Materialismo Dialético": "stalin",
+        "O Imperialismo e a Economia Mundial": "bukharin", "A Guerra Civil": "marx",
+        "O Desenvolvimento do Capitalismo": "lenin", "O Socialismo e as Igrejas": "luxemburgo",
+        "O Estado": "lenin", "O Que Fazer": "lenin", "A Mulher e o Socialismo": "bebel",
+        "O Trabalho Assalariado": "marx", "A Revolução Proletária": "lenin"
+    ]
+    private static let englishWorkAuthors: [String: String] = [
+        "The Communist Manifesto": "archive/marx", "Capital: A Critique": "archive/marx",
+        "The State and Revolution": "archive/lenin", "Imperialism, the Highest Stage": "archive/lenin",
+        "Reform or Revolution": "archive/luxemburg", "Socialism: Utopian and Scientific": "archive/marx",
+        "Origin of the Family, Private Property": "archive/marx", "Critique of the Gotha Program": "archive/marx",
+        "What Is to Be Done?": "archive/lenin", "Wage Labour and Capital": "archive/marx",
+        "Left-Wing Communism": "archive/lenin", "The Eighteenth Brumaire": "archive/marx",
+        "The Civil War in France": "archive/marx", "The German Ideology": "archive/marx",
+        "Value, Price and Profit": "archive/marx", "The Poverty of Philosophy": "archive/marx",
+        "Economic and Philosophical Manuscripts": "archive/marx", "Anti-Dühring": "archive/marx",
+        "The Mass Strike": "archive/luxemburg", "The Accumulation of Capital": "archive/luxemburg",
+        "The Revolution Betrayed": "archive/trotsky", "The Permanent Revolution": "archive/trotsky",
+        "Ten Days That Shook the World": "archive/reed", "Theses on Feuerbach": "archive/marx",
+        "ABC of Communism": "archive/bukharin", "Quotations from Chairman Mao": "reference/archive/mao",
+        "On Practice": "reference/archive/mao", "On Contradiction": "reference/archive/mao",
+        "The Development of Capitalism in Russia": "archive/lenin", "The Condition of the Working Class": "archive/marx",
+        "The Peasant War in Germany": "archive/marx", "The Jewish Question": "archive/marx",
+        "The Holy Family": "archive/marx", "The Right to Be Lazy": "archive/lafargue",
+        "The Russian Revolution": "archive/luxemburg", "Dialectical and Historical Materialism": "reference/archive/stalin",
+        "Imperialism and the World Economy": "archive/bukharin", "The State": "archive/lenin",
+        "The Junius Pamphlet": "archive/luxemburg", "History of the Russian Revolution": "archive/trotsky",
+        "Selections from the Prison Notebooks": "archive/gramsci", "The Conquest of Bread": "reference/archive/kropotkin-peter",
+        "The Wretched of the Earth": "subject/africa/fanon", "The Origin of the Family": "archive/marx"
+    ]
     private static let popularPortugueseTitles = [
         "Manifesto do Partido Comunista", "O Capital - Crítica", "O Estado e a Revolução", "O Imperialismo, Fase Superior",
         "Reforma ou Revolução", "Do Socialismo Utópico", "A Origem da Família", "Crítica do Programa de Gotha", "Que Fazer?",
@@ -356,7 +409,7 @@ struct LibraryView: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack { sectionHeading(language.text("Salvos", "Saved")); Spacer(); Button(language.text("Ver todos", "See all")) { filter = .saved }.font(.subheadline.weight(.medium)).foregroundStyle(DesignTokens.accent).frame(minHeight: 44).contentShape(Rectangle()) }
             ForEach(Array(savedWorks.prefix(4)), id: \.1.id) { author, work in
-                NavigationLink { ReaderView(work: work, authorName: author.full, language: language) } label: { WorkListRow(work: work, author: author.full) }
+                NavigationLink { ReaderView(work: work, authorName: work.displayCredit(archiveName: author.full), language: language) } label: { WorkListRow(work: work, author: work.displayCredit(archiveName: author.full)) }
                     .buttonStyle(.plain).foregroundStyle(DesignTokens.ink)
             }
         }
@@ -365,17 +418,21 @@ struct LibraryView: View {
     private func popularWorkList(_ works: [(Author, Work)], title: String, showAll: Bool = false) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack { sectionHeading(title); Spacer(); if showAll { Button(language.text("Ver todos", "See all")) { filter = .popular }.font(.subheadline.weight(.medium)).foregroundStyle(DesignTokens.accent).frame(minHeight: 44).contentShape(Rectangle()) } }
-            Text(language.text("Ranking editorial estimado", "Estimated editorial ranking"))
-                .font(.caption).foregroundStyle(DesignTokens.muted)
+            if !showAll {
+                Text(language.text("Ranking editorial estimado", "Estimated editorial ranking"))
+                    .font(.caption).foregroundStyle(DesignTokens.muted)
+            }
             LazyVStack(spacing: 0) {
                 ForEach(Array(works.enumerated()), id: \.offset) { index, item in
-                    NavigationLink { ReaderView(work: item.1, authorName: item.0.full, language: language) } label: {
+                    NavigationLink { ReaderView(work: item.1, authorName: item.1.displayCredit(archiveName: item.0.full), language: language) } label: {
                         HStack(spacing: 12) {
-                            Text(String(format: "%02d", index + 1)).font(.system(.caption, design: .monospaced, weight: .medium)).foregroundStyle(DesignTokens.muted).frame(width: 28, alignment: .leading)
-                            WorkListRow(work: item.1, author: item.0.full)
+                            if !showAll {
+                                Text(String(format: "%02d", index + 1)).font(.system(.caption, design: .monospaced, weight: .medium)).foregroundStyle(DesignTokens.muted).frame(width: 28, alignment: .leading)
+                            }
+                            WorkListRow(work: item.1, author: item.1.displayCredit(archiveName: item.0.full))
                         }
                     }.buttonStyle(.plain).foregroundStyle(DesignTokens.ink)
-                    if index < works.count - 1 { Rectangle().fill(DesignTokens.rule).frame(height: 1).padding(.leading, 40) }
+                    if index < works.count - 1 { Rectangle().fill(DesignTokens.rule).frame(height: 1).padding(.leading, showAll ? 63 : 40) }
                 }
             }
         }
@@ -388,7 +445,7 @@ struct LibraryView: View {
             ForEach(grouped.keys.sorted(), id: \.self) { group in
                 if !group.isEmpty { Text(group).font(.system(.headline, design: .serif)).padding(.top, 4) }
                 ForEach(grouped[group] ?? []) { collection in
-                    NavigationLink { CollectionDetailView(collection: collection, language: language) } label: {
+                    NavigationLink { CollectionDetailView(collection: collection, language: language, catalog: catalog) } label: {
                         HStack {
                             Text(collection.title).font(.system(.body, design: .serif, weight: .medium)).foregroundStyle(DesignTokens.ink)
                             Spacer()
@@ -466,7 +523,8 @@ struct LibraryView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(alignment: .top, spacing: 12) {
                     ForEach(entries) { entry in
-                        NavigationLink { ReaderView(work: Work(title: entry.title, path: entry.path, date: "", section: 0), authorName: entry.author, language: language) } label: {
+                        let credit = catalog?.credit(forPath: entry.path) ?? ""
+                        NavigationLink { ReaderView(work: Work(title: entry.title, path: entry.path, date: "", section: 0), authorName: credit, language: language) } label: {
                             HStack(alignment: .top, spacing: 11) {
                                     BookCover(title: entry.title, compact: false).frame(width: 64, height: 86)
                                     VStack(alignment: .leading, spacing: 5) {
@@ -474,7 +532,7 @@ struct LibraryView: View {
                                             .font(.system(.headline, design: .serif, weight: .semibold))
                                             .multilineTextAlignment(.leading)
                                             .frame(maxWidth: .infinity, alignment: .leading)
-                                        Text(entry.author).font(.caption).foregroundStyle(DesignTokens.muted)
+                                        if !credit.isEmpty { Text(credit).font(.caption).foregroundStyle(DesignTokens.muted) }
                                         Spacer(minLength: 2)
                                         ProgressView(value: entry.progress).tint(DesignTokens.accent)
                                         Text(language.readingProgress(Int(entry.progress * 100)))
@@ -497,12 +555,14 @@ struct LibraryView: View {
     private func startHere(_ item: (Author, Work)) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             sectionHeading(language.text("Uma boa leitura para começar", "A good place to start"))
-            NavigationLink { ReaderView(work: item.1, authorName: item.0.full, language: language) } label: {
+            NavigationLink { ReaderView(work: item.1, authorName: item.1.displayCredit(archiveName: item.0.full), language: language) } label: {
                 HStack(spacing: 15) {
                     BookCover(title: item.1.title, compact: false).frame(width: 76, height: 104)
                     VStack(alignment: .leading, spacing: 7) {
                         Text(item.1.title).font(.system(.title3, design: .serif, weight: .semibold)).multilineTextAlignment(.leading)
-                        Text(item.0.full).font(.subheadline).foregroundStyle(DesignTokens.muted)
+                        if !item.1.displayCredit(archiveName: item.0.full).isEmpty {
+                            Text(item.1.displayCredit(archiveName: item.0.full)).font(.subheadline).foregroundStyle(DesignTokens.muted)
+                        }
                         Text(language.text("Começar a ler", "Start reading"))
                             .font(.subheadline.weight(.semibold)).foregroundStyle(DesignTokens.accent).padding(.top, 2)
                     }
@@ -593,8 +653,8 @@ struct LibraryView: View {
             HStack { sectionHeading(title); Spacer(); sortMenu; if showAll { Button(language.text("Ver todos", "See all")) { filter = .works }.font(.subheadline.weight(.medium)).foregroundStyle(DesignTokens.accent).frame(minHeight: 44).contentShape(Rectangle()) } }
             LazyVStack(spacing: 0) {
                 ForEach(works, id: \.1.id) { author, work in
-                    NavigationLink { ReaderView(work: work, authorName: author.full, language: language) } label: {
-                        WorkListRow(work: work, author: author.full)
+                    NavigationLink { ReaderView(work: work, authorName: work.displayCredit(archiveName: author.full), language: language) } label: {
+                        WorkListRow(work: work, author: work.displayCredit(archiveName: author.full))
                     }.buttonStyle(.plain).foregroundStyle(DesignTokens.ink)
                     if work.id != works.last?.1.id { Rectangle().fill(DesignTokens.rule).frame(height: 1).padding(.leading, 65) }
                 }
@@ -772,7 +832,7 @@ struct WorkListRow: View {
             BookCover(title: work.title).frame(width: 50, height: 68)
             VStack(alignment: .leading, spacing: 5) {
                 Text(work.title).font(.system(.headline, design: .serif, weight: .medium)).multilineTextAlignment(.leading)
-                Text(author).font(.subheadline).foregroundStyle(DesignTokens.muted)
+                if !author.isEmpty { Text(author).font(.subheadline).foregroundStyle(DesignTokens.muted) }
                 if !work.date.isEmpty { Text(work.date).font(.caption).foregroundStyle(DesignTokens.muted) }
             }
             Spacer(minLength: 4)
@@ -825,7 +885,7 @@ struct AuthorView: View {
                 if !works.isEmpty {
                     Section(section.isEmpty ? language.text("Obras", "Works") : section) {
                         ForEach(works) { work in
-                            NavigationLink { ReaderView(work: work, authorName: author.full, language: language) } label: {
+                            NavigationLink { ReaderView(work: work, authorName: work.displayCredit(archiveName: author.full), language: language) } label: {
                                 VStack(alignment: .leading, spacing: 3) {
                                     Text(work.title)
                                     if !work.date.isEmpty { Text(work.date).font(.caption).foregroundStyle(.secondary) }
@@ -865,13 +925,14 @@ struct CountryWritersView: View {
 struct CollectionDetailView: View {
     let collection: CatalogCollection
     let language: Language
+    let catalog: Catalog?
     var body: some View {
         List {
             ForEach(collection.groups) { group in
                 Section(group.name.isEmpty ? collection.title : group.name) {
                     ForEach(group.items) { item in
                         NavigationLink {
-                            ReaderView(work: item.work, authorName: group.name, language: language)
+                            ReaderView(work: item.work, authorName: catalog?.credit(forPath: item.path) ?? "", language: language)
                         } label: { Text(item.title).font(.system(.body, design: .serif)) }
                     }
                 }
