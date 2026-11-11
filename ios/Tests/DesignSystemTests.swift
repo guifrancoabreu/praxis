@@ -17,7 +17,7 @@ final class DesignSystemTests: XCTestCase {
     }
 
     func testReaderTextAndLinksMeetNormalTextContrastInBothThemes() {
-        let reader = DesignTokens.Reader.self
+        let reader = ReaderTokens.self
         for (foreground, background) in [
             (reader.lightForeground, reader.lightBackground), (reader.lightLink, reader.lightBackground),
             (reader.darkForeground, reader.darkBackground), (reader.darkLink, reader.darkBackground)

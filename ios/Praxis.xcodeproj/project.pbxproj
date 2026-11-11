@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A00000000000000000000028 /* Praxis/Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000029 /* Praxis/Components.swift */; };
+		A00000000000000000000022 /* Praxis/RefTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000023 /* Praxis/RefTokens.swift */; };
+		A00000000000000000000024 /* Praxis/SystemTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000025 /* Praxis/SystemTokens.swift */; };
 		A0000000000000000000000E /* Praxis/PraxisApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000000B /* Praxis/PraxisApp.swift */; };
 		A0000000000000000000000F /* Praxis/Resources/catalog-pt.json in Resources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000000C /* Praxis/Resources/catalog-pt.json */; };
 		A00000000000000000000010 /* Praxis/Resources/catalog-en.json in Resources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000000D /* Praxis/Resources/catalog-en.json */; };
@@ -16,9 +19,13 @@
 		A0000000000000000000001E /* TelemetryDeck in Frameworks */ = {isa = PBXBuildFile; productRef = A0000000000000000000001D /* TelemetryDeck */; };
 		A0000000000000000000001F /* Praxis/Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000001B /* Praxis/Analytics.swift */; };
 		A00000000000000000000020 /* Praxis/PortraitCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000021 /* Praxis/PortraitCache.swift */; };
+		A00000000000000000000026 /* Praxis/Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000027 /* Praxis/Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		A00000000000000000000029 /* Praxis/Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Praxis/Components.swift; sourceTree = "<group>"; };
+		A00000000000000000000023 /* Praxis/RefTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Praxis/RefTokens.swift; sourceTree = "<group>"; };
+		A00000000000000000000025 /* Praxis/SystemTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Praxis/SystemTokens.swift; sourceTree = "<group>"; };
 		A0000000000000000000000A /* Praxis.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; path = Praxis.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A0000000000000000000000B /* Praxis/PraxisApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Praxis/PraxisApp.swift; sourceTree = "<group>"; };
 		A0000000000000000000000C /* Praxis/Resources/catalog-pt.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "Praxis/Resources/catalog-pt.json"; sourceTree = "<group>"; };
@@ -28,6 +35,7 @@
 		A00000000000000000000019 /* Praxis/DesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Praxis/DesignSystem.swift; sourceTree = "<group>"; };
 		A0000000000000000000001B /* Praxis/Analytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Praxis/Analytics.swift; sourceTree = "<group>"; };
 		A00000000000000000000021 /* Praxis/PortraitCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Praxis/PortraitCache.swift; sourceTree = "<group>"; };
+		A00000000000000000000027 /* Praxis/Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Praxis/Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -49,10 +57,14 @@
 				A00000000000000000000015 /* Praxis/Catalog.swift */,
 				A00000000000000000000021 /* Praxis/PortraitCache.swift */,
 				A00000000000000000000019 /* Praxis/DesignSystem.swift */,
+				A00000000000000000000023 /* Praxis/RefTokens.swift */,
+				A00000000000000000000025 /* Praxis/SystemTokens.swift */,
+				A00000000000000000000029 /* Praxis/Components.swift */,
 				A0000000000000000000001B /* Praxis/Analytics.swift */,
 				A0000000000000000000000C /* Praxis/Resources/catalog-pt.json */,
 				A0000000000000000000000D /* Praxis/Resources/catalog-en.json */,
 				A00000000000000000000017 /* Praxis/Resources/catalog-es.json */,
+				A00000000000000000000027 /* Praxis/Assets.xcassets */,
 				A00000000000000000000005 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -132,6 +144,7 @@
 				A0000000000000000000000F /* Praxis/Resources/catalog-pt.json in Resources */,
 				A00000000000000000000010 /* Praxis/Resources/catalog-en.json in Resources */,
 				A00000000000000000000018 /* Praxis/Resources/catalog-es.json in Resources */,
+				A00000000000000000000026 /* Praxis/Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -146,6 +159,9 @@
 				A00000000000000000000016 /* Praxis/Catalog.swift in Sources */,
 				A00000000000000000000020 /* Praxis/PortraitCache.swift in Sources */,
 				A0000000000000000000001A /* Praxis/DesignSystem.swift in Sources */,
+				A00000000000000000000022 /* Praxis/RefTokens.swift in Sources */,
+				A00000000000000000000024 /* Praxis/SystemTokens.swift in Sources */,
+				A00000000000000000000028 /* Praxis/Components.swift in Sources */,
 				A0000000000000000000001F /* Praxis/Analytics.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -170,7 +186,8 @@
 		A00000000000000000000013 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = "Praxis-logo.png";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				"ASSETCATALOG_COMPILER_APPICON_NAME[sdk=iphoneos*]" = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
@@ -191,7 +208,8 @@
 		A00000000000000000000014 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = "Praxis-logo.png";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				"ASSETCATALOG_COMPILER_APPICON_NAME[sdk=iphoneos*]" = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
