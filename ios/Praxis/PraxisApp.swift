@@ -14,17 +14,22 @@ struct PraxisApp: App {
 }
 
 struct LibraryView: View {
+    private enum LibraryScrollAnchor {
+        static let top = "library.top"
+    }
+
     @AppStorage("language") private var languageCode = Language.pt.rawValue
     @AppStorage("savedWorkPaths") private var savedWorkPaths = "[]"
     @AppStorage("recentReadings") private var recentReadings = "[]"
     @State private var query = ""
-    @State private var filter: LibraryFilter = .all
+    @State private var filterSelection = FilterBarSelection(LibraryFilter.all)
     @State private var catalog: Catalog?
     @State private var error = false
     @AppStorage("groupWritersByMovement") private var groupWriters = true
     @AppStorage("catalogSortOrder") private var catalogSortRaw = CatalogSort.popularity.rawValue
     @AppStorage("glossaryPeopleOnly") private var peopleOnly = true
     private var language: Language { Language(rawValue: languageCode) ?? .pt }
+    private var filter: LibraryFilter { filterSelection.selected }
     private var catalogSort: CatalogSort { CatalogSort(rawValue: catalogSortRaw) ?? .popularity }
     private var savedPaths: Set<String> { Set((try? JSONDecoder().decode([String].self, from: Data(savedWorkPaths.utf8))) ?? []) }
     private var recentEntries: [ReadingProgress] { (try? JSONDecoder().decode([ReadingProgress].self, from: Data(recentReadings.utf8))) ?? [] }
@@ -243,79 +248,88 @@ struct LibraryView: View {
         NavigationStack {
             Group {
                 if let catalog {
-                    ScrollView {
-                        LazyVStack(alignment: .leading, spacing: RefTokens.Spacing.s4) {
-                            header
-                            filterBar
-                            if query.isEmpty && filter == .all {
-                                if hasReadingProgress {
-                                    continueReadingShelf(recentEntries)
-                                } else if let featuredPopularWork {
-                                    startHere(featuredPopularWork)
-                                }
-                                if !popularAuthors.isEmpty { writerShelf(popularAuthors, title: language.text("Autores populares", "Popular writers")) }
-                                if !savedWorks.isEmpty { savedPreview }
-                                popularWorkList(Array(popularWorks.prefix(8)), title: language.text("Biblioteca", "Library"), showAll: true)
-                            } else if !query.isEmpty {
-                                switch filter {
-                                case .all:
-                                    if !matchingAuthors.isEmpty { writerList(matchingAuthors) }
-                                    if !matchingWorks.isEmpty { workList(matchingWorks, title: language.text("Textos", "Works")) }
-                                    if !matchingTopics.isEmpty { collectionList(matchingTopics, title: language.text("Temas e história", "Subjects and history")) }
-                                    if !matchingFigures.isEmpty { figureList(matchingFigures) }
-                                    if !matchingCountries.isEmpty { countryList(matchingCountries) }
-                                    if matchingAuthors.isEmpty && matchingWorks.isEmpty && matchingTopics.isEmpty && matchingFigures.isEmpty && matchingCountries.isEmpty {
-                                        emptyState(title: language.text("Nada encontrado", "No results found"), detail: language.text("Tente outro autor ou título.", "Try another writer or title."))
+                    ScrollViewReader { proxy in
+                        ScrollView {
+                            LazyVStack(alignment: .leading, spacing: RefTokens.Spacing.s4) {
+                                header
+                                    .id(LibraryScrollAnchor.top)
+                                filterBar
+                                if query.isEmpty && filter == .all {
+                                    if hasReadingProgress {
+                                        continueReadingShelf(recentEntries)
+                                    } else if let featuredPopularWork {
+                                        startHere(featuredPopularWork)
                                     }
-                                case .writers: writerList(matchingAuthors)
-                                case .works: workList(matchingWorks, title: language.text("Textos", "Works"))
-                                case .saved: workList(savedWorks.filter { $0.1.title.localizedStandardContains(query) || $0.0.full.localizedStandardContains(query) }, title: language.text("Salvos", "Saved works"))
-                                case .readingHistory: workList(historyWorks.filter { $0.1.title.localizedStandardContains(query) || $0.0.full.localizedStandardContains(query) }, title: language.text("Histórico de leitura", "Reading history"))
-                                case .topics: collectionList(catalog.themes.filter { $0.title.localizedStandardContains(query) }, title: language.text("Temas", "Subjects"))
-                                case .history: collectionList(catalog.history.filter { $0.title.localizedStandardContains(query) }, title: language.text("História", "History"))
-                                case .figures: figureList(matchingFigures)
-                                case .countries: countryList(matchingCountries)
-                                case .popular: popularWorkList(popularWorks.filter { $0.1.title.localizedStandardContains(query) || $0.0.full.localizedStandardContains(query) }, title: language.text("Textos populares", "Popular texts"))
+                                    if !popularAuthors.isEmpty { writerShelf(popularAuthors, title: language.text("Autores populares", "Popular writers")) }
+                                    if !savedWorks.isEmpty { savedPreview }
+                                    popularWorkList(Array(popularWorks.prefix(8)), title: language.text("Biblioteca", "Library"), showAll: true)
+                                } else if !query.isEmpty {
+                                    switch filter {
+                                    case .all:
+                                        if !matchingAuthors.isEmpty { writerList(matchingAuthors) }
+                                        if !matchingWorks.isEmpty { workList(matchingWorks, title: language.text("Textos", "Works")) }
+                                        if !matchingTopics.isEmpty { collectionList(matchingTopics, title: language.text("Temas e história", "Subjects and history")) }
+                                        if !matchingFigures.isEmpty { figureList(matchingFigures) }
+                                        if !matchingCountries.isEmpty { countryList(matchingCountries) }
+                                        if matchingAuthors.isEmpty && matchingWorks.isEmpty && matchingTopics.isEmpty && matchingFigures.isEmpty && matchingCountries.isEmpty {
+                                            emptyState(title: language.text("Nada encontrado", "No results found"), detail: language.text("Tente outro autor ou título.", "Try another writer or title."))
+                                        }
+                                    case .writers: writerList(matchingAuthors)
+                                    case .works: workList(matchingWorks, title: language.text("Textos", "Works"))
+                                    case .saved: workList(savedWorks.filter { $0.1.title.localizedStandardContains(query) || $0.0.full.localizedStandardContains(query) }, title: language.text("Salvos", "Saved works"))
+                                    case .readingHistory: workList(historyWorks.filter { $0.1.title.localizedStandardContains(query) || $0.0.full.localizedStandardContains(query) }, title: language.text("Histórico de leitura", "Reading history"))
+                                    case .topics: collectionList(catalog.themes.filter { $0.title.localizedStandardContains(query) }, title: language.text("Temas", "Subjects"))
+                                    case .history: collectionList(catalog.history.filter { $0.title.localizedStandardContains(query) }, title: language.text("História", "History"))
+                                    case .figures: figureList(matchingFigures)
+                                    case .countries: countryList(matchingCountries)
+                                    case .popular: popularWorkList(popularWorks.filter { $0.1.title.localizedStandardContains(query) || $0.0.full.localizedStandardContains(query) }, title: language.text("Textos populares", "Popular texts"))
+                                    }
+                                } else {
+                                    switch filter {
+                                    case .all: EmptyView()
+                                    case .saved:
+                                        if savedWorks.isEmpty {
+                                            emptyState(title: language.text("Sua biblioteca começa aqui", "Your library starts here"), detail: language.text("Salve textos para encontrá-los rapidamente depois.", "Save works to find them quickly later."))
+                                        } else { workList(savedWorks, title: language.text("Salvos", "Saved works")) }
+                                    case .writers: writerList(matchingAuthors)
+                                    case .works: workList(Array(sortedWorks(allWorks).prefix(60)), title: language.text("Todos os textos", "All works"))
+                                    case .readingHistory:
+                                        if historyWorks.isEmpty { emptyState(title: language.text("Histórico vazio", "No reading history yet"), detail: language.text("Os textos que você abrir aparecem aqui.", "Works you open will appear here.")) }
+                                        else { workList(historyWorks, title: language.text("Histórico de leitura", "Reading log")) }
+                                    case .topics: collectionList(catalog.themes, title: language.text("Temas", "Subjects"))
+                                    case .history: collectionList(catalog.history, title: language.text("História", "History"))
+                                    case .figures: figureList(catalog.figures.filter { !peopleOnly || $0.person })
+                                    case .countries: countryList(Array(Set(catalog.authors.map(\.country).filter { !$0.isEmpty })).sorted())
+                                    case .popular: popularWorkList(popularWorks, title: language.text("Textos populares", "Popular texts"))
+                                    }
                                 }
-                            } else {
-                                switch filter {
-                                case .all: EmptyView()
-                                case .saved:
-                                    if savedWorks.isEmpty {
-                                        emptyState(title: language.text("Sua biblioteca começa aqui", "Your library starts here"), detail: language.text("Salve textos para encontrá-los rapidamente depois.", "Save works to find them quickly later."))
-                                    } else { workList(savedWorks, title: language.text("Salvos", "Saved works")) }
-                                case .writers: writerList(matchingAuthors)
-                                case .works: workList(Array(sortedWorks(allWorks).prefix(60)), title: language.text("Todos os textos", "All works"))
-                                case .readingHistory:
-                                    if historyWorks.isEmpty { emptyState(title: language.text("Histórico vazio", "No reading history yet"), detail: language.text("Os textos que você abrir aparecem aqui.", "Works you open will appear here.")) }
-                                    else { workList(historyWorks, title: language.text("Histórico de leitura", "Reading log")) }
-                                case .topics: collectionList(catalog.themes, title: language.text("Temas", "Subjects"))
-                                case .history: collectionList(catalog.history, title: language.text("História", "History"))
-                                case .figures: figureList(catalog.figures.filter { !peopleOnly || $0.person })
-                                case .countries: countryList(Array(Set(catalog.authors.map(\.country).filter { !$0.isEmpty })).sorted())
-                                case .popular: popularWorkList(popularWorks, title: language.text("Textos populares", "Popular texts"))
+                                Text(language.text("Catálogo atualizado em", "Catalog updated") + " " + catalog.generated + " · Marxists Internet Archive")
+                                    .font(.footnote).foregroundStyle(SystemTokens.Colors.textSecondary).frame(maxWidth: .infinity, alignment: .center).padding(.vertical, 12)
+                                if query.isEmpty && filter == .all {
+                                    supportFooter
+                                    privacyFooter
                                 }
                             }
-                            Text(language.text("Catálogo atualizado em", "Catalog updated") + " " + catalog.generated + " · Marxists Internet Archive")
-                                .font(.footnote).foregroundStyle(SystemTokens.Colors.textSecondary).frame(maxWidth: .infinity, alignment: .center).padding(.vertical, 12)
-                            if query.isEmpty && filter == .all {
-                                supportFooter
-                                privacyFooter
+                            .padding(.horizontal, 20)
+                            .padding(.top, 14)
+                            .padding(.bottom, 28)
+                        }
+                        .onChange(of: filter) { _, _ in
+                            var transaction = Transaction()
+                            transaction.disablesAnimations = true
+                            withTransaction(transaction) {
+                                proxy.scrollTo(LibraryScrollAnchor.top, anchor: .top)
                             }
                         }
-                        .padding(.horizontal, 20)
-                        .padding(.top, 14)
-                        .padding(.bottom, 28)
+                        .safeAreaInset(edge: .bottom, spacing: 0) {
+                            searchField
+                                .padding(.horizontal, 20)
+                                .padding(.top, 8)
+                                .padding(.bottom, 8)
+                        }
+                        .scrollDismissesKeyboard(.interactively)
+                        .background(SystemTokens.Colors.background.ignoresSafeArea())
                     }
-                    .id(filter)
-                    .safeAreaInset(edge: .bottom, spacing: 0) {
-                        searchField
-                            .padding(.horizontal, 20)
-                            .padding(.top, 8)
-                            .padding(.bottom, 8)
-                    }
-                    .scrollDismissesKeyboard(.interactively)
-                    .background(SystemTokens.Colors.background.ignoresSafeArea())
                 } else if error {
                     ContentUnavailableView(language.text("Catálogo indisponível", "Catalog unavailable"), systemImage: "books.vertical", description: Text(language.text("Não foi possível abrir o catálogo.", "The catalog could not be opened.")))
                 } else { ProgressView().tint(SystemTokens.Colors.accent) }
@@ -353,31 +367,40 @@ struct LibraryView: View {
     }
 
     private var filterBar: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                ForEach(primaryFilters) { item in
-                    Button {
-                        Analytics.track(.filterSelected(item))
-                        withAnimation(.easeOut(duration: 0.18)) { filter = item }
-                    } label: {
-                        Text(item.title(language)).font(.subheadline.weight(.medium))
-                            .padding(.horizontal, 15).frame(minHeight: 44)
-                            .background(filter == item ? SystemTokens.Colors.textPrimary : SystemTokens.Colors.secondarySurface, in: Capsule())
-                            .foregroundStyle(filter == item ? SystemTokens.Colors.background : SystemTokens.Colors.textPrimary)
-                    }.buttonStyle(.plain)
-                        .accessibilityAddTraits(filter == item ? .isSelected : [])
+        ScrollViewReader { proxy in
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(primaryFilters) { item in
+                        Button {
+                            Analytics.track(.filterSelected(item))
+                            withAnimation(.easeOut(duration: 0.18)) { filterSelection.selectFromBar(item) }
+                        } label: {
+                            Text(item.title(language)).font(.subheadline.weight(.medium))
+                                .padding(.horizontal, 15).frame(minHeight: 44)
+                                .background(filter == item ? SystemTokens.Colors.textPrimary : SystemTokens.Colors.secondarySurface, in: Capsule())
+                                .foregroundStyle(filter == item ? SystemTokens.Colors.background : SystemTokens.Colors.textPrimary)
+                        }.buttonStyle(.plain)
+                            .accessibilityAddTraits(filter == item ? .isSelected : [])
+                            .accessibilityIdentifier("filter.\(item.rawValue)")
+                            .id(item)
+                    }
                 }
-            }
-        }.contentMargins(.trailing, 2)
+            }.contentMargins(.trailing, 2)
+                .accessibilityIdentifier("filterBar")
+                .onChange(of: filter) { _, newFilter in
+                    guard filterSelection.consumeRevealRequest(for: newFilter) else { return }
+                    withAnimation(.easeOut(duration: 0.18)) {
+                        proxy.scrollTo(newFilter, anchor: .center)
+                    }
+                }
+        }
     }
 
     private var primaryFilters: [LibraryFilter] {
-        guard let catalog else { return [.all, .saved, .writers, .works, .readingHistory] }
-        var result: [LibraryFilter] = [.all, .saved, .writers, .works, .readingHistory]
+        guard let catalog else { return [.all, .saved, .readingHistory, .writers, .works] }
+        var result: [LibraryFilter] = [.all, .saved, .readingHistory, .writers, .works]
         if !catalog.themes.isEmpty { result.append(.topics) }
         if !catalog.history.isEmpty { result.append(.history) }
-        if !catalog.figures.isEmpty { result.append(.figures) }
-        if catalog.authors.contains(where: { !$0.country.isEmpty }) { result.append(.countries) }
         return result
     }
 
@@ -411,7 +434,7 @@ struct LibraryView: View {
 
     private var savedPreview: some View {
         VStack(alignment: .leading, spacing: RefTokens.Spacing.s1) {
-            HStack { sectionHeading(language.text("Salvos", "Saved")); Spacer(); Button(language.text("Ver todos", "See all")) { filter = .saved }.font(.subheadline.weight(.medium)).foregroundStyle(SystemTokens.Colors.accent).frame(minHeight: 44).contentShape(Rectangle()) }
+            HStack { sectionHeading(language.text("Salvos", "Saved")); Spacer(); Button(language.text("Ver todos", "See all")) { filterSelection.selectProgrammatically(.saved) }.font(.subheadline.weight(.medium)).foregroundStyle(SystemTokens.Colors.accent).frame(minHeight: 44).contentShape(Rectangle()) }
             ForEach(Array(savedWorks.prefix(4)), id: \.1.id) { author, work in
                 NavigationLink { ReaderView(work: work, authorName: work.displayCredit(archiveName: author.full), language: language) } label: { WorkListRow(work: work, author: work.displayCredit(archiveName: author.full)) }
                     .buttonStyle(.plain).foregroundStyle(SystemTokens.Colors.textPrimary)
@@ -421,7 +444,7 @@ struct LibraryView: View {
 
     private func popularWorkList(_ works: [(Author, Work)], title: String, showAll: Bool = false) -> some View {
         VStack(alignment: .leading, spacing: RefTokens.Spacing.s2) {
-            HStack { sectionHeading(title); Spacer(); if showAll { Button(language.text("Ver todos", "See all")) { filter = .popular }.font(.subheadline.weight(.medium)).foregroundStyle(SystemTokens.Colors.accent).frame(minHeight: 44).contentShape(Rectangle()) } }
+            HStack { sectionHeading(title); Spacer(); if showAll { Button(language.text("Ver todos", "See all")) { filterSelection.selectProgrammatically(.popular) }.font(.subheadline.weight(.medium)).foregroundStyle(SystemTokens.Colors.accent).frame(minHeight: 44).contentShape(Rectangle()) } }
             if !showAll {
                 Text(language.text("Ranking editorial estimado", "Estimated editorial ranking"))
                     .font(.caption).foregroundStyle(SystemTokens.Colors.textSecondary)
@@ -521,7 +544,7 @@ struct LibraryView: View {
             HStack {
                 sectionHeading(language.text("Continue lendo", "Continue reading"))
                 Spacer()
-                Button(language.text("Ver histórico", "Full history")) { filter = .readingHistory }
+                Button(language.text("Ver histórico", "Full history")) { filterSelection.selectProgrammatically(.readingHistory) }
                     .font(.subheadline.weight(.medium)).foregroundStyle(SystemTokens.Colors.accent).frame(minHeight: 44).contentShape(Rectangle())
             }
             ScrollView(.horizontal, showsIndicators: false) {
@@ -582,7 +605,7 @@ struct LibraryView: View {
     private func writerShelf(_ authors: [Author], title: String) -> some View {
         VStack(alignment: .leading, spacing: RefTokens.Spacing.s2) {
             VStack(alignment: .leading, spacing: 0) {
-                HStack { sectionHeading(title); Spacer(); Button(language.text("Ver todos", "See all")) { filter = .writers }.font(.subheadline.weight(.medium)).foregroundStyle(SystemTokens.Colors.accent).frame(minHeight: 44).contentShape(Rectangle()) }
+                HStack { sectionHeading(title); Spacer(); Button(language.text("Ver todos", "See all")) { filterSelection.selectProgrammatically(.writers) }.font(.subheadline.weight(.medium)).foregroundStyle(SystemTokens.Colors.accent).frame(minHeight: 44).contentShape(Rectangle()) }
             }
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(alignment: .top, spacing: 12) {
@@ -650,7 +673,7 @@ struct LibraryView: View {
     private func workList(_ works: [(Author, Work)], title: String, showAll: Bool = false) -> some View {
         let works = sortedWorks(works)
         return VStack(alignment: .leading, spacing: 12) {
-            HStack { sectionHeading(title); Spacer(); sortMenu; if showAll { Button(language.text("Ver todos", "See all")) { filter = .works }.font(.subheadline.weight(.medium)).foregroundStyle(SystemTokens.Colors.accent).frame(minHeight: 44).contentShape(Rectangle()) } }
+            HStack { sectionHeading(title); Spacer(); sortMenu; if showAll { Button(language.text("Ver todos", "See all")) { filterSelection.selectProgrammatically(.works) }.font(.subheadline.weight(.medium)).foregroundStyle(SystemTokens.Colors.accent).frame(minHeight: 44).contentShape(Rectangle()) } }
             LazyVStack(spacing: 0) {
                 ForEach(works, id: \.1.id) { author, work in
                     NavigationLink { ReaderView(work: work, authorName: work.displayCredit(archiveName: author.full), language: language) } label: {
