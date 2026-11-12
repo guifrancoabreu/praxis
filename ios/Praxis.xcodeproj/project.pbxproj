@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A00000000000000000000030 /* Praxis/PageStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000031 /* Praxis/PageStore.swift */; };
 		A00000000000000000000028 /* Praxis/Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000029 /* Praxis/Components.swift */; };
 		A00000000000000000000022 /* Praxis/RefTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000023 /* Praxis/RefTokens.swift */; };
 		A00000000000000000000024 /* Praxis/SystemTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000025 /* Praxis/SystemTokens.swift */; };
@@ -23,6 +24,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		A00000000000000000000031 /* Praxis/PageStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Praxis/PageStore.swift; sourceTree = "<group>"; };
 		A00000000000000000000029 /* Praxis/Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Praxis/Components.swift; sourceTree = "<group>"; };
 		A00000000000000000000023 /* Praxis/RefTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Praxis/RefTokens.swift; sourceTree = "<group>"; };
 		A00000000000000000000025 /* Praxis/SystemTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Praxis/SystemTokens.swift; sourceTree = "<group>"; };
@@ -54,6 +56,7 @@
 			isa = PBXGroup;
 			children = (
 				A0000000000000000000000B /* Praxis/PraxisApp.swift */,
+				A00000000000000000000031 /* Praxis/PageStore.swift */,
 				A00000000000000000000015 /* Praxis/Catalog.swift */,
 				A00000000000000000000021 /* Praxis/PortraitCache.swift */,
 				A00000000000000000000019 /* Praxis/DesignSystem.swift */,
@@ -156,6 +159,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A0000000000000000000000E /* Praxis/PraxisApp.swift in Sources */,
+				A00000000000000000000030 /* Praxis/PageStore.swift in Sources */,
 				A00000000000000000000016 /* Praxis/Catalog.swift in Sources */,
 				A00000000000000000000020 /* Praxis/PortraitCache.swift in Sources */,
 				A0000000000000000000001A /* Praxis/DesignSystem.swift in Sources */,

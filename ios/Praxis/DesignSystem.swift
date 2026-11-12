@@ -66,3 +66,34 @@ enum ColorContrast {
         return (max(a, b) + 0.05) / (min(a, b) + 0.05)
     }
 }
+
+// Give relative archive links a base without making the initial WebKit navigation remote.
+enum ReaderHTML {
+    static let imageLoadingScript = """
+    document.querySelectorAll('img').forEach((img, i) => { if (i >= 2) img.loading = 'lazy'; img.decoding = 'async'; });
+    """
+    static func withBaseURL(_ url: URL, in html: String) -> String {
+        let escaped = url.absoluteString.replacingOccurrences(of: "&", with: "&amp;")
+            .replacingOccurrences(of: "\"", with: "&quot;")
+            .replacingOccurrences(of: "<", with: "&lt;")
+        let base = "<base href=\"\(escaped)\">"
+        guard let head = html.range(of: "<head(?:\\s[^>]*)?>", options: [.regularExpression, .caseInsensitive]) else {
+            return base + html
+        }
+        var result = html
+        result.insert(contentsOf: base, at: head.upperBound)
+        return result
+    }
+}
+
+// Limit messages across the WebKit bridge while keeping the final scroll position.
+enum ReaderProgress {
+    static let javascript = """
+    let progressTimer = null;
+    const scheduleReport = () => { if (progressTimer === null) progressTimer = setTimeout(() => { progressTimer = null; report(); }, 500); };
+    const flushReport = () => { if (progressTimer !== null) { clearTimeout(progressTimer); progressTimer = null; report(); } };
+    window.addEventListener('scroll', scheduleReport, { passive: true });
+    window.addEventListener('scrollend', flushReport);
+    window.addEventListener('pagehide', flushReport);
+    """
+}

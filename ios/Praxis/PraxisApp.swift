@@ -1172,6 +1172,9 @@ struct ReaderView: View {
     @State private var html: String?
     @State private var pdfData: Data?
     @State private var failed = false
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var pendingProgress: Double?
+    @State private var progressSaveTask: Task<Void, Never>?
     private var sourceURL: URL? { URL(string: work.path, relativeTo: URL(string: language.base))?.absoluteURL }
     private var isPDF: Bool { sourceURL?.pathExtension.lowercased() == "pdf" }
     private var isSaved: Bool {
@@ -1230,6 +1233,8 @@ struct ReaderView: View {
         .onChange(of: appearance) { _, updated in appearanceData = updated.encoded }
         .task(id: work.path + language.rawValue) { await load() }
         .onAppear { Analytics.track(.workOpened) }
+        .onDisappear { flushProgress() }
+        .onChange(of: scenePhase) { _, phase in if phase != .active { flushProgress() } }
     }
     private func load() async {
         guard let sourceURL, sourceURL.host == "www.marxists.org" else { failed = true; return }
@@ -1237,7 +1242,6 @@ struct ReaderView: View {
         do {
             if isPDF {
                 let data = try await PageStore.loadPDF(sourceURL)
-                guard PDFDocument(data: data) != nil else { throw URLError(.cannotDecodeContentData) }
                 pdfData = data
                 html = nil
             } else {
@@ -1259,69 +1263,29 @@ struct ReaderView: View {
         Analytics.track(.bookmarkChanged(isSaved: paths.contains(work.path)))
     }
     private func saveProgress(_ progress: Double) {
+        pendingProgress = min(1, max(0, progress))
+        if scenePhase != .active { flushProgress(); return }
+        guard progressSaveTask == nil else { return }
+        progressSaveTask = Task { @MainActor in
+            try? await Task.sleep(for: .seconds(5))
+            guard !Task.isCancelled else { return }
+            flushProgress()
+        }
+    }
+    private func flushProgress() {
+        progressSaveTask?.cancel()
+        progressSaveTask = nil
+        guard let progress = pendingProgress else { return }
+        pendingProgress = nil
         var entries = (try? JSONDecoder().decode([ReadingProgress].self, from: Data(recentReadings.utf8))) ?? []
-        guard let index = entries.firstIndex(where: { $0.path == work.path }) else { return }
-        let updated = min(1, max(0, progress))
-        guard Int(entries[index].progress * 100) != Int(updated * 100) else { return }
-        entries[index].progress = updated
+        guard let index = entries.firstIndex(where: { $0.path == work.path }),
+              entries[index].progress != progress else { return }
+        entries[index].progress = progress
         recentReadings = String(data: (try? JSONEncoder().encode(entries)) ?? Data("[]".utf8), encoding: .utf8) ?? "[]"
     }
+
 }
 
-enum PageStore {
-    private static var directory: URL {
-        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("OfflinePages", isDirectory: true)
-    }
-    private static func cachedFile(for url: URL, extension ext: String = "") -> URL {
-        let key = SHA256.hash(data: Data(url.absoluteString.utf8)).map { String(format: "%02x", $0) }.joined()
-        return directory.appendingPathComponent(key + (ext.isEmpty ? "" : ".\(ext)"))
-    }
-    static func load(_ url: URL) async throws -> String {
-        let file = cachedFile(for: url)
-        if let data = try? Data(contentsOf: file), let text = String(data: data, encoding: .utf8) {
-            try? FileManager.default.setAttributes([.modificationDate: Date()], ofItemAtPath: file.path)
-            return text
-        }
-        let (data, response) = try await URLSession.shared.data(from: url)
-        guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode), http.url?.host == "www.marxists.org" else { throw URLError(.badServerResponse) }
-        guard let text = String(data: data, encoding: .utf8) ?? String(data: data, encoding: .windowsCP1252) else { throw URLError(.cannotDecodeContentData) }
-        try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-        try? text.data(using: .utf8)?.write(to: file, options: .atomic)
-        var values = URLResourceValues(); values.isExcludedFromBackup = true
-        var savedFile = file; try? savedFile.setResourceValues(values)
-        trimCache(in: directory, keepingAtMost: 100 * 1024 * 1024)
-        return text
-    }
-    static func loadPDF(_ url: URL) async throws -> Data {
-        let file = cachedFile(for: url, extension: "pdf")
-        if let data = try? Data(contentsOf: file), PDFDocument(data: data) != nil {
-            try? FileManager.default.setAttributes([.modificationDate: Date()], ofItemAtPath: file.path)
-            return data
-        }
-        let (data, response) = try await URLSession.shared.data(from: url)
-        guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode), http.url?.host == "www.marxists.org" else { throw URLError(.badServerResponse) }
-        guard PDFDocument(data: data) != nil else { throw URLError(.cannotDecodeContentData) }
-        try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-        try? data.write(to: file, options: .atomic)
-        var values = URLResourceValues(); values.isExcludedFromBackup = true
-        var savedFile = file; try? savedFile.setResourceValues(values)
-        trimCache(in: directory, keepingAtMost: 100 * 1024 * 1024)
-        return data
-    }
-    private static func trimCache(in directory: URL, keepingAtMost limit: Int) {
-        let manager = FileManager.default
-        guard let files = try? manager.contentsOfDirectory(at: directory, includingPropertiesForKeys: [.fileSizeKey, .contentModificationDateKey]) else { return }
-        let sorted = files.compactMap { url -> (URL, Int, Date)? in
-            guard let values = try? url.resourceValues(forKeys: [.fileSizeKey, .contentModificationDateKey]) else { return nil }
-            return (url, values.fileSize ?? 0, values.contentModificationDate ?? .distantPast)
-        }.sorted { $0.2 > $1.2 }
-        var total = 0
-        for (url, size, _) in sorted {
-            total += size
-            if total > limit { try? manager.removeItem(at: url) }
-        }
-    }
-}
 
 struct PDFReaderView: UIViewRepresentable {
     let data: Data
@@ -1391,27 +1355,46 @@ struct ReaderWebView: UIViewRepresentable {
             .replacingOccurrences(of: "__INITIAL_APPEARANCE__", with: config)
         configuration.userContentController.addUserScript(WKUserScript(source: script, injectionTime: .atDocumentEnd, forMainFrameOnly: true))
         let view = WKWebView(frame: .zero, configuration: configuration)
+        view.navigationDelegate = context.coordinator
         view.isOpaque = false
         view.backgroundColor = UIColor(red: 0.984, green: 0.98, blue: 0.969, alpha: 1)
-        view.loadHTMLString(html, baseURL: sourceURL)
+        view.loadHTMLString(ReaderHTML.withBaseURL(sourceURL, in: html), baseURL: nil)
         return view
     }
     func updateUIView(_ view: WKWebView, context: Context) {
         context.coordinator.onProgress = onProgress
-        let json = (try? String(data: JSONEncoder().encode(scaledAppearance), encoding: .utf8)) ?? "{}"
-        view.evaluateJavaScript("window.setReaderAppearance && window.setReaderAppearance(\(json))")
+        context.coordinator.updateAppearance(scaledAppearance, in: view)
     }
-    final class Coordinator: NSObject, WKScriptMessageHandler {
+    final class Coordinator: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
         var onProgress: (Double) -> Void
+        private var appearance: ReaderAppearance?
+        private var appliedAppearance: ReaderAppearance?
         init(onProgress: @escaping (Double) -> Void) { self.onProgress = onProgress }
+        func updateAppearance(_ value: ReaderAppearance, in view: WKWebView) {
+            appearance = value
+            applyAppearance(in: view)
+        }
+        private func applyAppearance(in view: WKWebView) {
+            guard !view.isLoading, let appearance, appearance != appliedAppearance,
+                  let data = try? JSONEncoder().encode(appearance),
+                  let json = String(data: data, encoding: .utf8) else { return }
+            appliedAppearance = appearance
+            view.evaluateJavaScript("window.setReaderAppearance && window.setReaderAppearance(\(json))")
+        }
+        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+            appliedAppearance = nil
+            applyAppearance(in: webView)
+        }
         func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
             guard message.name == "readerProgress", let value = message.body as? Double else { return }
-            DispatchQueue.main.async { self.onProgress(value) }
+            onProgress(value)
         }
     }
     static let cleanup = """
     document.querySelectorAll('script,style,link,meta,iframe,form,input,button,select,noscript,object,embed,map,.toplink,.toplink-centro,img.logo,img.logodic,nav,p.title').forEach(e => e.remove());
-    document.querySelectorAll('*').forEach(e => { for (const a of [...e.attributes]) { if (a.name.toLowerCase().startsWith('on') || ['style','align','bgcolor','color','face','size','background','border','cellpadding','cellspacing','valign','width','height'].includes(a.name.toLowerCase())) e.removeAttribute(a.name); } });
+    const removedAttributes = new Set(['style','align','bgcolor','color','face','size','background','border','cellpadding','cellspacing','valign','width','height']);
+    document.querySelectorAll('*').forEach(e => { for (let i = e.attributes.length - 1; i >= 0; i--) { const name = e.attributes[i].name.toLowerCase(); if ((name === 'width' || name === 'height') && e.tagName === 'IMG') continue; if (name.startsWith('on') || removedAttributes.has(name)) e.removeAttribute(name); } });
+    \(ReaderHTML.imageLoadingScript)
     const style = document.createElement('style'); style.textContent = 'html { -webkit-text-size-adjust: 100%; } body { --reader-bg:#fbfaf7; --reader-ink:#1d1b19; --reader-link:#b3121d; --reader-size:19px; --reader-line:1.6; --reader-margin:18px; --reader-align:left; --reader-font:Georgia, serif; max-width:40rem; margin:auto; padding:26px var(--reader-margin) 64px; background:var(--reader-bg); color:var(--reader-ink); font-family:var(--reader-font); font-size:var(--reader-size); line-height:var(--reader-line); text-align:var(--reader-align); overflow-wrap:anywhere; } h1 { line-height:1.25; letter-spacing:-.025em; margin:.7em 0 .45em; } h2 { line-height:1.3; margin:1.5em 0 .6em; } blockquote { border-left:2px solid var(--reader-link); opacity:.8; margin:1.4em 0; padding-left:1em; } img, table { max-width:100%; height:auto; } a { color:var(--reader-link); text-decoration:underline; }'; document.head.appendChild(style);
     window.setReaderAppearance = (p) => { const b=document.body; const fonts={serif:'Georgia, serif',sans:'system-ui, sans-serif',book:'Palatino, serif',condensed:'\"Arial Narrow\", sans-serif',mono:'monospace',casual:'\"Comic Sans MS\", cursive'}; b.style.setProperty('--reader-bg',p.background||'#fbfaf7'); b.style.setProperty('--reader-ink',p.foreground||'#1d1b19'); b.style.setProperty('--reader-link',p.link||'#b3121d'); b.style.setProperty('--reader-size',(p.size||19)+'px'); b.style.setProperty('--reader-line',p.lineSpacing||1.6); b.style.setProperty('--reader-margin',(p.margin||18)+'px'); b.style.setProperty('--reader-align',p.alignment==='justified'?'justify':'left'); b.style.setProperty('--reader-font',fonts[p.font]||fonts.serif); };
     window.setReaderAppearance(__INITIAL_APPEARANCE__);
@@ -1419,7 +1402,8 @@ struct ReaderWebView: UIViewRepresentable {
     const report = () => { const max = document.documentElement.scrollHeight - window.innerHeight; const progress = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0; window.webkit.messageHandlers.readerProgress.postMessage(progress); };
     let restored = false;
     const restore = () => { if (restored) return; const max = document.documentElement.scrollHeight - window.innerHeight; if (max > 0) { window.scrollTo(0, initialProgress * max); restored = true; report(); } };
-    window.addEventListener('scroll', report, { passive: true }); window.addEventListener('load', () => setTimeout(restore, 120)); setTimeout(restore, 350); setTimeout(restore, 1000);
+    \(ReaderProgress.javascript)
+    window.addEventListener('load', () => setTimeout(restore, 120)); setTimeout(restore, 350); setTimeout(restore, 1000);
     const viewport = document.createElement('meta'); viewport.name = 'viewport'; viewport.content = 'width=device-width, initial-scale=1'; document.head.appendChild(viewport);
     """
 }

@@ -40,3 +40,19 @@ final class DesignSystemTests: XCTestCase {
         XCTAssertNil(ColorContrast.ratio("invalid", "#ffffff"))
     }
 }
+
+final class ReaderHTMLTests: XCTestCase {
+    func testBaseIsInsertedInsideHeadAndEscapesURL() throws {
+        let url = try XCTUnwrap(URL(string: "https://www.marxists.org/a.htm?x=1&y=2"))
+        let html = "<!DOCTYPE html><HTML><HEAD lang=\"pt\"><title>Text</title></HEAD><body>Work</body></HTML>"
+        let result = ReaderHTML.withBaseURL(url, in: html)
+        XCTAssertTrue(result.contains("<HEAD lang=\"pt\"><base href=\"https://www.marxists.org/a.htm?x=1&amp;y=2\"><title>"))
+        XCTAssertTrue(result.hasPrefix("<!DOCTYPE html>"))
+        XCTAssertTrue(result.contains("<body>Work</body>"))
+    }
+
+    func testBaseIsAddedWhenHeadIsMissing() throws {
+        let url = try XCTUnwrap(URL(string: "https://www.marxists.org/portugues/work.htm"))
+        XCTAssertEqual(ReaderHTML.withBaseURL(url, in: "<p>Text</p>"), "<base href=\"https://www.marxists.org/portugues/work.htm\"><p>Text</p>")
+    }
+}
