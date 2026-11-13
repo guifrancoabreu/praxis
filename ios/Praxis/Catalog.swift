@@ -106,7 +106,7 @@ struct PrivacyPolicyCopy {
                 retentionBody: "As preferências e o histórico ficam no armazenamento local do app até você apagar o app. O cache apaga arquivos antigos quando passa de 100 MB. Desative as análises acima para interromper o envio de novos eventos. Eventos já recebidos pelo TelemetryDeck seguem a retenção do plano; no plano gratuito atual, são três meses. O serviço permite excluir dados por mês, mas não localizar e excluir os dados de uma instalação específica. Consulte a política do serviço para detalhes.",
                 contactTitle: "Contato",
                 contactBody: "Para dúvidas ou solicitações sobre privacidade, escreva para:",
-                contactEmail: "guifrancoabreu@gmail.com"
+                contactEmail: "support@guifran.co"
             )
         case .en:
             PrivacyPolicyCopy(
@@ -128,7 +128,7 @@ struct PrivacyPolicyCopy {
                 retentionBody: "Preferences and reading history stay in the app’s local storage until you delete the app. The cache removes older files when it exceeds 100 MB. Turn off analytics above to stop new events from being sent. Events received by TelemetryDeck follow your plan’s retention period; the current free plan keeps them for three months. The service lets customers delete data by month, but it cannot locate and delete data from one specific installation. See its policy for details.",
                 contactTitle: "Contact",
                 contactBody: "For privacy questions or requests, email:",
-                contactEmail: "guifrancoabreu@gmail.com"
+                contactEmail: "support@guifran.co"
             )
         case .es:
             PrivacyPolicyCopy(
@@ -150,7 +150,7 @@ struct PrivacyPolicyCopy {
                 retentionBody: "Las preferencias y el historial permanecen en el almacenamiento local de la app hasta que borres la app. La caché elimina archivos antiguos al superar 100 MB. Desactiva las analíticas arriba para detener el envío de nuevos eventos. Los eventos recibidos por TelemetryDeck siguen la retención de tu plan; el plan gratuito actual los conserva durante tres meses. El servicio permite borrar datos por mes, pero no localizar y borrar los datos de una instalación específica. Consulta su política para más detalles.",
                 contactTitle: "Contacto",
                 contactBody: "Para consultas o solicitudes sobre privacidad, escribe a:",
-                contactEmail: "guifrancoabreu@gmail.com"
+                contactEmail: "support@guifran.co"
             )
         }
     }
