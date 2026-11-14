@@ -15,12 +15,22 @@ import urllib.request
 from html.parser import HTMLParser
 from urllib.parse import urljoin
 
+import credits
+
 BASE = "https://www.marxists.org/portugues/"
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CACHE = os.path.join(ROOT, "tools", ".cache")
 OUT = os.path.join(ROOT, "ios", "Praxis", "Resources", "catalog-pt.json")
 DELAY = 0.35  # pausa entre downloads, para não sobrecarregar o site
 UA = "LeitorMarxista-catalogo/1.0 (app de leitura; uso pessoal)"
+
+
+def load_credits(language):
+    """Créditos explícitos extraídos das páginas de origem, se existirem."""
+    return credits.load_credit_map(
+        os.path.join(ROOT, "tools", "credits-%s.json" % language),
+        expected_language=language,
+    )
 
 
 # ---------------------------------------------------------------- download
@@ -319,6 +329,7 @@ def build_authors():
 
     if len(sys.argv) > 1:  # teste rápido: python build_catalog.py 5
         authors = authors[: int(sys.argv[1])]
+    credit_map = load_credits("pt")
     print(f"{len(authors)} autores; baixando páginas dos autores…")
     for i, a in enumerate(authors, 1):
         if i % 25 == 0:
@@ -352,7 +363,7 @@ def build_authors():
         works = parse_works(h, a["id"] + "/", skip_other_dirs=True)
         sections = []
         rows = []
-        credits = {}
+        marx_credits = {}
         if a["id"] == "marx":
             names = {"Marx": "Karl Marx", "Engels": "Friedrich Engels", "Marx e Engels": "Karl Marx e Friedrich Engels"}
             for row_html in re.findall(r"<tr\b[^>]*>(.*?)</tr>", h, re.S | re.I):
@@ -361,14 +372,15 @@ def build_authors():
                     for href in re.findall(r'<a\b[^>]*href="([^"]+)"', row_html, re.I):
                         path = norm("marx/", html.unescape(href))
                         if path:
-                            credits[path] = names.get(credit.group(1), "")
+                            marx_credits[path] = names.get(credit.group(1), "")
         for title, path, date, sec in works:
             if sec not in sections:
                 sections.append(sec)
             row = [title, path, date, sections.index(sec)]
             if a["id"] == "marx":
-                row.append(credits.get(path, ""))
+                row.append(marx_credits.get(path, ""))
             rows.append(row)
+        credits.apply_credit_map(rows, credit_map)
         a["sections"] = sections
         a["works"] = rows
     return authors

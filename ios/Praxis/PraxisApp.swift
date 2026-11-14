@@ -24,15 +24,22 @@ struct LibraryView: View {
     @State private var query = ""
     @State private var filterSelection = FilterBarSelection(LibraryFilter.all)
     @State private var catalog: Catalog?
+    @State private var catalogWorkKeys: Set<String> = []
     @State private var error = false
     @AppStorage("groupWritersByMovement") private var groupWriters = true
     @AppStorage("catalogSortOrder") private var catalogSortRaw = CatalogSort.popularity.rawValue
     @AppStorage("glossaryPeopleOnly") private var peopleOnly = true
-    private var language: Language { Language(rawValue: languageCode) ?? .pt }
+    private var language: Language { Language.releaseLanguage(for: languageCode) }
+    private var baseURL: URL { URL(string: language.base) ?? URL(string: "https://www.marxists.org/")! }
     private var filter: LibraryFilter { filterSelection.selected }
     private var catalogSort: CatalogSort { CatalogSort(rawValue: catalogSortRaw) ?? .popularity }
     private var savedPaths: Set<String> { Set((try? JSONDecoder().decode([String].self, from: Data(savedWorkPaths.utf8))) ?? []) }
-    private var recentEntries: [ReadingProgress] { (try? JSONDecoder().decode([ReadingProgress].self, from: Data(recentReadings.utf8))) ?? [] }
+    // Cached once per catalog load: recomputing every work key on each body
+    // evaluation is expensive and the value does not change in between.
+    private var knownWorkPaths: Set<String> { catalogWorkKeys }
+    private var recentEntries: [ReadingProgress] {
+        ReadingHistory.history(fromJSON: recentReadings, base: baseURL, knownWorkPaths: knownWorkPaths)
+    }
     private var allWorks: [(Author, Work)] {
         guard let catalog else { return [] }
         var seenPaths = Set<String>()
@@ -117,9 +124,11 @@ struct LibraryView: View {
     }
     private var savedWorks: [(Author, Work)] { allWorks.filter { savedPaths.contains($0.1.path) } }
     private var historyWorks: [(Author, Work)] {
-        recentEntries.compactMap { entry in
-            if let match = allWorks.first(where: { $0.1.path == entry.path }) { return match }
-            return (Author(id: entry.path, name: "", full: "", dates: "", avatar: nil, bio: "", sections: [], works: [], country: "", groups: [], photo: nil, bioPath: nil), Work(title: entry.title, path: entry.path, date: "", section: 0, credit: ""))
+        recentEntries.map { entry in
+            let authorName = entry.author.isEmpty ? (catalog?.credit(forPath: entry.path) ?? "") : entry.author
+            let author = Author(id: entry.workID ?? entry.path, name: "", full: authorName, dates: "", avatar: nil, bio: "", sections: [], works: [], country: "", groups: [], photo: nil, bioPath: nil)
+            let work = Work(title: entry.title, path: entry.path, date: "", section: 0, credit: authorName, readingID: entry.workID)
+            return (author, work)
         }
     }
     private var hasReadingProgress: Bool { recentEntries.contains { $0.progress > 0 } }
@@ -138,11 +147,9 @@ struct LibraryView: View {
             }) ?? sources.first(where: {
                 $0.0.id == authorID && $0.1.title.lowercased().hasPrefix(signature.lowercased())
             }), !chosen.contains(where: { $0.1.path == match.1.path }) {
-                var creditedWork = match.1
-                if creditedWork.credit == nil {
-                    creditedWork.credit = match.0.full
-                }
-                chosen.append((match.0, creditedWork))
+                // Keep an uncredited text uncredited. The archive that lists a
+                // work is not by itself evidence of authorship.
+                chosen.append(match)
             }
         }
         // The Spanish catalog is a small starter set; fill remaining places from its
@@ -337,9 +344,18 @@ struct LibraryView: View {
             .toolbar(.hidden, for: .navigationBar)
             .tint(SystemTokens.Colors.accent)
             .background(SystemTokens.Colors.background.ignoresSafeArea())
-            .task(id: languageCode) {
+            .task(id: language.rawValue) {
                 query = ""
-                do { catalog = try Catalog.load(language); error = false } catch { catalog = nil; self.error = true }
+                do {
+                    let loaded = try Catalog.load(language)
+                    catalog = loaded
+                    catalogWorkKeys = loaded.workKeys(base: baseURL)
+                    error = false
+                } catch {
+                    catalog = nil
+                    catalogWorkKeys = []
+                    self.error = true
+                }
             }
         }
     }
@@ -353,9 +369,18 @@ struct LibraryView: View {
                     .font(.subheadline).foregroundStyle(SystemTokens.Colors.textSecondary)
             }
             Spacer()
+            languageMenu
+        }
+    }
+
+    /// Hidden in the Portuguese-only release. The switch and its translations
+    /// remain intact for a later release that exposes more languages.
+    @ViewBuilder
+    private var languageMenu: some View {
+        if Language.releaseLanguages.count > 1 {
             Menu {
                 Picker(language.text("Idioma", "Language"), selection: $languageCode) {
-                    ForEach(Language.allCases) { Text($0.label).tag($0.rawValue) }
+                    ForEach(Language.releaseLanguages) { Text($0.label).tag($0.rawValue) }
                 }
             } label: {
                 Image(systemName: "globe").font(.system(size: 17, weight: .medium))
@@ -436,7 +461,7 @@ struct LibraryView: View {
         VStack(alignment: .leading, spacing: RefTokens.Spacing.s1) {
             HStack { sectionHeading(language.text("Salvos", "Saved")); Spacer(); Button(language.text("Ver todos", "See all")) { filterSelection.selectProgrammatically(.saved) }.font(.subheadline.weight(.medium)).foregroundStyle(SystemTokens.Colors.accent).frame(minHeight: 44).contentShape(Rectangle()) }
             ForEach(Array(savedWorks.prefix(4)), id: \.1.id) { author, work in
-                NavigationLink { ReaderView(work: work, authorName: work.displayCredit(archiveName: author.full), language: language) } label: { WorkListRow(work: work, author: work.displayCredit(archiveName: author.full)) }
+                NavigationLink { ReaderView(work: work, authorName: work.displayCredit(archiveName: author.full), language: language, knownWorkPaths: knownWorkPaths) } label: { WorkListRow(work: work, author: work.displayCredit(archiveName: author.full)) }
                     .buttonStyle(.plain).foregroundStyle(SystemTokens.Colors.textPrimary)
             }
         }
@@ -451,7 +476,7 @@ struct LibraryView: View {
             }
             LazyVStack(spacing: 0) {
                 ForEach(Array(works.enumerated()), id: \.offset) { index, item in
-                    NavigationLink { ReaderView(work: item.1, authorName: item.1.displayCredit(archiveName: item.0.full), language: language) } label: {
+                    NavigationLink { ReaderView(work: item.1, authorName: item.1.displayCredit(archiveName: item.0.full), language: language, knownWorkPaths: knownWorkPaths) } label: {
                         HStack(spacing: 12) {
                             if !showAll {
                                 Text(String(format: "%02d", index + 1)).font(.system(.caption, design: .monospaced, weight: .medium)).foregroundStyle(SystemTokens.Colors.textSecondary).frame(width: 28, alignment: .leading)
@@ -472,7 +497,7 @@ struct LibraryView: View {
             ForEach(grouped.keys.sorted(), id: \.self) { group in
                 if !group.isEmpty { Text(group).font(.system(.headline, design: .serif)).padding(.top, 4) }
                 ForEach(grouped[group] ?? []) { collection in
-                    NavigationLink { CollectionDetailView(collection: collection, language: language, catalog: catalog) } label: {
+                    NavigationLink { CollectionDetailView(collection: collection, language: language, catalog: catalog, knownWorkPaths: knownWorkPaths) } label: {
                         HStack {
                             Text(collection.title).font(.system(.body, design: .serif, weight: .medium)).foregroundStyle(SystemTokens.Colors.textPrimary)
                             Spacer()
@@ -492,7 +517,7 @@ struct LibraryView: View {
             Toggle(language.text("Somente pessoas", "People only"), isOn: $peopleOnly).font(.subheadline)
             LazyVStack(spacing: 0) {
                 ForEach(figures) { figure in
-                    NavigationLink { ReaderView(work: figure.work, authorName: "", language: language) } label: {
+                    NavigationLink { ReaderView(work: figure.work, authorName: "", language: language, knownWorkPaths: knownWorkPaths) } label: {
                         ListRow(title: figure.title)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }.buttonStyle(.plain).foregroundStyle(SystemTokens.Colors.textPrimary)
@@ -508,7 +533,7 @@ struct LibraryView: View {
             sectionHeading(language.text("Países", "Countries"))
             if let catalog {
                 ForEach(countries, id: \.self) { country in
-                    NavigationLink { CountryWritersView(country: country, authors: catalog.authors, language: language) } label: {
+                    NavigationLink { CountryWritersView(country: country, authors: catalog.authors, language: language, knownWorkPaths: knownWorkPaths) } label: {
                         HStack { Text(country).foregroundStyle(SystemTokens.Colors.textPrimary); Spacer(); Text(catalog.authors.filter { $0.country == country }.count.formatted()).foregroundStyle(SystemTokens.Colors.textSecondary); Image(systemName: "chevron.right").font(.caption).foregroundStyle(SystemTokens.Colors.textSecondary) }
                             .padding(.vertical, 10)
                     }.buttonStyle(.plain)
@@ -550,19 +575,21 @@ struct LibraryView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(alignment: .top, spacing: 12) {
                     ForEach(entries) { entry in
-                        let credit = catalog?.credit(forPath: entry.path) ?? ""
-                        NavigationLink { ReaderView(work: Work(title: entry.title, path: entry.path, date: "", section: 0), authorName: credit, language: language) } label: {
+                        let credit = entry.author.isEmpty ? (catalog?.credit(forPath: entry.path) ?? "") : entry.author
+                        NavigationLink { ReaderView(work: entry.work, authorName: credit, language: language, knownWorkPaths: knownWorkPaths) } label: {
                             HStack(alignment: .top, spacing: 11) {
                                     BookCover(title: entry.title, compact: false).frame(width: 64, height: 86)
                                     VStack(alignment: .leading, spacing: 5) {
                                         Text(entry.title)
                                             .font(.system(.headline, design: .serif, weight: .semibold))
                                             .multilineTextAlignment(.leading)
+                                            .lineLimit(3)
+                                            .truncationMode(.tail)
                                             .frame(maxWidth: .infinity, alignment: .leading)
                                         if !credit.isEmpty { Text(credit).font(.caption).foregroundStyle(SystemTokens.Colors.textSecondary) }
                                         Spacer(minLength: 2)
                                         ProgressView(value: entry.progress).tint(SystemTokens.Colors.accent)
-                                        Text(language.readingProgress(Int(entry.progress * 100)))
+                                        Text(language.sectionProgress(Int(entry.progress * 100)))
                                             .font(.caption).foregroundStyle(SystemTokens.Colors.textSecondary)
                                     }
                                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -572,7 +599,9 @@ struct LibraryView: View {
                             .background(SystemTokens.Colors.surface, in: RoundedRectangle(cornerRadius: RefTokens.Radius.lg, style: .continuous))
                             .overlay(RoundedRectangle(cornerRadius: RefTokens.Radius.lg, style: .continuous).stroke(SystemTokens.Colors.separator, lineWidth: 1))
                             .contentShape(RoundedRectangle(cornerRadius: RefTokens.Radius.lg, style: .continuous))
-                        }.buttonStyle(.plain).foregroundStyle(SystemTokens.Colors.textPrimary)
+                        }
+                        .accessibilityIdentifier("continueReading.card")
+                        .buttonStyle(.plain).foregroundStyle(SystemTokens.Colors.textPrimary)
                     }
                 }
             }.contentMargins(.trailing, 2).scrollTargetBehavior(.viewAligned)
@@ -582,7 +611,7 @@ struct LibraryView: View {
     private func startHere(_ item: (Author, Work)) -> some View {
         VStack(alignment: .leading, spacing: RefTokens.Spacing.s2) {
             sectionHeading(language.text("Uma boa leitura para começar", "A good place to start"))
-            NavigationLink { ReaderView(work: item.1, authorName: item.1.displayCredit(archiveName: item.0.full), language: language) } label: {
+            NavigationLink { ReaderView(work: item.1, authorName: item.1.displayCredit(archiveName: item.0.full), language: language, knownWorkPaths: knownWorkPaths) } label: {
                 HStack(spacing: 15) {
                     BookCover(title: item.1.title, compact: false).frame(width: 76, height: 104)
                     VStack(alignment: .leading, spacing: 7) {
@@ -610,7 +639,7 @@ struct LibraryView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(alignment: .top, spacing: 12) {
                     ForEach(authors) { author in
-                        NavigationLink { AuthorView(author: author, language: language) } label: {
+                        NavigationLink { AuthorView(author: author, language: language, knownWorkPaths: knownWorkPaths) } label: {
                             VStack(alignment: .leading, spacing: 8) {
                                 AuthorArtwork(author: author, language: language).frame(width: 126, height: 116)
                                 Text(author.full).font(.system(.subheadline, design: .serif, weight: .semibold)).multilineTextAlignment(.leading)
@@ -654,7 +683,7 @@ struct LibraryView: View {
 
     private func writerRow(_ author: Author) -> some View {
         VStack(spacing: 0) {
-            NavigationLink { AuthorView(author: author, language: language) } label: {
+            NavigationLink { AuthorView(author: author, language: language, knownWorkPaths: knownWorkPaths) } label: {
                 HStack(spacing: 13) {
                     AuthorArtwork(author: author, language: language).frame(width: 52, height: 58)
                     VStack(alignment: .leading, spacing: 4) {
@@ -676,7 +705,7 @@ struct LibraryView: View {
             HStack { sectionHeading(title); Spacer(); sortMenu; if showAll { Button(language.text("Ver todos", "See all")) { filterSelection.selectProgrammatically(.works) }.font(.subheadline.weight(.medium)).foregroundStyle(SystemTokens.Colors.accent).frame(minHeight: 44).contentShape(Rectangle()) } }
             LazyVStack(spacing: 0) {
                 ForEach(works, id: \.1.id) { author, work in
-                    NavigationLink { ReaderView(work: work, authorName: work.displayCredit(archiveName: author.full), language: language) } label: {
+                    NavigationLink { ReaderView(work: work, authorName: work.displayCredit(archiveName: author.full), language: language, knownWorkPaths: knownWorkPaths) } label: {
                         WorkListRow(work: work, author: work.displayCredit(archiveName: author.full))
                     }.buttonStyle(.plain).foregroundStyle(SystemTokens.Colors.textPrimary)
                     if work.id != works.last?.1.id { Rectangle().fill(SystemTokens.Colors.separator).frame(height: 1).padding(.leading, 65) }
@@ -738,14 +767,6 @@ enum LibraryFilter: String, CaseIterable, Identifiable {
         case .popular: language.text("Populares", "Popular")
         }
     }
-}
-
-struct ReadingProgress: Codable, Identifiable {
-    var path: String
-    var title: String
-    var author: String
-    var progress: Double
-    var id: String { path }
 }
 
 struct AuthorArtwork: View {
@@ -841,6 +862,7 @@ struct WorkListRow: View {
 struct AuthorView: View {
     let author: Author
     let language: Language
+    var knownWorkPaths: Set<String> = []
     @State private var expandedBio = false
     var body: some View {
         List {
@@ -861,7 +883,7 @@ struct AuthorView: View {
                 }
                 if let bioPath = author.bioPath, !bioPath.isEmpty {
                     NavigationLink(language.text("Biografia completa", "Full biography")) {
-                        ReaderView(work: Work(title: language.text("Biografia", "Biography"), path: bioPath, date: "", section: 0), authorName: author.full, language: language)
+                        ReaderView(work: Work(title: language.text("Biografia", "Biography"), path: bioPath, date: "", section: 0), authorName: author.full, language: language, knownWorkPaths: knownWorkPaths)
                     }
                 }
             }
@@ -870,7 +892,7 @@ struct AuthorView: View {
                 if !works.isEmpty {
                     Section(section.isEmpty ? language.text("Obras", "Works") : section) {
                         ForEach(works) { work in
-                            NavigationLink { ReaderView(work: work, authorName: work.displayCredit(archiveName: author.full), language: language) } label: {
+                            NavigationLink { ReaderView(work: work, authorName: work.displayCredit(archiveName: author.full), language: language, knownWorkPaths: knownWorkPaths) } label: {
                                 VStack(alignment: .leading, spacing: 3) {
                                     Text(work.title)
                                     if !work.date.isEmpty { Text(work.date).font(.caption).foregroundStyle(.secondary) }
@@ -892,9 +914,10 @@ struct CountryWritersView: View {
     let country: String
     let authors: [Author]
     let language: Language
+    var knownWorkPaths: Set<String> = []
     var body: some View {
         List(authors.filter { $0.country == country }) { author in
-            NavigationLink { AuthorView(author: author, language: language) } label: {
+            NavigationLink { AuthorView(author: author, language: language, knownWorkPaths: knownWorkPaths) } label: {
                 HStack(spacing: 12) {
                     AuthorArtwork(author: author, language: language).frame(width: 48, height: 54)
                     VStack(alignment: .leading) {
@@ -911,20 +934,21 @@ struct CollectionDetailView: View {
     let collection: CatalogCollection
     let language: Language
     let catalog: Catalog?
+    let knownWorkPaths: Set<String>
     var body: some View {
         List {
             ForEach(collection.groups) { group in
                 Section(group.name.isEmpty ? collection.title : group.name) {
                     ForEach(group.items) { item in
                         NavigationLink {
-                            ReaderView(work: item.work, authorName: catalog?.credit(forPath: item.path) ?? "", language: language)
+                            ReaderView(work: item.work, authorName: catalog?.credit(forPath: item.path) ?? "", language: language, knownWorkPaths: knownWorkPaths)
                         } label: { Text(item.title).font(.system(.body, design: .serif)) }
                     }
                 }
             }
             if collection.groups.allSatisfy({ $0.items.isEmpty }) {
                 Section { NavigationLink(language.text("Abrir no arquivo", "Open in archive")) {
-                    ReaderView(work: Work(title: collection.title, path: collection.id, date: "", section: 0), authorName: "", language: language)
+                    ReaderView(work: Work(title: collection.title, path: collection.id, date: "", section: 0), authorName: "", language: language, knownWorkPaths: knownWorkPaths)
                 } }
             }
         }
@@ -1184,9 +1208,17 @@ extension Color {
 }
 
 struct ReaderView: View {
+    private struct LinkedReader: Identifiable, Hashable {
+        let work: Work
+        let identity: ReadingWork
+        var id: String { work.path + "|" + identity.id }
+    }
+
     let work: Work
     let authorName: String
     let language: Language
+    let workIdentity: ReadingWork?
+    let knownWorkPaths: Set<String>
     @AppStorage("savedWorkPaths") private var savedWorkPaths = "[]"
     @AppStorage("recentReadings") private var recentReadings = "[]"
     @AppStorage("readerAppearance") private var appearanceData = ""
@@ -1198,19 +1230,35 @@ struct ReaderView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var pendingProgress: Double?
     @State private var progressSaveTask: Task<Void, Never>?
-    private var sourceURL: URL? { URL(string: work.path, relativeTo: URL(string: language.base))?.absoluteURL }
+    @State private var linkedReader: LinkedReader?
+    @Environment(\.openURL) private var openURL
+    private var baseURL: URL { URL(string: language.base) ?? URL(string: "https://www.marxists.org/")! }
+    private var sourceURL: URL? { URL(string: work.path, relativeTo: baseURL)?.absoluteURL }
     private var isPDF: Bool { sourceURL?.pathExtension.lowercased() == "pdf" }
     private var isSaved: Bool {
         ((try? JSONDecoder().decode([String].self, from: Data(savedWorkPaths.utf8))) ?? []).contains(work.path)
     }
+    private var identity: ReadingWork {
+        if let workIdentity { return workIdentity }
+        if let readingID = work.readingID {
+            return ReadingWork(id: readingID, title: work.title, author: authorName, knownWorkPaths: knownWorkPaths)
+        }
+        return ReadingWork(path: work.path, title: work.title, author: authorName, base: baseURL, knownWorkPaths: knownWorkPaths)
+    }
+    private var storedEntries: [ReadingProgress] {
+        ReadingHistory.migrated(fromJSON: recentReadings, base: baseURL, knownWorkPaths: knownWorkPaths)
+    }
     private var initialProgress: Double {
-        let entries = (try? JSONDecoder().decode([ReadingProgress].self, from: Data(recentReadings.utf8))) ?? []
+        let entries = storedEntries
+        if let entry = entries.first(where: { $0.path == work.path && $0.workID == identity.id }) { return entry.progress }
         return entries.first(where: { $0.path == work.path })?.progress ?? 0
     }
-    init(work: Work, authorName: String, language: Language) {
+    init(work: Work, authorName: String, language: Language, workIdentity: ReadingWork? = nil, knownWorkPaths: Set<String> = []) {
         self.work = work
         self.authorName = authorName
         self.language = language
+        self.workIdentity = workIdentity
+        self.knownWorkPaths = knownWorkPaths
         let saved = UserDefaults.standard.string(forKey: "readerAppearance") ?? ""
         _appearance = State(initialValue: ReaderAppearance.decode(saved))
     }
@@ -1220,7 +1268,18 @@ struct ReaderView: View {
                 PDFReaderView(data: pdfData, initialProgress: initialProgress) { saveProgress($0) }
                     .ignoresSafeArea(edges: .bottom)
             } else if let html, let sourceURL {
-                ReaderWebView(html: html, sourceURL: sourceURL, appearance: appearance, initialProgress: initialProgress) { saveProgress($0) }
+                ReaderWebView(html: html, sourceURL: sourceURL, appearance: appearance, initialProgress: initialProgress, onProgress: { saveProgress($0) }, onLink: { url, title in
+                    switch ReaderLink.destination(for: url) {
+                    case .archive(let target):
+                        flushProgress()
+                        linkedReader = LinkedReader(
+                            work: Work(title: title.isEmpty ? target.lastPathComponent : title, path: target.absoluteString, date: "", section: 0),
+                            identity: identity.following(target, title: title, base: baseURL)
+                        )
+                    case .external(let target): openURL(target)
+                    case .unsupported: break
+                    }
+                })
             } else if failed {
                 ContentUnavailableView {
                     Label(language.text("Não foi possível carregar", "Could not load the work"), systemImage: "wifi.slash")
@@ -1228,6 +1287,9 @@ struct ReaderView: View {
                     Text(language.text("Verifique sua conexão e tente novamente.", "Check your connection and try again."))
                 } actions: { Button(language.text("Tentar novamente", "Try again")) { Task { await load() } } }
             } else { ProgressView(language.text("Carregando…", "Loading…")) }
+        }
+        .navigationDestination(item: $linkedReader) { linked in
+            ReaderView(work: linked.work, authorName: linked.identity.author, language: language, workIdentity: linked.identity, knownWorkPaths: knownWorkPaths)
         }
         .navigationTitle(work.title).navigationBarTitleDisplayMode(.inline)
         .background(SystemTokens.Colors.background.ignoresSafeArea())
@@ -1268,13 +1330,15 @@ struct ReaderView: View {
                 pdfData = data
                 html = nil
             } else {
-                html = try await PageStore.load(sourceURL)
+                var components = URLComponents(url: sourceURL, resolvingAgainstBaseURL: true)
+                components?.fragment = nil
+                html = try await PageStore.load(components?.url ?? sourceURL)
                 pdfData = nil
             }
-            var entries = (try? JSONDecoder().decode([ReadingProgress].self, from: Data(recentReadings.utf8))) ?? []
-            let prior = entries.first { $0.path == work.path }
+            var entries = storedEntries
+            let priorProgress = entries.first(where: { $0.path == work.path })?.progress ?? initialProgress
             entries.removeAll { $0.path == work.path }
-            entries.insert(ReadingProgress(path: work.path, title: work.title, author: authorName, progress: prior?.progress ?? 0), at: 0)
+            entries.insert(ReadingProgress(path: work.path, title: identity.title, author: identity.author, progress: priorProgress, workID: identity.id), at: 0)
             recentReadings = String(data: try JSONEncoder().encode(entries), encoding: .utf8) ?? "[]"
         } catch { pdfData = nil; html = nil; failed = true }
     }
@@ -1300,10 +1364,11 @@ struct ReaderView: View {
         progressSaveTask = nil
         guard let progress = pendingProgress else { return }
         pendingProgress = nil
-        var entries = (try? JSONDecoder().decode([ReadingProgress].self, from: Data(recentReadings.utf8))) ?? []
+        var entries = storedEntries
         guard let index = entries.firstIndex(where: { $0.path == work.path }),
               entries[index].progress != progress else { return }
         entries[index].progress = progress
+        entries[index].workID = entries[index].workID ?? identity.id
         recentReadings = String(data: (try? JSONEncoder().encode(entries)) ?? Data("[]".utf8), encoding: .utf8) ?? "[]"
     }
 
@@ -1367,13 +1432,19 @@ struct ReaderWebView: UIViewRepresentable {
     let appearance: ReaderAppearance
     let initialProgress: Double
     var onProgress: (Double) -> Void
-    func makeCoordinator() -> Coordinator { Coordinator(onProgress: onProgress) }
+    var onLink: (URL, String) -> Void
+    func makeCoordinator() -> Coordinator { Coordinator(onProgress: onProgress, onLink: onLink) }
     func makeUIView(context: Context) -> WKWebView {
         let configuration = WKWebViewConfiguration()
         configuration.defaultWebpagePreferences.allowsContentJavaScript = false
         configuration.userContentController.add(context.coordinator, name: "readerProgress")
+        configuration.userContentController.add(context.coordinator, name: "readerLink")
         let config = (try? String(data: JSONEncoder().encode(scaledAppearance), encoding: .utf8)) ?? "{}"
+        let source = (try? String(data: JSONEncoder().encode(sourceURL.absoluteString), encoding: .utf8)) ?? "null"
+        let fragment = (try? String(data: JSONEncoder().encode(sourceURL.fragment), encoding: .utf8)) ?? "null"
         let script = Self.cleanup
+            .replacingOccurrences(of: "__SOURCE_URL__", with: source)
+            .replacingOccurrences(of: "__INITIAL_FRAGMENT__", with: fragment)
             .replacingOccurrences(of: "__INITIAL_PROGRESS__", with: String(min(1, max(0, initialProgress))))
             .replacingOccurrences(of: "__INITIAL_APPEARANCE__", with: config)
         configuration.userContentController.addUserScript(WKUserScript(source: script, injectionTime: .atDocumentEnd, forMainFrameOnly: true))
@@ -1386,13 +1457,15 @@ struct ReaderWebView: UIViewRepresentable {
     }
     func updateUIView(_ view: WKWebView, context: Context) {
         context.coordinator.onProgress = onProgress
+        context.coordinator.onLink = onLink
         context.coordinator.updateAppearance(scaledAppearance, in: view)
     }
     final class Coordinator: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
         var onProgress: (Double) -> Void
+        var onLink: (URL, String) -> Void
         private var appearance: ReaderAppearance?
         private var appliedAppearance: ReaderAppearance?
-        init(onProgress: @escaping (Double) -> Void) { self.onProgress = onProgress }
+        init(onProgress: @escaping (Double) -> Void, onLink: @escaping (URL, String) -> Void) { self.onProgress = onProgress; self.onLink = onLink }
         func updateAppearance(_ value: ReaderAppearance, in view: WKWebView) {
             appearance = value
             applyAppearance(in: view)
@@ -1409,11 +1482,13 @@ struct ReaderWebView: UIViewRepresentable {
             applyAppearance(in: webView)
         }
         func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-            guard message.name == "readerProgress", let value = message.body as? Double else { return }
-            onProgress(value)
+            if message.name == "readerProgress", let value = message.body as? Double { onProgress(value) }
+            else if message.name == "readerLink", let body = message.body as? [String: String],
+                    let raw = body["url"], let url = URL(string: raw) { onLink(url, body["title"] ?? "") }
         }
     }
     static let cleanup = """
+    document.querySelectorAll('nav').forEach(nav => { nav.querySelectorAll('[id],a[name]').forEach(anchor => { const marker = document.createElement('span'); if (anchor.id) marker.id = anchor.id; if (anchor.getAttribute('name')) marker.setAttribute('name', anchor.getAttribute('name')); nav.before(marker); }); });
     document.querySelectorAll('script,style,link,meta,iframe,form,input,button,select,noscript,object,embed,map,.toplink,.toplink-centro,img.logo,img.logodic,nav,p.title').forEach(e => e.remove());
     const removedAttributes = new Set(['style','align','bgcolor','color','face','size','background','border','cellpadding','cellspacing','valign','width','height']);
     document.querySelectorAll('*').forEach(e => { for (let i = e.attributes.length - 1; i >= 0; i--) { const name = e.attributes[i].name.toLowerCase(); if ((name === 'width' || name === 'height') && e.tagName === 'IMG') continue; if (name.startsWith('on') || removedAttributes.has(name)) e.removeAttribute(name); } });
@@ -1422,9 +1497,12 @@ struct ReaderWebView: UIViewRepresentable {
     window.setReaderAppearance = (p) => { const b=document.body; const fonts={serif:'Georgia, serif',sans:'system-ui, sans-serif',book:'Palatino, serif',condensed:'\"Arial Narrow\", sans-serif',mono:'monospace',casual:'\"Comic Sans MS\", cursive'}; b.style.setProperty('--reader-bg',p.background||'#fbfaf7'); b.style.setProperty('--reader-ink',p.foreground||'#1d1b19'); b.style.setProperty('--reader-link',p.link||'#b3121d'); b.style.setProperty('--reader-size',(p.size||19)+'px'); b.style.setProperty('--reader-line',p.lineSpacing||1.6); b.style.setProperty('--reader-margin',(p.margin||18)+'px'); b.style.setProperty('--reader-align',p.alignment==='justified'?'justify':'left'); b.style.setProperty('--reader-font',fonts[p.font]||fonts.serif); };
     window.setReaderAppearance(__INITIAL_APPEARANCE__);
     const initialProgress = __INITIAL_PROGRESS__;
+    const initialFragment = __INITIAL_FRAGMENT__;
+    const sourceURL = __SOURCE_URL__;
+    \(ReaderLink.javascript)
     const report = () => { const max = document.documentElement.scrollHeight - window.innerHeight; const progress = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0; window.webkit.messageHandlers.readerProgress.postMessage(progress); };
     let restored = false;
-    const restore = () => { if (restored) return; const max = document.documentElement.scrollHeight - window.innerHeight; if (max > 0) { window.scrollTo(0, initialProgress * max); restored = true; report(); } };
+    const restore = () => { if (restored) return; const max = document.documentElement.scrollHeight - window.innerHeight; if (max > 0) { if (initialFragment !== null) scrollToReaderAnchor(initialFragment); else window.scrollTo(0, initialProgress * max); restored = true; report(); } };
     \(ReaderProgress.javascript)
     window.addEventListener('load', () => setTimeout(restore, 120)); setTimeout(restore, 350); setTimeout(restore, 1000);
     const viewport = document.createElement('meta'); viewport.name = 'viewport'; viewport.content = 'width=device-width, initial-scale=1'; document.head.appendChild(viewport);

@@ -1,6 +1,6 @@
 # Praxis for iOS
 
-Praxis is a Marxist reading and study app for iOS, built with SwiftUI and drawing on the Marxists Internet Archive (MIA). Its name refers to the connection between theory and practice. The app runs on iOS 17 and later and supports Portuguese, English, and Spanish catalogs.
+Praxis is a Marxist reading and study app for iOS, built with SwiftUI and drawing on the Marxists Internet Archive (MIA). Its name refers to the connection between theory and practice. The app runs on iOS 17 and later. The first release is Portuguese-only; English and Spanish catalogs, copy, and the language switch remain in the project for a later release.
 
 The app's name is **Praxis**. `Praxis` remains the internal Xcode project, scheme, and source-directory name.
 

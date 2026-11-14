@@ -1,5 +1,13 @@
 import Foundation
 
+/// Product surface available in the shipping release. The first release is
+/// Portuguese-only. English and Spanish catalogs, copy, and the language
+/// switch stay in the project so a later release can restore them by changing
+/// this single flag.
+enum ReleasePolicy {
+    static let isPortugueseOnly = true
+}
+
 enum Language: String, CaseIterable, Identifiable {
     case pt, en, es
     var id: String { rawValue }
@@ -18,6 +26,25 @@ enum Language: String, CaseIterable, Identifiable {
         if self == .es { return "\(percent)% leído" }
         return "\(percent)% read"
     }
+    func sectionProgress(_ percent: Int) -> String {
+        if self == .pt { return "\(percent)% nesta seção" }
+        if self == .es { return "\(percent)% en esta sección" }
+        return "\(percent)% in this section"
+    }
+
+    /// The language shown by the shipping app. Portuguese-only releases ignore
+    /// an older stored English or Spanish preference without overwriting it,
+    /// so the previous choice can return when the release policy changes.
+    static func releaseLanguage(for storedCode: String) -> Language {
+        guard !ReleasePolicy.isPortugueseOnly else { return .pt }
+        return Language(rawValue: storedCode) ?? .pt
+    }
+
+    /// Languages exposed by the language switch in the shipping app.
+    static var releaseLanguages: [Language] {
+        ReleasePolicy.isPortugueseOnly ? [.pt] : allCases
+    }
+
     private static let spanish: [String: String] = [
         "Language": "Idioma", "Writers": "Autores", "works": "obras", "Works": "Obras",
         "No results found.": "No se encontraron resultados.", "No results found": "No se encontraron resultados.", "Catalog updated": "Catálogo actualizado el",
@@ -175,6 +202,9 @@ struct Work: Identifiable, Hashable {
     let date: String
     let section: Int
     var credit: String? = nil
+    /// Set when the work was opened from reading history. It keeps the
+    /// catalogue identity separate from the page currently being resumed.
+    var readingID: String? = nil
     var id: String { path + title }
 
     // An archive can include works by other people. Only an explicit source
@@ -227,20 +257,24 @@ struct Catalog {
     let history: [CatalogCollection]
     let figures: [CatalogItem]
 
-    /// Resolve by exact catalog path only. Conflicting credits are ambiguous.
+    /// Resolve by exact catalog path only. Conflicting credits are ambiguous;
+    /// an uncredited duplicate is not evidence of a different author.
     func credit(forPath path: String) -> String? {
         let credits = Set(authors.flatMap { author in
             author.works.filter { $0.path == path }.map { $0.displayCredit(archiveName: author.full) }
-        })
+        }.filter { !$0.isEmpty })
         guard credits.count == 1 else { return nil }
         return credits.first
     }
 
     static func load(_ language: Language) throws -> Catalog {
-        guard let url = Bundle.main.url(forResource: "catalog-\(language.rawValue)", withExtension: "json") else {
+        // Keep non-Portuguese snapshots bundled for a later release, but do
+        // not allow the shipping app to load them through any code path.
+        let releaseLanguage = ReleasePolicy.isPortugueseOnly ? Language.pt : language
+        guard let url = Bundle.main.url(forResource: "catalog-\(releaseLanguage.rawValue)", withExtension: "json") else {
             throw CocoaError(.fileNoSuchFile)
         }
-        return try decode(Data(contentsOf: url), language: language)
+        return try decode(Data(contentsOf: url), language: releaseLanguage)
     }
 
     static func decode(_ data: Data, language: Language = .pt) throws -> Catalog {
@@ -306,6 +340,248 @@ struct Catalog {
         result[index] = marx
         result.insert(engels, at: index + 1)
         return result
+    }
+
+    /// Every explicit work path known to this catalogue. Readers use it to
+    /// avoid treating one catalogue work as a chapter of another work that
+    /// happens to share an archive directory.
+    func workKeys(base: URL) -> Set<String> {
+        var paths = authors.flatMap { $0.works.map(\.path) }
+        paths += (themes + history).flatMap { $0.groups.flatMap { $0.items.map(\.path) } }
+        paths += figures.map(\.path)
+        return Set(paths.map { ReadingHistory.canonicalKey(for: $0, base: base) })
+    }
+}
+
+/// An explicit reading identity. It is created once when a work is opened and
+/// propagated while the reader follows links inside that work, so a preface or
+/// chapter does not become a new work in the reading history.
+struct ReadingWork: Hashable {
+    let id: String
+    let title: String
+    let author: String
+    let knownWorkPaths: Set<String>
+
+    init(id: String, title: String, author: String, knownWorkPaths: Set<String> = []) {
+        self.id = id
+        self.title = title
+        self.author = author
+        self.knownWorkPaths = knownWorkPaths
+    }
+
+    init(path: String, title: String, author: String, base: URL, knownWorkPaths: Set<String> = []) {
+        self.init(id: ReadingHistory.canonicalKey(for: path, base: base), title: title, author: author, knownWorkPaths: knownWorkPaths)
+    }
+
+    /// Keeps this identity only when the destination is safely part of the
+    /// same work. Other catalogue works and other hosts always start a new one.
+    func destination(for url: URL, base: URL) -> ReadingWork? {
+        let key = ReadingHistory.canonicalKey(for: url.absoluteString, base: base)
+        guard ReadingHistory.isSameWork(key, as: id, knownWorkPaths: knownWorkPaths) else { return nil }
+        return self
+    }
+
+    /// Follows an archive link. Same-work destinations keep the work title and
+    /// author; a different work starts a new identity without inventing an
+    /// author that cannot be established from the link.
+    func following(_ url: URL, title: String, base: URL) -> ReadingWork {
+        if let destination = destination(for: url, base: base) { return destination }
+        let fallbackTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        return ReadingWork(
+            path: url.absoluteString,
+            title: fallbackTitle.isEmpty ? url.lastPathComponent : fallbackTitle,
+            author: "",
+            base: base,
+            knownWorkPaths: knownWorkPaths
+        )
+    }
+}
+
+/// One reading entry per visited destination. `path` is always the page to
+/// resume, `progress` belongs to that page only, and `workID` groups all pages
+/// that belong to the same work. Older stored entries have no `workID`; they
+/// are migrated on read instead of being discarded.
+struct ReadingProgress: Codable, Identifiable, Equatable {
+    var path: String
+    var title: String
+    var author: String
+    var progress: Double
+    var workID: String?
+
+    var id: String { workID ?? path }
+
+    var work: Work {
+        Work(title: title, path: path, date: "", section: 0, credit: author, readingID: workID)
+    }
+
+    init(path: String, title: String, author: String, progress: Double, workID: String? = nil) {
+        self.path = path
+        self.title = title
+        self.author = author
+        self.progress = progress
+        self.workID = workID
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case path, title, author, progress, workID
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        path = try container.decode(String.self, forKey: .path)
+        title = try container.decodeIfPresent(String.self, forKey: .title) ?? ""
+        author = try container.decodeIfPresent(String.self, forKey: .author) ?? ""
+        progress = try container.decodeIfPresent(Double.self, forKey: .progress) ?? 0
+        workID = try container.decodeIfPresent(String.self, forKey: .workID)
+    }
+}
+
+enum ReadingHistory {
+    private static let indexNames: Set<String> = ["", "index.htm", "index.html", "default.htm", "default.html"]
+    // A work page is only grouped by directory when that directory looks like
+    // a work container, not an author/year/month listing that holds many works.
+    private static let genericDirectoryNames: Set<String> = [
+        "ano", "anos", "mes", "meses", "month", "months", "year", "years",
+        "works", "work", "archive", "arquivo", "texts", "textos", "text", "documents",
+        "documentos", "docs", "images", "imagens", "photo", "photos", "foto", "fotos",
+        "download", "downloads", "letters", "cartas", "cw", "sw", "index"
+    ]
+
+    /// Canonical absolute identity for a catalogue path or an archive URL.
+    /// Fragments are ignored; the Marxists archive is normalized to one host.
+    static func canonicalKey(for path: String, base: URL) -> String {
+        let trimmed = path.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty,
+              let url = URL(string: trimmed, relativeTo: base)?.absoluteURL,
+              var components = URLComponents(url: url, resolvingAgainstBaseURL: true) else { return trimmed }
+        components.fragment = nil
+        components.scheme = components.scheme?.lowercased()
+        let host = components.host?.lowercased()
+        if host == "marxists.org" || host == "www.marxists.org" {
+            components.host = "www.marxists.org"
+            components.scheme = "https"
+        } else {
+            components.host = host
+        }
+        return components.url?.absoluteString ?? trimmed
+    }
+
+    static func migrated(fromJSON json: String, base: URL, knownWorkPaths: Set<String> = []) -> [ReadingProgress] {
+        guard let data = json.data(using: .utf8),
+              let entries = try? JSONDecoder().decode([ReadingProgress].self, from: data) else { return [] }
+        return migrated(entries, base: base, knownWorkPaths: knownWorkPaths)
+    }
+
+    /// Assigns an explicit identity to legacy entries without deleting any of
+    /// them. A legacy chapter is only attached to an index page when both live
+    /// in the same dedicated work directory and the chapter is not itself a
+    /// different catalogue work.
+    static func migrated(_ entries: [ReadingProgress], base: URL, knownWorkPaths: Set<String> = []) -> [ReadingProgress] {
+        let keys = entries.map { canonicalKey(for: $0.path, base: base) }
+        var indexByDirectory: [String: String] = [:]
+        for (entry, key) in zip(entries, keys) {
+            guard isIndexPage(key), let directory = directory(of: key), isDedicatedDirectory(directory) else { continue }
+            // The index may already carry an identity from the new format.
+            // Legacy pages in the same directory must join that identity, not
+            // the index path or a second copy of the same work.
+            let id = entry.workID.flatMap { $0.isEmpty ? nil : canonicalKey(for: $0, base: base) } ?? key
+            if indexByDirectory[directory] == nil { indexByDirectory[directory] = id }
+        }
+
+        return entries.enumerated().map { offset, entry in
+            var entry = entry
+            let key = keys[offset]
+            if let existing = entry.workID, !existing.isEmpty {
+                entry.workID = canonicalKey(for: existing, base: base)
+            } else if knownWorkPaths.contains(key) || isIndexPage(key) {
+                entry.workID = key
+            } else if let directory = directory(of: key),
+                      let index = indexByDirectory[directory],
+                      index != key {
+                entry.workID = index
+            } else {
+                entry.workID = key
+            }
+            return entry
+        }
+    }
+
+    /// Collapses the stored destinations into one entry per work. The newest
+    /// entry supplies the page to resume and its progress; the work page (when
+    /// present) supplies the stable title and author. No total-book progress is
+    /// calculated.
+    static func grouped(_ entries: [ReadingProgress], base: URL) -> [ReadingProgress] {
+        var order: [String] = []
+        var groups: [String: [ReadingProgress]] = [:]
+        for entry in entries {
+            let id = entry.workID ?? canonicalKey(for: entry.path, base: base)
+            if groups[id] == nil { order.append(id) }
+            groups[id, default: []].append(entry)
+        }
+
+        return order.compactMap { id in
+            guard let members = groups[id], let newest = members.first else { return nil }
+            var result = newest
+            result.workID = id
+            let canonical = members.first { canonicalKey(for: $0.path, base: base) == id }
+            if let canonical {
+                if !canonical.title.isEmpty { result.title = canonical.title }
+                if !canonical.author.isEmpty { result.author = canonical.author }
+            } else {
+                if let title = members.first(where: { !$0.title.isEmpty })?.title { result.title = title }
+                if let author = members.first(where: { !$0.author.isEmpty })?.author { result.author = author }
+            }
+            return result
+        }
+    }
+
+    static func history(fromJSON json: String, base: URL, knownWorkPaths: Set<String> = []) -> [ReadingProgress] {
+        grouped(migrated(fromJSON: json, base: base, knownWorkPaths: knownWorkPaths), base: base)
+    }
+
+    /// Directory proximity is only used inside a dedicated work directory and
+    /// never for a destination that the catalogue lists as a separate work.
+    static func isSameWork(_ destination: String, as workID: String, knownWorkPaths: Set<String> = []) -> Bool {
+        guard let destinationURL = URL(string: destination), let workURL = URL(string: workID),
+              destinationURL.host?.lowercased() == workURL.host?.lowercased() else { return false }
+        if destination == workID { return true }
+        if knownWorkPaths.contains(destination) { return false }
+        guard let destinationDirectory = directory(of: destination),
+              let workDirectory = directory(of: workID),
+              destinationDirectory == workDirectory,
+              isDedicatedDirectory(workDirectory) else { return false }
+        return true
+    }
+
+    private static func isIndexPage(_ key: String) -> Bool {
+        guard let url = URL(string: key),
+              let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else { return false }
+        // URL.path drops a trailing slash, so read the path from URLComponents.
+        let path = components.path
+        return path.hasSuffix("/") || indexNames.contains((path as NSString).lastPathComponent.lowercased())
+    }
+
+    private static func directory(of key: String) -> String? {
+        guard let url = URL(string: key), !url.path.isEmpty,
+              var components = URLComponents(url: url, resolvingAgainstBaseURL: true) else { return nil }
+        // A path ending in "/" already names its directory. Asking Foundation
+        // for the parent would climb to the year/listing directory and break
+        // grouping for directory-style index pages.
+        var path = components.path
+        if !path.hasSuffix("/") { path = (path as NSString).deletingLastPathComponent }
+        if !path.hasSuffix("/") { path += "/" }
+        components.path = path
+        components.query = nil
+        components.fragment = nil
+        return components.url?.absoluteString
+    }
+
+    private static func isDedicatedDirectory(_ directory: String) -> Bool {
+        guard let url = URL(string: directory) else { return false }
+        let parts = url.path.split(separator: "/").map(String.init)
+        guard parts.count >= 3, let name = parts.last?.lowercased() else { return false }
+        if name.allSatisfy({ $0.isNumber }) || genericDirectoryNames.contains(name) { return false }
+        return true
     }
 }
 

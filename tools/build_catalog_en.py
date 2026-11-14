@@ -79,6 +79,7 @@ def build_writers():
 
     if len(sys.argv) > 1:  # teste rápido: python build_catalog_en.py 5
         writers = writers[: int(sys.argv[1])]
+    source_credit_map = b.load_credits("en")
     print(f"{len(writers)} writers; fetching their pages…")
     for i, w in enumerate(writers, 1):
         if i % 50 == 0:
@@ -137,6 +138,7 @@ def build_writers():
         elif w["id"] == "subject/women/authors/ehrenreich-barbara/socialist-feminism.htm":
             sections = [""]
             rows = [["What is Socialist Feminism?", w["id"], "1976", 0, "Barbara Ehrenreich"]]
+        b.credits.apply_credit_map(rows, source_credit_map)
         w["sections"], w["works"] = sections, rows
         ph = re.search(r'<img[^>]+src="([^"]+\.(?:jpe?g|png|gif))"', page, re.I)
         if ph:

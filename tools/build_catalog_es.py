@@ -18,6 +18,7 @@ def main():
     if not index:
         raise RuntimeError("Could not load Spanish writers index")
     authors = []
+    credit_map = b.load_credits("es")
     for href, title in re.findall(r'<span class="author">\s*<a\s+href="([^"]+)"[^>]*>(.*?)</a>', index, re.S | re.I):
         name = b.clean(title)
         path = b.norm("", href)
@@ -33,6 +34,7 @@ def main():
             if section not in sections:
                 sections.append(section)
             works.append([title, work_path, date, sections.index(section)])
+        b.credits.apply_credit_map(works, credit_map)
         author = {"id": path, "name": name, "sections": sections, "works": works}
         if photo:
             author["photo"] = photo

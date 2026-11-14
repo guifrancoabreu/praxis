@@ -22,14 +22,21 @@ final class CatalogTests: XCTestCase {
         XCTAssertEqual(marx.works.first?.credit, "Karl Marx e Friedrich Engels")
     }
 
-    func testCreditResolutionUsesExactPathsAndExplicitUnknown() throws {
+    func testCreditResolutionUsesExactPathsAndLeavesUnknownUncredited() throws {
         let data = Data(#"{"authors":[{"id":"a","name":"Archive A","works":[["Known","known.htm","",0,"Actual author"],["Unknown","unknown.htm","",0,""],["Legacy","legacy.htm","",0],["Conflict","conflict.htm","",0,"One"]]},{"id":"b","name":"Archive B","works":[["Conflict","conflict.htm","",0,"Two"]]}]}"#.utf8)
         let catalog = try Catalog.decode(data, language: .en)
         XCTAssertEqual(catalog.credit(forPath: "known.htm"), "Actual author")
-        XCTAssertEqual(catalog.credit(forPath: "unknown.htm"), "")
-        XCTAssertEqual(catalog.credit(forPath: "legacy.htm"), "")
+        XCTAssertNil(catalog.credit(forPath: "unknown.htm"))
+        XCTAssertNil(catalog.credit(forPath: "legacy.htm"))
         XCTAssertNil(catalog.credit(forPath: "missing.htm"))
         XCTAssertNil(catalog.credit(forPath: "conflict.htm"))
+    }
+
+    func testUncreditedDuplicateDoesNotHideExplicitCredit() throws {
+        let data = Data(#"{"authors":[{"id":"a","name":"Archive A","works":[["Shared","shared.htm","",0,"Actual author"],["Uncredited","uncredited.htm","",0]]},{"id":"b","name":"Archive B","works":[["Shared","shared.htm","",0]]}]}"#.utf8)
+        let catalog = try Catalog.decode(data, language: .en)
+        XCTAssertEqual(catalog.credit(forPath: "shared.htm"), "Actual author")
+        XCTAssertNil(catalog.credit(forPath: "uncredited.htm"))
     }
 
     func testInvalidCatalogFails() {
@@ -43,6 +50,25 @@ final class CatalogTests: XCTestCase {
         XCTAssertEqual(Language.pt.base, "https://www.marxists.org/portugues/")
         XCTAssertEqual(Language.en.base, "https://www.marxists.org/")
         XCTAssertEqual(Language.es.base, "https://www.marxists.org/espanol/")
+    }
+
+    func testReleasePinsStoredLanguageToPortuguese() {
+        // Existing installations may still have English or Spanish stored.
+        // The first release must show Portuguese without deleting that value.
+        for storedCode in ["pt", "en", "es", "unknown"] {
+            XCTAssertEqual(Language.releaseLanguage(for: storedCode), .pt)
+        }
+    }
+
+    func testReleaseExposesOnlyPortugueseInLanguageSwitch() {
+        XCTAssertEqual(Language.releaseLanguages, [.pt])
+    }
+
+    func testEnglishAndSpanishRemainAvailableForFutureRelease() {
+        XCTAssertEqual(Language(rawValue: "en"), .en)
+        XCTAssertEqual(Language(rawValue: "es"), .es)
+        XCTAssertEqual(PrivacyPolicyCopy.forLanguage(.en).title, "Privacy")
+        XCTAssertEqual(PrivacyPolicyCopy.forLanguage(.es).title, "Privacidad")
     }
 
     func testBundledCatalogSnapshotsDecode() throws {
