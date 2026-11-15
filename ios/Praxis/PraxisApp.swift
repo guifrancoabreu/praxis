@@ -607,7 +607,13 @@ struct LibraryView: View {
                                             .lineLimit(3)
                                             .truncationMode(.tail)
                                             .frame(maxWidth: .infinity, alignment: .leading)
-                                        if !credit.isEmpty { Text(credit).font(.caption).foregroundStyle(SystemTokens.Colors.textSecondary) }
+                                        if !credit.isEmpty {
+                                            Text(credit)
+                                                .font(.caption)
+                                                .foregroundStyle(SystemTokens.Colors.textSecondary)
+                                                .lineLimit(1)
+                                                .truncationMode(.tail)
+                                        }
                                         Spacer(minLength: 2)
                                         ProgressView(value: entry.progress).tint(SystemTokens.Colors.accent)
                                         Text(language.sectionProgress(Int(entry.progress * 100)))
