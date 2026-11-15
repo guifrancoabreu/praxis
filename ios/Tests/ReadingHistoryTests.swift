@@ -67,6 +67,27 @@ final class ReadingHistoryTests: XCTestCase {
         XCTAssertEqual(work.destination(for: preface, base: base), work)
     }
 
+    func testNestedChaptersKeepIdentityUnlessTheyEnterAnotherCataloguedWork() {
+        let capital = "marx/1867/capital/index.htm"
+        let nestedWork = "marx/1867/capital/livro2/index.htm"
+        let known = Set([key(capital), key(nestedWork)])
+        let work = ReadingWork(path: capital, title: "O Capital", author: "Karl Marx", base: base, knownWorkPaths: known)
+
+        let chapter = URL(string: "https://www.marxists.org/portugues/marx/1867/capital/livro1/cap01/01.htm")!
+        XCTAssertEqual(work.destination(for: chapter, base: base), work)
+
+        let separateChapter = URL(string: "https://www.marxists.org/portugues/marx/1867/capital/livro2/cap01/01.htm")!
+        XCTAssertNil(work.destination(for: separateChapter, base: base))
+        let nextWork = work.following(
+            separateChapter,
+            title: "Capítulo 1",
+            base: base,
+            authorForNewWork: "Karl Marx"
+        )
+        XCTAssertEqual(nextWork.author, "Karl Marx", "Starting a separate catalogued work should retain its explicit credit.")
+        XCTAssertNotEqual(nextWork.id, work.id)
+    }
+
     func testLinksToOtherWorksStartSeparateIdentities() {
         let known = Set([key(manifesto), key(galicianManifesto), key("marx/guerra/04.htm"), key("marx/guerra/05.htm")])
         let work = ReadingWork(path: manifesto, title: "Manifesto do Partido Comunista", author: "Karl Marx", base: base, knownWorkPaths: known)

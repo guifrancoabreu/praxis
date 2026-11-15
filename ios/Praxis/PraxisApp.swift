@@ -482,7 +482,7 @@ struct LibraryView: View {
         VStack(alignment: .leading, spacing: RefTokens.Spacing.s1) {
             HStack { sectionHeading(language.text("Salvos", "Saved")); Spacer(); Button(language.text("Ver todos", "See all")) { filterSelection.selectProgrammatically(.saved) }.font(.subheadline.weight(.medium)).foregroundStyle(SystemTokens.Colors.accent).frame(minHeight: 44).contentShape(Rectangle()) }
             ForEach(Array(savedWorks.prefix(4)), id: \.1.id) { author, work in
-                NavigationLink { ReaderView(work: work, authorName: work.displayCredit(archiveName: author.full), language: language, knownWorkPaths: knownWorkPaths) } label: { WorkListRow(work: work, author: work.displayCredit(archiveName: author.full)) }
+                NavigationLink { ReaderView(work: work, authorName: work.displayCredit(archiveName: author.full), language: language, knownWorkPaths: knownWorkPaths, catalog: catalog) } label: { WorkListRow(work: work, author: work.displayCredit(archiveName: author.full)) }
                     .buttonStyle(.plain).foregroundStyle(SystemTokens.Colors.textPrimary)
             }
         }
@@ -497,7 +497,7 @@ struct LibraryView: View {
             }
             LazyVStack(spacing: 0) {
                 ForEach(Array(works.enumerated()), id: \.offset) { index, item in
-                    NavigationLink { ReaderView(work: item.1, authorName: item.1.displayCredit(archiveName: item.0.full), language: language, knownWorkPaths: knownWorkPaths) } label: {
+                    NavigationLink { ReaderView(work: item.1, authorName: item.1.displayCredit(archiveName: item.0.full), language: language, knownWorkPaths: knownWorkPaths, catalog: catalog) } label: {
                         HStack(spacing: 12) {
                             if !showAll {
                                 Text(String(format: "%02d", index + 1)).font(.system(.caption, design: .monospaced, weight: .medium)).foregroundStyle(SystemTokens.Colors.textSecondary).frame(width: 28, alignment: .leading)
@@ -538,7 +538,7 @@ struct LibraryView: View {
             Toggle(language.text("Somente pessoas", "People only"), isOn: $peopleOnly).font(.subheadline)
             LazyVStack(spacing: 0) {
                 ForEach(figures) { figure in
-                    NavigationLink { ReaderView(work: figure.work, authorName: "", language: language, knownWorkPaths: knownWorkPaths) } label: {
+                    NavigationLink { ReaderView(work: figure.work, authorName: "", language: language, knownWorkPaths: knownWorkPaths, catalog: catalog) } label: {
                         ListRow(title: figure.title)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }.buttonStyle(.plain).foregroundStyle(SystemTokens.Colors.textPrimary)
@@ -554,7 +554,7 @@ struct LibraryView: View {
             sectionHeading(language.text("Países", "Countries"))
             if let catalog {
                 ForEach(countries, id: \.self) { country in
-                    NavigationLink { CountryWritersView(country: country, authors: catalog.authors, language: language, knownWorkPaths: knownWorkPaths) } label: {
+                    NavigationLink { CountryWritersView(country: country, authors: catalog.authors, language: language, knownWorkPaths: knownWorkPaths, catalog: catalog) } label: {
                         HStack { Text(country).foregroundStyle(SystemTokens.Colors.textPrimary); Spacer(); Text(catalog.authors.filter { $0.country == country }.count.formatted()).foregroundStyle(SystemTokens.Colors.textSecondary); Image(systemName: "chevron.right").font(.caption).foregroundStyle(SystemTokens.Colors.textSecondary) }
                             .padding(.vertical, 10)
                     }.buttonStyle(.plain)
@@ -597,7 +597,7 @@ struct LibraryView: View {
                 HStack(alignment: .top, spacing: 12) {
                     ForEach(entries) { entry in
                         let credit = entry.author.isEmpty ? (catalog?.credit(forPath: entry.path, base: baseURL) ?? "") : entry.author
-                        NavigationLink { ReaderView(work: entry.work, authorName: credit, language: language, knownWorkPaths: knownWorkPaths) } label: {
+                        NavigationLink { ReaderView(work: entry.work, authorName: credit, language: language, knownWorkPaths: knownWorkPaths, catalog: catalog) } label: {
                             HStack(alignment: .top, spacing: 11) {
                                     BookCover(title: entry.title, compact: false).frame(width: 64, height: 86)
                                     VStack(alignment: .leading, spacing: 5) {
@@ -638,7 +638,7 @@ struct LibraryView: View {
     private func startHere(_ item: (Author, Work)) -> some View {
         VStack(alignment: .leading, spacing: RefTokens.Spacing.s2) {
             sectionHeading(language.text("Uma boa leitura para começar", "A good place to start"))
-            NavigationLink { ReaderView(work: item.1, authorName: item.1.displayCredit(archiveName: item.0.full), language: language, knownWorkPaths: knownWorkPaths) } label: {
+            NavigationLink { ReaderView(work: item.1, authorName: item.1.displayCredit(archiveName: item.0.full), language: language, knownWorkPaths: knownWorkPaths, catalog: catalog) } label: {
                 HStack(spacing: 15) {
                     BookCover(title: item.1.title, compact: false).frame(width: 76, height: 104)
                     VStack(alignment: .leading, spacing: 7) {
@@ -666,7 +666,7 @@ struct LibraryView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(alignment: .top, spacing: 12) {
                     ForEach(authors) { author in
-                        NavigationLink { AuthorView(author: author, language: language, knownWorkPaths: knownWorkPaths) } label: {
+                    NavigationLink { AuthorView(author: author, language: language, knownWorkPaths: knownWorkPaths, catalog: catalog) } label: {
                             VStack(alignment: .leading, spacing: 8) {
                                 AuthorArtwork(author: author, language: language).frame(width: 126, height: 116)
                                 Text(author.full).font(.system(.subheadline, design: .serif, weight: .semibold)).lineLimit(1).truncationMode(.tail).multilineTextAlignment(.leading)
@@ -710,7 +710,7 @@ struct LibraryView: View {
 
     private func writerRow(_ author: Author) -> some View {
         VStack(spacing: 0) {
-            NavigationLink { AuthorView(author: author, language: language, knownWorkPaths: knownWorkPaths) } label: {
+                NavigationLink { AuthorView(author: author, language: language, knownWorkPaths: knownWorkPaths, catalog: catalog) } label: {
                 HStack(spacing: 13) {
                     AuthorArtwork(author: author, language: language).frame(width: 52, height: 58)
                     VStack(alignment: .leading, spacing: 4) {
@@ -732,7 +732,7 @@ struct LibraryView: View {
             HStack { sectionHeading(title); Spacer(); sortMenu; if showAll { Button(language.text("Ver todos", "See all")) { filterSelection.selectProgrammatically(.works) }.font(.subheadline.weight(.medium)).foregroundStyle(SystemTokens.Colors.accent).frame(minHeight: 44).contentShape(Rectangle()) } }
             LazyVStack(spacing: 0) {
                 ForEach(works, id: \.1.id) { author, work in
-                    NavigationLink { ReaderView(work: work, authorName: work.displayCredit(archiveName: author.full), language: language, knownWorkPaths: knownWorkPaths) } label: {
+                    NavigationLink { ReaderView(work: work, authorName: work.displayCredit(archiveName: author.full), language: language, knownWorkPaths: knownWorkPaths, catalog: catalog) } label: {
                         WorkListRow(work: work, author: work.displayCredit(archiveName: author.full))
                     }.buttonStyle(.plain).foregroundStyle(SystemTokens.Colors.textPrimary)
                     if work.id != works.last?.1.id { Rectangle().fill(SystemTokens.Colors.separator).frame(height: 1).padding(.leading, 65) }
@@ -890,6 +890,7 @@ struct AuthorView: View {
     let author: Author
     let language: Language
     var knownWorkPaths: Set<String> = []
+    var catalog: Catalog? = nil
     @State private var expandedBio = false
     var body: some View {
         List {
@@ -910,7 +911,7 @@ struct AuthorView: View {
                 }
                 if let bioPath = author.bioPath, !bioPath.isEmpty {
                     NavigationLink(language.text("Biografia completa", "Full biography")) {
-                        ReaderView(work: Work(title: language.text("Biografia", "Biography"), path: bioPath, date: "", section: 0), authorName: author.full, language: language, knownWorkPaths: knownWorkPaths)
+                        ReaderView(work: Work(title: language.text("Biografia", "Biography"), path: bioPath, date: "", section: 0), authorName: author.full, language: language, knownWorkPaths: knownWorkPaths, catalog: catalog)
                     }
                 }
             }
@@ -919,7 +920,7 @@ struct AuthorView: View {
                 if !works.isEmpty {
                     Section(section.isEmpty ? language.text("Obras", "Works") : section) {
                         ForEach(works) { work in
-                            NavigationLink { ReaderView(work: work, authorName: work.displayCredit(archiveName: author.full), language: language, knownWorkPaths: knownWorkPaths) } label: {
+                            NavigationLink { ReaderView(work: work, authorName: work.displayCredit(archiveName: author.full), language: language, knownWorkPaths: knownWorkPaths, catalog: catalog) } label: {
                                 VStack(alignment: .leading, spacing: 3) {
                                     Text(work.title)
                                     if !work.date.isEmpty { Text(work.date).font(.caption).foregroundStyle(.secondary) }
@@ -942,9 +943,10 @@ struct CountryWritersView: View {
     let authors: [Author]
     let language: Language
     var knownWorkPaths: Set<String> = []
+    var catalog: Catalog? = nil
     var body: some View {
         List(authors.filter { $0.country == country }) { author in
-            NavigationLink { AuthorView(author: author, language: language, knownWorkPaths: knownWorkPaths) } label: {
+            NavigationLink { AuthorView(author: author, language: language, knownWorkPaths: knownWorkPaths, catalog: catalog) } label: {
                 HStack(spacing: 12) {
                     AuthorArtwork(author: author, language: language).frame(width: 48, height: 54)
                     VStack(alignment: .leading) {
@@ -969,14 +971,14 @@ struct CollectionDetailView: View {
                 Section(group.name.isEmpty ? collection.title : group.name) {
                     ForEach(group.items) { item in
                         NavigationLink {
-                            ReaderView(work: item.work, authorName: catalog?.credit(forPath: item.path, base: baseURL) ?? "", language: language, knownWorkPaths: knownWorkPaths)
+                            ReaderView(work: item.work, authorName: catalog?.credit(forPath: item.path, base: baseURL) ?? "", language: language, knownWorkPaths: knownWorkPaths, catalog: catalog)
                         } label: { Text(item.title).font(.system(.body, design: .serif)) }
                     }
                 }
             }
             if collection.groups.allSatisfy({ $0.items.isEmpty }) {
                 Section { NavigationLink(language.text("Abrir no arquivo", "Open in archive")) {
-                    ReaderView(work: Work(title: collection.title, path: collection.id, date: "", section: 0), authorName: "", language: language, knownWorkPaths: knownWorkPaths)
+                    ReaderView(work: Work(title: collection.title, path: collection.id, date: "", section: 0), authorName: "", language: language, knownWorkPaths: knownWorkPaths, catalog: catalog)
                 } }
             }
         }
@@ -1247,6 +1249,7 @@ struct ReaderView: View {
     let language: Language
     let workIdentity: ReadingWork?
     let knownWorkPaths: Set<String>
+    let catalog: Catalog?
     @AppStorage("savedWorkPaths") private var savedWorkPaths = "[]"
     @AppStorage("recentReadings") private var recentReadings = "[]"
     @AppStorage("readerAppearance") private var appearanceData = ""
@@ -1281,12 +1284,13 @@ struct ReaderView: View {
         if let entry = entries.first(where: { $0.path == work.path && $0.workID == identity.id }) { return entry.progress }
         return entries.first(where: { $0.path == work.path })?.progress ?? 0
     }
-    init(work: Work, authorName: String, language: Language, workIdentity: ReadingWork? = nil, knownWorkPaths: Set<String> = []) {
+    init(work: Work, authorName: String, language: Language, workIdentity: ReadingWork? = nil, knownWorkPaths: Set<String> = [], catalog: Catalog? = nil) {
         self.work = work
         self.authorName = authorName
         self.language = language
         self.workIdentity = workIdentity
         self.knownWorkPaths = knownWorkPaths
+        self.catalog = catalog
         let saved = UserDefaults.standard.string(forKey: "readerAppearance") ?? ""
         _appearance = State(initialValue: ReaderAppearance.decode(saved))
     }
@@ -1302,7 +1306,12 @@ struct ReaderView: View {
                         flushProgress()
                         linkedReader = LinkedReader(
                             work: Work(title: title.isEmpty ? target.lastPathComponent : title, path: target.absoluteString, date: "", section: 0),
-                            identity: identity.following(target, title: title, base: baseURL)
+                            identity: identity.following(
+                                target,
+                                title: title,
+                                base: baseURL,
+                                authorForNewWork: catalog?.credit(forPath: target.absoluteString, base: baseURL) ?? ""
+                            )
                         )
                     case .external(let target): openURL(target)
                     case .unsupported: break
@@ -1317,7 +1326,7 @@ struct ReaderView: View {
             } else { ProgressView(language.text("Carregando…", "Loading…")) }
         }
         .navigationDestination(item: $linkedReader) { linked in
-            ReaderView(work: linked.work, authorName: linked.identity.author, language: language, workIdentity: linked.identity, knownWorkPaths: knownWorkPaths)
+            ReaderView(work: linked.work, authorName: linked.identity.author, language: language, workIdentity: linked.identity, knownWorkPaths: knownWorkPaths, catalog: catalog)
         }
         .navigationTitle(work.title).navigationBarTitleDisplayMode(.inline)
         .background(SystemTokens.Colors.background.ignoresSafeArea())

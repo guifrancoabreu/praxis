@@ -261,11 +261,17 @@ struct Catalog {
     let history: [CatalogCollection]
     let figures: [CatalogItem]
 
-    /// Resolve by exact catalog path only. Conflicting credits are ambiguous;
-    /// an uncredited duplicate is not evidence of a different author.
+    /// Resolve explicit work credits first. For a chapter below a dedicated
+    /// catalogued work directory, inherit only the nearest catalog entry's
+    /// credit; uncredited or conflicting nearer entries stop inheritance.
     func credit(forPath path: String, base: URL? = nil) -> String? {
+        let target = base.map { ReadingHistory.canonicalKey(for: path, base: $0) }
         let exactWorks = authors.flatMap { author in
-            author.works.filter { $0.path == path }.map { ($0, author) }
+            author.works.filter { work in
+                if work.path == path { return true }
+                guard let base, let target else { return false }
+                return ReadingHistory.canonicalKey(for: work.path, base: base) == target
+            }.map { ($0, author) }
         }
         let exactCredits = Set(exactWorks.map { $0.0.displayCredit(archiveName: $0.1.full) }.filter { !$0.isEmpty })
         if !exactWorks.isEmpty {
@@ -273,25 +279,35 @@ struct Catalog {
             return exactCredits.first
         }
 
-        // Chapter pages can live below a catalogued book's index path. Carry
-        // that explicit book credit into its dedicated subdirectories, using
-        // the nearest catalogued work when several roots could match.
         guard let base else { return nil }
-        let target = ReadingHistory.canonicalKey(for: path, base: base)
+        let canonicalTarget = target ?? ReadingHistory.canonicalKey(for: path, base: base)
         let allWorkPaths = workKeys(base: base)
-        let ancestors = authors.flatMap { author in
-            author.works.compactMap { work -> (String, String)? in
-                let credit = work.displayCredit(archiveName: author.full)
-                let root = ReadingHistory.canonicalKey(for: work.path, base: base)
-                guard !credit.isEmpty,
-                      ReadingHistory.isSameWork(target, as: root, knownWorkPaths: allWorkPaths) else { return nil }
-                return (root, credit)
-            }
+        let ancestors = allWorkPaths.compactMap { root -> (String, String)? in
+            guard ReadingHistory.isSameWork(canonicalTarget, as: root, knownWorkPaths: allWorkPaths),
+                  let directory = ReadingHistory.directory(of: root) else { return nil }
+            return (root, directory)
         }
-        guard let nearestPathLength = ancestors.map({ $0.0.count }).max() else { return nil }
-        let nearestCredits = Set(ancestors.filter { $0.0.count == nearestPathLength }.map(\.1))
+        guard let nearestDirectoryDepth = ancestors.map({ Self.pathDepth($0.1) }).max() else { return nil }
+        let nearestPaths = Set(ancestors.filter { Self.pathDepth($0.1) == nearestDirectoryDepth }.map(\.0))
+        var nearestCredits = Set<String>()
+        for root in nearestPaths {
+            let rootWorks = authors.flatMap { author in
+                author.works.filter { ReadingHistory.canonicalKey(for: $0.path, base: base) == root }
+                    .map { ($0, author) }
+            }
+            let credits = Set(rootWorks.map { $0.0.displayCredit(archiveName: $0.1.full) }.filter { !$0.isEmpty })
+            // If a closer catalog entry is uncredited or ambiguous, the parent
+            // work's credit is not enough evidence for this chapter.
+            guard !rootWorks.isEmpty, credits.count == 1, let credit = credits.first else { return nil }
+            nearestCredits.insert(credit)
+        }
         guard nearestCredits.count == 1 else { return nil }
         return nearestCredits.first
+    }
+
+    private static func pathDepth(_ path: String) -> Int {
+        guard let url = URL(string: path) else { return 0 }
+        return url.path.split(separator: "/").count
     }
 
     static func load(_ language: Language) throws -> Catalog {
@@ -411,13 +427,13 @@ struct ReadingWork: Hashable {
     /// Follows an archive link. Same-work destinations keep the work title and
     /// author; a different work starts a new identity without inventing an
     /// author that cannot be established from the link.
-    func following(_ url: URL, title: String, base: URL) -> ReadingWork {
+    func following(_ url: URL, title: String, base: URL, authorForNewWork: String = "") -> ReadingWork {
         if let destination = destination(for: url, base: base) { return destination }
         let fallbackTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
         return ReadingWork(
             path: url.absoluteString,
             title: fallbackTitle.isEmpty ? url.lastPathComponent : fallbackTitle,
-            author: "",
+            author: authorForNewWork,
             base: base,
             knownWorkPaths: knownWorkPaths
         )
@@ -577,6 +593,16 @@ enum ReadingHistory {
               let workDirectory = directory(of: workID),
               (destinationDirectory == workDirectory || destinationDirectory.hasPrefix(workDirectory)),
               isDedicatedDirectory(workDirectory) else { return false }
+        let entersNestedCataloguedWork = knownWorkPaths.contains { path in
+            guard path != workID,
+                  let nestedDirectory = directory(of: path),
+                  nestedDirectory != workDirectory,
+                  nestedDirectory.hasPrefix(workDirectory),
+                  destinationDirectory.hasPrefix(nestedDirectory),
+                  isDedicatedDirectory(nestedDirectory) else { return false }
+            return true
+        }
+        guard !entersNestedCataloguedWork else { return false }
         return true
     }
 
@@ -588,7 +614,7 @@ enum ReadingHistory {
         return path.hasSuffix("/") || indexNames.contains((path as NSString).lastPathComponent.lowercased())
     }
 
-    private static func directory(of key: String) -> String? {
+    static func directory(of key: String) -> String? {
         guard let url = URL(string: key), !url.path.isEmpty,
               var components = URLComponents(url: url, resolvingAgainstBaseURL: true) else { return nil }
         // A path ending in "/" already names its directory. Asking Foundation

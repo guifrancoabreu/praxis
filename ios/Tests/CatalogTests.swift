@@ -32,6 +32,48 @@ final class CatalogTests: XCTestCase {
         XCTAssertNil(catalog.credit(forPath: "conflict.htm"))
     }
 
+    func testChapterCreditsUseNearestCataloguedWorkAndRespectUncreditedChildren() throws {
+        let data = Data(#"{"authors":[{"id":"marx","name":"Marx","full":"Karl Marx","works":[["Capital","marx/1867/capital/index.htm","",0,"Karl Marx"],["Uncredited volume","marx/1867/capital/livro3/index.htm","",0,""],["Part A","marx/1867/capital/livro4/part-a.htm","",0,"Karl Marx"]]},{"id":"engels","name":"Engels","full":"Friedrich Engels","works":[["Prefaces","marx/1867/capital/livro1/prefacios/index.htm","",0,"Friedrich Engels"],["Part B","marx/1867/capital/livro4/part-b.htm","",0,"Friedrich Engels"]]}]}"#.utf8)
+        let catalog = try Catalog.decode(data)
+        let base = URL(string: Language.pt.base)!
+
+        XCTAssertEqual(
+            catalog.credit(forPath: "https://www.marxists.org/portugues/marx/1867/capital/livro1/cap01/01.htm", base: base),
+            "Karl Marx"
+        )
+        XCTAssertEqual(
+            catalog.credit(forPath: "marx/1867/capital/livro1/prefacios/03.htm", base: base),
+            "Friedrich Engels"
+        )
+        XCTAssertNil(
+            catalog.credit(forPath: "marx/1867/capital/livro3/cap01/01.htm", base: base),
+            "An uncredited nearer catalog entry must block inheritance from the parent book."
+        )
+        XCTAssertNil(
+            catalog.credit(forPath: "marx/1867/capital/livro4/unlisted.htm", base: base),
+            "Sibling catalog works with different credits must not cause a guessed attribution."
+        )
+        XCTAssertEqual(
+            catalog.credit(forPath: "https://www.marxists.org/portugues/marx/1867/capital/index.htm", base: base),
+            "Karl Marx",
+            "Absolute history URLs should resolve the same credit as catalog-relative paths."
+        )
+    }
+
+    func testRealCapitalChapterAndEngelsPrefaceKeepTheirCatalogCredits() throws {
+        let catalog = try portugueseCatalog()
+        let base = URL(string: Language.pt.base)!
+
+        XCTAssertEqual(
+            catalog.credit(forPath: "https://www.marxists.org/portugues/marx/1867/capital/livro1/cap01/01.htm", base: base),
+            "Karl Marx"
+        )
+        XCTAssertEqual(
+            catalog.credit(forPath: "https://www.marxists.org/portugues/marx/1867/capital/livro1/prefacios/05.htm", base: base),
+            "Friedrich Engels"
+        )
+    }
+
     func testUncreditedDuplicateDoesNotHideExplicitCredit() throws {
         let data = Data(#"{"authors":[{"id":"a","name":"Archive A","works":[["Shared","shared.htm","",0,"Actual author"],["Uncredited","uncredited.htm","",0]]},{"id":"b","name":"Archive B","works":[["Shared","shared.htm","",0]]}]}"#.utf8)
         let catalog = try Catalog.decode(data, language: .en)
@@ -78,5 +120,10 @@ final class CatalogTests: XCTestCase {
             XCTAssertGreaterThan(catalog.authors.count, 5)
             XCTAssertTrue(catalog.authors.contains { !$0.works.isEmpty })
         }
+    }
+
+    private func portugueseCatalog() throws -> Catalog {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+        return try Catalog.decode(Data(contentsOf: root.appendingPathComponent("Praxis/Resources/catalog-pt.json")))
     }
 }
