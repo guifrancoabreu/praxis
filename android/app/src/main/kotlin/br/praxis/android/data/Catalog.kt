@@ -18,7 +18,9 @@ data class Work(
     val section: Int = 0,
     val credit: String? = null,
     val readingID: String? = null,
-)
+) {
+    val id: String get() = path
+}
 
 data class CatalogItem(
     val title: String,

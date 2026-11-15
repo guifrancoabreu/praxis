@@ -40,6 +40,11 @@ app/src/main/kotlin/br/praxis/android/
 
 ## Status
 
-Fase 0 and the first half of Fase 3 of `docs/plan-android.md`: the library renders chips, the
-daily featured text, popular writers with portraits, the work list, search and the footer. Saved
-works, reading history, the reader, appearance, author pages and the Play Store release are next.
+Feature-complete against `docs/plan-android.md` for a Portuguese release: library with chips,
+featured text, popular writers, saved works, reading log, search and footer; author, collection,
+support and privacy screens; the archive reader with the six themes, custom colours, bookmark,
+source link and 100 MB offline cache; the optional TelemetryDeck consent flow.
+
+Still open before publishing: PDF works open in the system browser (no in-app renderer yet),
+portrait cropping uses a centred crop instead of face detection, and tablet layouts are out of
+scope. Play packaging lives in `docs/play-listing-pt-BR.md`.

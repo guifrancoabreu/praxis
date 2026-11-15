@@ -41,4 +41,39 @@
     <string name="work_count">%1$d textos</string>
     <string name="work_count_one">%1$d texto</string>
     <string name="catalog_updated">Catálogo atualizado em %1$s · Marxists Internet Archive</string>
+
+    <string name="action_back">Voltar</string>
+
+    <!-- SupportView -->
+    <string name="support_title">Apoie</string>
+    <string name="support_lead">Escolha como apoiar</string>
+    <string name="support_app_section">Apoie este app</string>
+    <string name="support_app_body">Ajude a manter o leitor gratuito e em evolução.</string>
+    <string name="support_kofi_title">Ko-fi</string>
+    <string name="support_kofi_action">Apoiar no Ko-fi</string>
+    <string name="support_archive_section">Apoie o Marxists.org</string>
+    <string name="support_archive_body">Ajude a preservar o Marxists Internet Archive.</string>
+    <string name="support_archive_title">Marxists.org</string>
+    <string name="support_archive_action">Doar ao Marxists.org</string>
+
+    <!-- PrivacyPolicyCopy, Portuguese variant -->
+    <string name="privacy_title">Privacidade</string>
+    <string name="privacy_intro">O Praxis não exige uma conta. Não vendemos dados nem usamos anúncios. Seus dados de leitura ficam no aparelho, salvo quando você autoriza o envio opcional de análises descrito abaixo.</string>
+    <string name="privacy_on_device_title">No seu aparelho</string>
+    <string name="privacy_on_device_body">Favoritos, histórico, posição de leitura, idioma, ordenação e aparência são guardados no armazenamento do app para manter sua biblioteca como você deixou. Textos e PDFs abertos também podem ficar no cache local, limitado a 100 MB. Esses dados não são enviados à equipe do app.</string>
+    <string name="privacy_archive_title">Conteúdo do arquivo</string>
+    <string name="privacy_archive_body">Ao abrir um texto ou PDF, ou ao carregar um retrato, o app solicita esse conteúdo diretamente a marxists.org. O servidor do arquivo pode ver qual página ou arquivo foi solicitado e recebe dados técnicos da conexão, como seu endereço IP. O app não controla as práticas de privacidade do arquivo.</string>
+    <string name="privacy_analytics_title">Análises opcionais</string>
+    <string name="privacy_analytics_body">Quando ativas e autorizadas, as análises enviam eventos gerais ao TelemetryDeck: filtros escolhidos, uso da busca, abertura de autores e textos, favoritos, controles de leitura e toques em links de apoio. A busca é registrada sem o termo digitado. Não enviamos títulos, nomes de autores, caminhos do arquivo ou posição de leitura. O SDK também envia um identificador pseudônimo temporário gerado a cada abertura do app, que não é guardado entre sessões, ID da sessão, data e hora e dados do app e do aparelho, como versão do app, versão do Android, modelo, idioma, região e fuso horário. O TelemetryDeck informa que não armazena endereços IP. Esses dados são usados para entender o uso do app, não para publicidade ou rastreamento entre apps.</string>
+    <string name="privacy_analytics_unavailable">As análises ainda não estão ativas nesta versão. Nenhum dado de uso está sendo enviado.</string>
+    <string name="privacy_analytics_consent_title">Compartilhar dados de uso</string>
+    <string name="privacy_analytics_consent_detail">Opcional e desativado por padrão. Você pode mudar esta escolha a qualquer momento.</string>
+    <string name="privacy_analytics_policy_link">Política de privacidade do TelemetryDeck</string>
+    <string name="privacy_third_party_title">Serviços externos</string>
+    <string name="privacy_third_party_body">Links de apoio podem abrir sites como Ko-fi ou Marxists.org. Ao sair do app, valem as políticas desses serviços. O TelemetryDeck recebe análises somente quando você ativa a opção acima.</string>
+    <string name="privacy_retention_title">Armazenamento e remoção</string>
+    <string name="privacy_retention_body">As preferências e o histórico ficam no armazenamento local do app até você apagar o app. O cache apaga arquivos antigos quando passa de 100 MB. Desative as análises acima para interromper o envio de novos eventos. Eventos já recebidos pelo TelemetryDeck seguem a retenção do plano; no plano gratuito atual, são três meses. O serviço permite excluir dados por mês, mas não localizar e excluir os dados de uma instalação específica. Consulte a política do serviço para detalhes.</string>
+    <string name="privacy_contact_title">Contato</string>
+    <string name="privacy_contact_body">Para dúvidas ou solicitações sobre privacidade, escreva para:</string>
+    <string name="privacy_contact_email">support@guifran.co</string>
 </resources>
