@@ -65,3 +65,28 @@ final class LibraryFilterScrollTests: XCTestCase {
         )
     }
 }
+extension LibraryFilterScrollTests {
+    func testStoreShots() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-language", "pt", "-analyticsPromptAnswered", "YES"]
+        app.launch()
+        XCTAssertTrue(app.buttons["filter.writers"].waitForExistence(timeout: 25))
+        func shot(_ name: String) {
+            let image = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+            image.name = name
+            image.lifetime = .keepAlways
+            add(image)
+        }
+        shot("home")
+        app.buttons["filter.writers"].tap()
+        let marx = app.buttons.matching(NSPredicate(format: "label CONTAINS 'Karl Marx'")).firstMatch
+        XCTAssertTrue(marx.waitForExistence(timeout: 10))
+        marx.tap()
+        let work = app.buttons.matching(NSPredicate(format: "label CONTAINS 'Teses sobre Feuerbach'")).firstMatch
+        XCTAssertTrue(work.waitForExistence(timeout: 10))
+        shot("autor")
+        work.tap()
+        _ = app.buttons.matching(identifier: "BackButton").firstMatch.waitForExistence(timeout: 15)
+        shot("leitor")
+    }
+}

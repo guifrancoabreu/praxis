@@ -1,0 +1,3 @@
+Generated using the built-in image generation tool.
+
+Edit the provided Praxis logo image. Remove the entire PRAXIS wordmark and all text. Deliver only the same red square containing the cream and near-black carved fist rising from the open book. Preserve the existing fist anatomy, silhouette, book page shapes, black shadow cuts, red/cream/black colors and Socialist Realist woodcut style as faithfully as possible; do not redesign or add elements. Reframe as a square logo image: the existing red panel fills the entire canvas edge to edge, no external cream border, no empty wordmark area, with the complete fist-and-book emblem centered and comfortable even red margins so nothing is clipped. No lettering, no text, no watermark, no mockup. Opaque red background.
