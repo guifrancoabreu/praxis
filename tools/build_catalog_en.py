@@ -139,6 +139,7 @@ def build_writers():
             sections = [""]
             rows = [["What is Socialist Feminism?", w["id"], "1976", 0, "Barbara Ehrenreich"]]
         b.credits.apply_credit_map(rows, source_credit_map)
+        b.credits.apply_archive_author_fallback(rows, w["name"])
         w["sections"], w["works"] = sections, rows
         ph = re.search(r'<img[^>]+src="([^"]+\.(?:jpe?g|png|gif))"', page, re.I)
         if ph:

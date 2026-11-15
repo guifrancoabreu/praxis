@@ -160,6 +160,11 @@ class ApplyCreditMapTests(unittest.TestCase):
         self.assertEqual(rows[2], ["Legacy", "c.htm", "", 0])
         self.assertEqual(rows[3][4], "Source D")
 
+    def test_page_credit_replaces_archive_author_fallback(self):
+        rows = [["Work", "a.htm", "", 0, "Karl Marx", "archive-author"]]
+        credits.apply_credit_map(rows, {"a.htm": "Friedrich Engels"})
+        self.assertEqual(rows[0][4:], ["Friedrich Engels", "source-page"])
+
     def test_missing_data_file_is_empty(self):
         self.assertEqual(credits.load_credit_map("/definitely/not/here.json"), {})
 
@@ -247,6 +252,29 @@ class ApplyCreditMapTests(unittest.TestCase):
             self._load_credit_file(payload, expected_language="pt"),
             {"d.htm": "Dora B. Montefiore", "f.htm": "Jussara Valéria de Miranda"},
         )
+
+
+class ApplyArchiveAuthorFallbackTests(unittest.TestCase):
+    def test_fills_missing_credits_but_preserves_explicit_credits(self):
+        rows = [
+            ["Existing", "a.htm", "", 0, "Friedrich Engels"],
+            ["Missing", "b.htm", "", 0],
+            ["Legacy", "c.htm", "", 0, ""],
+        ]
+        credits.apply_archive_author_fallback(rows, "Karl Marx")
+        self.assertEqual(rows[0][4], "Friedrich Engels")
+        self.assertEqual(rows[1][4:], ["Karl Marx", "archive-author"])
+        self.assertEqual(rows[2][4:], ["Karl Marx", "archive-author"])
+
+    def test_short_rows_and_missing_author_are_left_untouched(self):
+        rows = [["Too short", "a.htm", "1900"], ["No author", "b.htm", "", 0]]
+        credits.apply_archive_author_fallback(rows, "")
+        self.assertEqual(rows, [["Too short", "a.htm", "1900"], ["No author", "b.htm", "", 0]])
+
+    def test_appends_credit_slot_to_standard_catalog_rows(self):
+        rows = [["Work", "a.htm", "1900", 0]]
+        credits.apply_archive_author_fallback(rows, "Author Name")
+        self.assertEqual(rows, [["Work", "a.htm", "1900", 0, "Author Name", "archive-author"]])
 
 
 if __name__ == "__main__":

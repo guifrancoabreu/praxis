@@ -1,4 +1,4 @@
-"""Explicit work credits from MIA source pages.
+"""Work credits from MIA source pages and author archive listings.
 
 A work hosted in an author's archive is not necessarily by that author. This
 module reads only visible, page-level bylines (and a corroborated author meta
@@ -430,10 +430,37 @@ def apply_credit_map(rows, credits):
         if not credit:
             continue
         if len(row) >= 5:
-            if not row[4]:
+            if not row[4] or (len(row) >= 6 and row[5] == "archive-author"):
                 row[4] = credit
+                if len(row) >= 6 and row[5] == "archive-author":
+                    row[5] = "source-page"
         elif len(row) == 4:
             row.append(credit)
         # Shorter rows do not have a credit slot; leave them untouched instead
         # of writing the credit into the date or section field.
+    return rows
+
+
+def apply_archive_author_fallback(rows, author):
+    """Use the owning author archive as a fallback for its listed works.
+
+    Explicit work-page and index credits are applied first and remain intact.
+    The fallback is limited to rows already collected from an author's own
+    works index; it is not suitable for thematic or general bibliography rows.
+    """
+    if not isinstance(author, str):
+        return rows
+    author = clean_text(author)
+    if not author:
+        return rows
+    for row in rows:
+        if len(row) < 4:
+            continue
+        if len(row) == 4:
+            row.append(author)
+            row.append("archive-author")
+        elif not row[4]:
+            row[4] = author
+            if len(row) == 5:
+                row.append("archive-author")
     return rows

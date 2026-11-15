@@ -381,6 +381,8 @@ def build_authors():
                 row.append(marx_credits.get(path, ""))
             rows.append(row)
         credits.apply_credit_map(rows, credit_map)
+        archive_author = "Karl Marx" if a["id"] == "marx" else (a["full"] or a["name"])
+        credits.apply_archive_author_fallback(rows, archive_author)
         a["sections"] = sections
         a["works"] = rows
     return authors

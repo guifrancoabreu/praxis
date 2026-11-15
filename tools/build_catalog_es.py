@@ -35,6 +35,7 @@ def main():
                 sections.append(section)
             works.append([title, work_path, date, sections.index(section)])
         b.credits.apply_credit_map(works, credit_map)
+        b.credits.apply_archive_author_fallback(works, name)
         author = {"id": path, "name": name, "sections": sections, "works": works}
         if photo:
             author["photo"] = photo
