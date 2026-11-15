@@ -604,7 +604,7 @@ struct LibraryView: View {
                                         Text(entry.title)
                                             .font(.system(.headline, design: .serif, weight: .semibold))
                                             .multilineTextAlignment(.leading)
-                                            .lineLimit(3)
+                                            .lineLimit(2)
                                             .truncationMode(.tail)
                                             .frame(maxWidth: .infinity, alignment: .leading)
                                         if !credit.isEmpty {
