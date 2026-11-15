@@ -642,7 +642,7 @@ struct LibraryView: View {
                         NavigationLink { AuthorView(author: author, language: language, knownWorkPaths: knownWorkPaths) } label: {
                             VStack(alignment: .leading, spacing: 8) {
                                 AuthorArtwork(author: author, language: language).frame(width: 126, height: 116)
-                                Text(author.full).font(.system(.subheadline, design: .serif, weight: .semibold)).multilineTextAlignment(.leading)
+                                Text(author.full).font(.system(.subheadline, design: .serif, weight: .semibold)).lineLimit(1).truncationMode(.tail).multilineTextAlignment(.leading)
                                 Text(language.workCount(author.works.count))
                                     .font(.caption).foregroundStyle(SystemTokens.Colors.textSecondary)
                             }.frame(width: 126, alignment: .leading)
