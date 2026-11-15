@@ -15,6 +15,8 @@ For a physical device, choose a development team in **Signing & Capabilities** a
 ## Project structure
 
 ```text
+design/
+  tokens.json              Primitive design values shared by every app
 shared/
   catalog/                 Catalog snapshots shared by every app (pt, en, es)
   reader/                  Reader stylesheet and scripts shared by every app
@@ -30,6 +32,7 @@ tools/
   build_catalog_en.py            Refresh the English catalog
   build_catalog_es.py            Refresh the Spanish starter catalog
   check_shared.py                Verify shared content and builder output paths
+  gen_tokens.py                  Verify design tokens and generate the Kotlin ones
 ```
 
 ## Catalogs
