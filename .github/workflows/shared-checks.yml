@@ -1,0 +1,24 @@
+name: Shared content
+
+on:
+  push:
+    paths:
+      - "shared/**"
+      - "tools/**"
+      - ".github/workflows/shared-checks.yml"
+  pull_request:
+    paths:
+      - "shared/**"
+      - "tools/**"
+      - ".github/workflows/shared-checks.yml"
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Catalogs live in shared/catalog and builders write there
+        run: python3 tools/check_shared.py

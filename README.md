@@ -15,18 +15,20 @@ For a physical device, choose a development team in **Signing & Capabilities** a
 ## Project structure
 
 ```text
+shared/
+  catalog/                 Catalog snapshots shared by every app (pt, en, es)
 ios/
   Praxis.xcodeproj/       Xcode project and app scheme
   Praxis/
     PraxisApp.swift       SwiftUI screens, reader, and app entry point
     Catalog.swift                Catalog models, loading, and language metadata
-    Resources/                   Bundled Portuguese, English, and Spanish catalogs
   Tests/                         Catalog and core behavior tests
   Package.swift                  Swift package for the testable core
 tools/
   build_catalog.py               Refresh the Portuguese catalog
   build_catalog_en.py            Refresh the English catalog
   build_catalog_es.py            Refresh the Spanish starter catalog
+  check_shared.py                Verify shared content and builder output paths
 ```
 
 ## Catalogs
@@ -39,7 +41,9 @@ python3 tools/build_catalog_en.py
 python3 tools/build_catalog_es.py
 ```
 
-The scripts write JSON files to `ios/Praxis/Resources/`. They fetch data from the corresponding MIA archive section; an internet connection is required. The Spanish catalog is a starter selection, not a complete mirror of the Spanish archive.
+The scripts write JSON files to `shared/catalog/`, which every app target reads from directly. They fetch data from the corresponding MIA archive section; an internet connection is required. The Spanish catalog is a starter selection, not a complete mirror of the Spanish archive.
+
+`python3 tools/check_shared.py` verifies that the catalogs are present and valid and that every builder still writes to `shared/catalog/`. Run it after changing a catalog script.
 
 ## Tests
 
