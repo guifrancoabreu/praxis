@@ -127,7 +127,7 @@ struct LibraryView: View {
     private var savedWorks: [(Author, Work)] { allWorks.filter { savedPaths.contains($0.1.path) } }
     private var historyWorks: [(Author, Work)] {
         recentEntries.map { entry in
-            let authorName = entry.author.isEmpty ? (catalog?.credit(forPath: entry.path, base: baseURL) ?? "") : entry.author
+            let authorName = catalog?.credit(forPath: entry.path, base: baseURL) ?? entry.author
             let author = Author(id: entry.workID ?? entry.path, name: "", full: authorName, dates: "", avatar: nil, bio: "", sections: [], works: [], country: "", groups: [], photo: nil, bioPath: nil)
             let work = Work(title: entry.title, path: entry.path, date: "", section: 0, credit: authorName, readingID: entry.workID)
             return (author, work)
@@ -596,7 +596,7 @@ struct LibraryView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(alignment: .top, spacing: 12) {
                     ForEach(entries) { entry in
-                        let credit = entry.author.isEmpty ? (catalog?.credit(forPath: entry.path, base: baseURL) ?? "") : entry.author
+                        let credit = catalog?.credit(forPath: entry.path, base: baseURL) ?? entry.author
                         NavigationLink { ReaderView(work: entry.work, authorName: credit, language: language, knownWorkPaths: knownWorkPaths, catalog: catalog) } label: {
                             HStack(alignment: .top, spacing: 11) {
                                     BookCover(title: entry.title, compact: false).frame(width: 64, height: 86)

@@ -32,6 +32,16 @@ final class CatalogTests: XCTestCase {
         XCTAssertNil(catalog.credit(forPath: "conflict.htm"))
     }
 
+    func testCreditsUseCanonicalProfileNamesForAliasesAndKeepOtherAuthors() throws {
+        let data = Data(#"{"authors":[{"id":"lenin","name":"Lênin, Vladimir I.","full":"Vladimir Ilitch Lênin","works":[["Herança","lenin.htm","",0,"V. I. Lénine"],["Herança com coautor","joint.htm","",0,"V. I. Lénine e Friedrich Engels"]]},{"id":"debs","name":"Eugene Debs","full":"Eugene Debs","works":[["Interview","interview.htm","",0,"Nellie Bly"]]},{"id":"abramowski","name":"Abramowski, Edward Józef","full":"Edward Józef Abramowski","works":[["Text","abramowski.htm","",0,"Edward Abramowski"]]}]}"#.utf8)
+        let catalog = try Catalog.decode(data, language: .pt)
+
+        XCTAssertEqual(catalog.credit(forPath: "lenin.htm"), "Vladimir Ilitch Lênin")
+        XCTAssertEqual(catalog.credit(forPath: "joint.htm"), "Vladimir Ilitch Lênin e Friedrich Engels")
+        XCTAssertEqual(catalog.credit(forPath: "interview.htm"), "Nellie Bly")
+        XCTAssertEqual(catalog.credit(forPath: "abramowski.htm"), "Edward Józef Abramowski")
+    }
+
     func testChapterCreditsUseNearestCataloguedWorkAndRespectUncreditedChildren() throws {
         let data = Data(#"{"authors":[{"id":"marx","name":"Marx","full":"Karl Marx","works":[["Capital","marx/1867/capital/index.htm","",0,"Karl Marx"],["Uncredited volume","marx/1867/capital/livro3/index.htm","",0,""],["Part A","marx/1867/capital/livro4/part-a.htm","",0,"Karl Marx"]]},{"id":"engels","name":"Engels","full":"Friedrich Engels","works":[["Prefaces","marx/1867/capital/livro1/prefacios/index.htm","",0,"Friedrich Engels"],["Part B","marx/1867/capital/livro4/part-b.htm","",0,"Friedrich Engels"]]}]}"#.utf8)
         let catalog = try Catalog.decode(data)

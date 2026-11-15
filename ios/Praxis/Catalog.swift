@@ -200,6 +200,91 @@ enum CatalogSort: String, CaseIterable, Identifiable {
     }
 }
 
+enum AuthorCreditName {
+    static func display(_ credit: String?, profileName: String) -> String {
+        guard let credit, !credit.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return "" }
+        let canonical = profileName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !canonical.isEmpty else { return credit }
+        if matches(credit, canonical) { return canonical }
+
+        for separator in [" e ", " y ", " and ", " & "] {
+            let names = credit.components(separatedBy: separator)
+            guard names.count > 1 else { continue }
+            let matchesAt = names.indices.filter { matches(names[$0], canonical) }
+            guard matchesAt.count == 1, let index = matchesAt.first else { continue }
+            var canonicalized = names
+            canonicalized[index] = canonical
+            return canonicalized.joined(separator: separator)
+        }
+        return credit
+    }
+
+    private static func matches(_ candidate: String, _ profile: String) -> Bool {
+        let candidateTokens = tokens(candidate)
+        let profileTokens = tokens(profile)
+        guard !candidateTokens.isEmpty, !profileTokens.isEmpty else { return false }
+        if candidateTokens == profileTokens { return true }
+        guard candidateTokens.count >= 2, profileTokens.count >= 2,
+              sameNamePart(candidateTokens[0], profileTokens[0]),
+              sameSurname(candidateTokens[candidateTokens.count - 1], profileTokens[profileTokens.count - 1]) else {
+            return false
+        }
+
+        let candidateMiddle = Array(candidateTokens.dropFirst().dropLast())
+        let profileMiddle = Array(profileTokens.dropFirst().dropLast())
+        if candidateMiddle.isEmpty { return true }
+        if profileMiddle.isEmpty { return candidateMiddle.allSatisfy { $0.count == 1 } }
+
+        var profileIndex = 0
+        for candidatePart in candidateMiddle {
+            guard let matchedIndex = profileMiddle[profileIndex...].firstIndex(where: {
+                sameNamePart(candidatePart, $0)
+            }) else { return false }
+            profileIndex = matchedIndex + 1
+        }
+        return true
+    }
+
+    private static func tokens(_ name: String) -> [String] {
+        var orderedName = name
+        if let comma = name.firstIndex(of: ",") {
+            let family = name[..<comma]
+            let given = name[name.index(after: comma)...]
+            orderedName = "\(given) \(family)"
+        }
+        let folded = orderedName.folding(options: [.diacriticInsensitive, .caseInsensitive], locale: Locale(identifier: "en_US_POSIX"))
+        return folded.split(whereSeparator: { !$0.isLetter && !$0.isNumber }).map(String.init)
+    }
+
+    private static func sameNamePart(_ candidate: String, _ profile: String) -> Bool {
+        candidate == profile || (candidate.count == 1 && profile.first == candidate.first)
+    }
+
+    private static func sameSurname(_ candidate: String, _ profile: String) -> Bool {
+        if candidate == profile { return true }
+        guard min(candidate.count, profile.count) >= 5 else { return false }
+        return editDistance(candidate, profile) == 1
+    }
+
+    private static func editDistance(_ lhs: String, _ rhs: String) -> Int {
+        let left = Array(lhs)
+        let right = Array(rhs)
+        var previous = Array(0...right.count)
+        for (leftIndex, leftCharacter) in left.enumerated() {
+            var current = [leftIndex + 1] + Array(repeating: 0, count: right.count)
+            for (rightIndex, rightCharacter) in right.enumerated() {
+                current[rightIndex + 1] = min(
+                    previous[rightIndex + 1] + 1,
+                    current[rightIndex] + 1,
+                    previous[rightIndex] + (leftCharacter == rightCharacter ? 0 : 1)
+                )
+            }
+            previous = current
+        }
+        return previous[right.count]
+    }
+}
+
 struct Work: Identifiable, Hashable {
     let title: String
     let path: String
@@ -214,7 +299,7 @@ struct Work: Identifiable, Hashable {
     // An archive can include works by other people. Only an explicit source
     // credit identifies the author of this particular work.
     func displayCredit(archiveName: String) -> String {
-        credit ?? ""
+        AuthorCreditName.display(credit, profileName: archiveName)
     }
 }
 
