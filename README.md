@@ -17,6 +17,7 @@ For a physical device, choose a development team in **Signing & Capabilities** a
 ```text
 shared/
   catalog/                 Catalog snapshots shared by every app (pt, en, es)
+  reader/                  Reader stylesheet and scripts shared by every app
 ios/
   Praxis.xcodeproj/       Xcode project and app scheme
   Praxis/

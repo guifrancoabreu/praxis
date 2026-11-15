@@ -18,6 +18,8 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 CATALOG_DIR = ROOT / "shared" / "catalog"
+READER_DIR = ROOT / "shared" / "reader"
+READER_FILES = ["reader.css", "reader.js", "reader-link.js", "reader-progress.js", "reader-images.js"]
 SCRIPTS = {
     "tools/build_catalog.py": "catalog-pt.json",
     "tools/build_catalog_en.py": "catalog-en.json",
@@ -69,15 +71,35 @@ def check_script_outputs() -> None:
             errors.append(f"{script} OUT does not resolve under shared/catalog")
 
 
+def check_reader() -> None:
+    for name in READER_FILES:
+        path = READER_DIR / name
+        if not path.is_file():
+            errors.append(f"missing reader asset: {path.relative_to(ROOT)}")
+            continue
+        if not path.read_text(encoding="utf-8").strip():
+            errors.append(f"empty reader asset: {path.relative_to(ROOT)}")
+    document = READER_DIR / "reader.js"
+    if document.is_file():
+        text = document.read_text(encoding="utf-8")
+        for token in ["window.webkit", "messageHandlers"]:
+            if token in text:
+                errors.append(f"reader.js must stay platform-neutral but mentions {token}")
+        for placeholder in ["__READER_CSS__", "__READER_LINK__", "__READER_PROGRESS__", "__READER_IMAGES__"]:
+            if placeholder not in text:
+                errors.append(f"reader.js is missing the {placeholder} placeholder")
+
+
 def main() -> int:
     check_catalogs()
+    check_reader()
     check_script_outputs()
     if errors:
         print("shared content check failed:", file=sys.stderr)
         for error in errors:
             print(f"  - {error}", file=sys.stderr)
         return 1
-    print(f"shared content OK: {len(SCRIPTS)} catalogs in shared/catalog used by every builder")
+    print(f"shared content OK: {len(SCRIPTS)} catalogs and {len(READER_FILES)} reader assets")
     return 0
 
 

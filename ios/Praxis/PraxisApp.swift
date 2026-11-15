@@ -1476,14 +1476,7 @@ struct ReaderWebView: UIViewRepresentable {
         configuration.defaultWebpagePreferences.allowsContentJavaScript = false
         configuration.userContentController.add(context.coordinator, name: "readerProgress")
         configuration.userContentController.add(context.coordinator, name: "readerLink")
-        let config = (try? String(data: JSONEncoder().encode(scaledAppearance), encoding: .utf8)) ?? "{}"
-        let source = (try? String(data: JSONEncoder().encode(sourceURL.absoluteString), encoding: .utf8)) ?? "null"
-        let fragment = (try? String(data: JSONEncoder().encode(sourceURL.fragment), encoding: .utf8)) ?? "null"
-        let script = Self.cleanup
-            .replacingOccurrences(of: "__SOURCE_URL__", with: source)
-            .replacingOccurrences(of: "__INITIAL_FRAGMENT__", with: fragment)
-            .replacingOccurrences(of: "__INITIAL_PROGRESS__", with: String(min(1, max(0, initialProgress))))
-            .replacingOccurrences(of: "__INITIAL_APPEARANCE__", with: config)
+        let script = Self.hostShim + "\n" + ReaderAssets.documentScript(source: sourceURL, appearance: scaledAppearance, initialProgress: initialProgress)
         configuration.userContentController.addUserScript(WKUserScript(source: script, injectionTime: .atDocumentEnd, forMainFrameOnly: true))
         let view = WKWebView(frame: .zero, configuration: configuration)
         view.navigationDelegate = context.coordinator
@@ -1524,24 +1517,9 @@ struct ReaderWebView: UIViewRepresentable {
                     let raw = body["url"], let url = URL(string: raw) { onLink(url, body["title"] ?? "") }
         }
     }
-    static let cleanup = """
-    document.querySelectorAll('nav').forEach(nav => { nav.querySelectorAll('[id],a[name]').forEach(anchor => { const marker = document.createElement('span'); if (anchor.id) marker.id = anchor.id; if (anchor.getAttribute('name')) marker.setAttribute('name', anchor.getAttribute('name')); nav.before(marker); }); });
-    document.querySelectorAll('script,style,link,meta,iframe,form,input,button,select,noscript,object,embed,map,.toplink,.toplink-centro,img.logo,img.logodic,nav,p.title').forEach(e => e.remove());
-    const removedAttributes = new Set(['style','align','bgcolor','color','face','size','background','border','cellpadding','cellspacing','valign','width','height']);
-    document.querySelectorAll('*').forEach(e => { for (let i = e.attributes.length - 1; i >= 0; i--) { const name = e.attributes[i].name.toLowerCase(); if ((name === 'width' || name === 'height') && e.tagName === 'IMG') continue; if (name.startsWith('on') || removedAttributes.has(name)) e.removeAttribute(name); } });
-    \(ReaderHTML.imageLoadingScript)
-    const style = document.createElement('style'); style.textContent = 'html { -webkit-text-size-adjust: 100%; } body { --reader-bg:#fbfaf7; --reader-ink:#1d1b19; --reader-link:#b3121d; --reader-size:19px; --reader-line:1.6; --reader-margin:18px; --reader-align:left; --reader-font:Georgia, serif; max-width:40rem; margin:auto; padding:26px var(--reader-margin) 64px; background:var(--reader-bg); color:var(--reader-ink); font-family:var(--reader-font); font-size:var(--reader-size); line-height:var(--reader-line); text-align:var(--reader-align); overflow-wrap:anywhere; } h1 { line-height:1.25; letter-spacing:-.025em; margin:.7em 0 .45em; } h2 { line-height:1.3; margin:1.5em 0 .6em; } blockquote { border-left:2px solid var(--reader-link); opacity:.8; margin:1.4em 0; padding-left:1em; } img, table { max-width:100%; height:auto; } a { color:var(--reader-link); text-decoration:underline; }'; document.head.appendChild(style);
-    window.setReaderAppearance = (p) => { const b=document.body; const fonts={serif:'Georgia, serif',sans:'system-ui, sans-serif',book:'Palatino, serif',condensed:'\"Arial Narrow\", sans-serif',mono:'monospace',casual:'\"Comic Sans MS\", cursive'}; b.style.setProperty('--reader-bg',p.background||'#fbfaf7'); b.style.setProperty('--reader-ink',p.foreground||'#1d1b19'); b.style.setProperty('--reader-link',p.link||'#b3121d'); b.style.setProperty('--reader-size',(p.size||19)+'px'); b.style.setProperty('--reader-line',p.lineSpacing||1.6); b.style.setProperty('--reader-margin',(p.margin||18)+'px'); b.style.setProperty('--reader-align',p.alignment==='justified'?'justify':'left'); b.style.setProperty('--reader-font',fonts[p.font]||fonts.serif); };
-    window.setReaderAppearance(__INITIAL_APPEARANCE__);
-    const initialProgress = __INITIAL_PROGRESS__;
-    const initialFragment = __INITIAL_FRAGMENT__;
-    const sourceURL = __SOURCE_URL__;
-    \(ReaderLink.javascript)
-    const report = () => { const max = document.documentElement.scrollHeight - window.innerHeight; const progress = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0; window.webkit.messageHandlers.readerProgress.postMessage(progress); };
-    let restored = false;
-    const restore = () => { if (restored) return; const max = document.documentElement.scrollHeight - window.innerHeight; if (max > 0) { if (initialFragment !== null) scrollToReaderAnchor(initialFragment); else window.scrollTo(0, initialProgress * max); restored = true; report(); } };
-    \(ReaderProgress.javascript)
-    window.addEventListener('load', () => setTimeout(restore, 120)); setTimeout(restore, 350); setTimeout(restore, 1000);
-    const viewport = document.createElement('meta'); viewport.name = 'viewport'; viewport.content = 'width=device-width, initial-scale=1'; document.head.appendChild(viewport);
+    /// Bridges the shared reader script to WebKit's message handlers. The script itself lives in
+    /// shared/reader and is identical to the Android one.
+    static let hostShim = """
+    window.__praxisHost = { progress: (value) => window.webkit.messageHandlers.readerProgress.postMessage(value), link: (url, title) => window.webkit.messageHandlers.readerLink.postMessage({url, title}) };
     """
 }

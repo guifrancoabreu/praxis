@@ -1,0 +1,57 @@
+/* Reading surface shared by the iOS and Android readers.
+   Injected into every archive page as a <style> element; colors and metrics read from the
+   custom properties that setReaderAppearance() overwrites. Keep this file free of
+   platform-specific selectors. */
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  --reader-bg: #fbfaf7;
+  --reader-ink: #1d1b19;
+  --reader-link: #b3121d;
+  --reader-size: 19px;
+  --reader-line: 1.6;
+  --reader-margin: 18px;
+  --reader-align: left;
+  --reader-font: Georgia, serif;
+  max-width: 40rem;
+  margin: auto;
+  padding: 26px var(--reader-margin) 64px;
+  background: var(--reader-bg);
+  color: var(--reader-ink);
+  font-family: var(--reader-font);
+  font-size: var(--reader-size);
+  line-height: var(--reader-line);
+  text-align: var(--reader-align);
+  overflow-wrap: anywhere;
+}
+
+h1 {
+  line-height: 1.25;
+  letter-spacing: -.025em;
+  margin: .7em 0 .45em;
+}
+
+h2 {
+  line-height: 1.3;
+  margin: 1.5em 0 .6em;
+}
+
+blockquote {
+  border-left: 2px solid var(--reader-link);
+  opacity: .8;
+  margin: 1.4em 0;
+  padding-left: 1em;
+}
+
+img,
+table {
+  max-width: 100%;
+  height: auto;
+}
+
+a {
+  color: var(--reader-link);
+  text-decoration: underline;
+}

@@ -16,16 +16,6 @@ final class DesignSystemTests: XCTestCase {
         return (max(a, b) + 0.05) / (min(a, b) + 0.05)
     }
 
-    func testReaderTextAndLinksMeetNormalTextContrastInBothThemes() {
-        let reader = ReaderTokens.self
-        for (foreground, background) in [
-            (reader.lightForeground, reader.lightBackground), (reader.lightLink, reader.lightBackground),
-            (reader.darkForeground, reader.darkBackground), (reader.darkLink, reader.darkBackground)
-        ] {
-            XCTAssertGreaterThanOrEqual(contrast(foreground, background), 4.5)
-        }
-    }
-
     func testActiveReaderThemesMeetNormalTextContrast() throws {
         var appearance = ReaderAppearance()
         for theme in ReaderAppearance.builtInThemes {
