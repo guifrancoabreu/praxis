@@ -263,12 +263,35 @@ struct Catalog {
 
     /// Resolve by exact catalog path only. Conflicting credits are ambiguous;
     /// an uncredited duplicate is not evidence of a different author.
-    func credit(forPath path: String) -> String? {
-        let credits = Set(authors.flatMap { author in
-            author.works.filter { $0.path == path }.map { $0.displayCredit(archiveName: author.full) }
-        }.filter { !$0.isEmpty })
-        guard credits.count == 1 else { return nil }
-        return credits.first
+    func credit(forPath path: String, base: URL? = nil) -> String? {
+        let exactWorks = authors.flatMap { author in
+            author.works.filter { $0.path == path }.map { ($0, author) }
+        }
+        let exactCredits = Set(exactWorks.map { $0.0.displayCredit(archiveName: $0.1.full) }.filter { !$0.isEmpty })
+        if !exactWorks.isEmpty {
+            guard exactCredits.count == 1 else { return nil }
+            return exactCredits.first
+        }
+
+        // Chapter pages can live below a catalogued book's index path. Carry
+        // that explicit book credit into its dedicated subdirectories, using
+        // the nearest catalogued work when several roots could match.
+        guard let base else { return nil }
+        let target = ReadingHistory.canonicalKey(for: path, base: base)
+        let allWorkPaths = workKeys(base: base)
+        let ancestors = authors.flatMap { author in
+            author.works.compactMap { work -> (String, String)? in
+                let credit = work.displayCredit(archiveName: author.full)
+                let root = ReadingHistory.canonicalKey(for: work.path, base: base)
+                guard !credit.isEmpty,
+                      ReadingHistory.isSameWork(target, as: root, knownWorkPaths: allWorkPaths) else { return nil }
+                return (root, credit)
+            }
+        }
+        guard let nearestPathLength = ancestors.map({ $0.0.count }).max() else { return nil }
+        let nearestCredits = Set(ancestors.filter { $0.0.count == nearestPathLength }.map(\.1))
+        guard nearestCredits.count == 1 else { return nil }
+        return nearestCredits.first
     }
 
     static func load(_ language: Language) throws -> Catalog {
@@ -552,7 +575,7 @@ enum ReadingHistory {
         if knownWorkPaths.contains(destination) { return false }
         guard let destinationDirectory = directory(of: destination),
               let workDirectory = directory(of: workID),
-              destinationDirectory == workDirectory,
+              (destinationDirectory == workDirectory || destinationDirectory.hasPrefix(workDirectory)),
               isDedicatedDirectory(workDirectory) else { return false }
         return true
     }
