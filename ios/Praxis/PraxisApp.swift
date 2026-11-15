@@ -21,6 +21,8 @@ struct LibraryView: View {
     @AppStorage("language") private var languageCode = Language.pt.rawValue
     @AppStorage("savedWorkPaths") private var savedWorkPaths = "[]"
     @AppStorage("recentReadings") private var recentReadings = "[]"
+    @AppStorage("analyticsPromptAnswered") private var analyticsPromptAnswered = false
+    @State private var showAnalyticsPrompt = false
     @State private var query = ""
     @State private var filterSelection = FilterBarSelection(LibraryFilter.all)
     @State private var catalog: Catalog?
@@ -344,6 +346,18 @@ struct LibraryView: View {
             .toolbar(.hidden, for: .navigationBar)
             .tint(SystemTokens.Colors.accent)
             .background(SystemTokens.Colors.background.ignoresSafeArea())
+            .alert(language.text("Ajude a melhorar o Praxis", "Help improve Praxis"), isPresented: $showAnalyticsPrompt) {
+                Button(language.text("Não compartilhar", "Don't share"), role: .cancel) {
+                    Analytics.setConsent(false)
+                    analyticsPromptAnswered = true
+                }
+                Button(language.text("Compartilhar dados de uso", "Share usage data")) {
+                    Analytics.setConsent(true)
+                    analyticsPromptAnswered = true
+                }
+            } message: {
+                Text(language.text("Compartilhe dados gerais de uso com o TelemetryDeck para ajudar a melhorar o app. Não enviamos suas buscas, títulos ou posição de leitura. A escolha é opcional e pode ser alterada em Privacidade.", "Share general usage data with TelemetryDeck to help improve the app. We don't send search terms, titles, or reading positions. This is optional and can be changed in Privacy."))
+            }
             .task(id: language.rawValue) {
                 query = ""
                 do {
@@ -351,6 +365,13 @@ struct LibraryView: View {
                     catalog = loaded
                     catalogWorkKeys = loaded.workKeys(base: baseURL)
                     error = false
+                    if Analytics.isAvailable && !analyticsPromptAnswered {
+                        if UserDefaults.standard.bool(forKey: "analyticsConsent") {
+                            analyticsPromptAnswered = true
+                        } else {
+                            showAnalyticsPrompt = true
+                        }
+                    }
                 } catch {
                     catalog = nil
                     catalogWorkKeys = []

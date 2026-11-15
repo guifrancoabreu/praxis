@@ -39,7 +39,7 @@ enum Analytics {
         }
     }
 
-    private static let appID = "YOUR-TELEMETRYDECK-APP-ID"
+    private static let appID = "27BA9D21-5BD6-445D-81B7-F082D2A861A6"
     private static var isConfigured = false
     private static var configuration: TelemetryDeck.Config?
 

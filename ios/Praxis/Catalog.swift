@@ -46,6 +46,10 @@ enum Language: String, CaseIterable, Identifiable {
     }
 
     private static let spanish: [String: String] = [
+        "Help improve Praxis": "Ayuda a mejorar Praxis",
+        "Don't share": "No compartir",
+        "Share usage data": "Compartir datos de uso",
+        "Share general usage data with TelemetryDeck to help improve the app. We don't send search terms, titles, or reading positions. This is optional and can be changed in Privacy.": "Comparte datos generales de uso con TelemetryDeck para ayudar a mejorar la app. No enviamos términos de búsqueda, títulos ni posiciones de lectura. Es opcional y puedes cambiarlo en Privacidad.",
         "Language": "Idioma", "Writers": "Autores", "works": "obras", "Works": "Obras",
         "No results found.": "No se encontraron resultados.", "No results found": "No se encontraron resultados.", "Catalog updated": "Catálogo actualizado el",
         "Search writers and works": "Buscar autores y obras", "Catalog unavailable": "Catálogo no disponible",
