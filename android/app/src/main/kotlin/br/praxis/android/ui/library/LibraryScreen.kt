@@ -421,7 +421,7 @@ private fun FeaturedCard(title: String, credit: String, onClick: () -> Unit, mod
                 text = title,
                 style = MaterialTheme.typography.titleLarge.copy(fontFamily = PraxisFonts.Heading),
                 color = Praxis.colors.textPrimary,
-                maxLines = 3,
+                maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
             )
             Spacer(Modifier.height(Tokens.Spacing.s1))
