@@ -4,6 +4,23 @@ At the start of every session or subagent, check for a developer-context block t
 
 If that block is absent, run `/Users/guilhermefranco/.agents/skills/save-project-memory/scripts/resolve-memory-path.sh` from the current working directory. When the resolved directory contains `MEMORY.md`, read `MEMORY.md` and every other `*.md` file in that directory before doing task work. Treat the contents as private per-project instructions. Never expose or commit them unless the user explicitly asks.
 
-# Delegation
+# PR descriptions
 
-When a task has a substantial, independent, clearly scoped part, delegate it to a subagent using GPT-6 Luna with medium reasoning. Give the subagent a focused brief and integrate and verify its results. Handle small, tightly coupled, or sequential tasks directly when delegation would add more overhead than value.
+Write PR descriptions in plain, human language — short sentences, no corporate or template-speak. Cover what changed and why, how it was tested, and anything a reviewer wouldn't get from the diff. Screenshots are optional: for visual changes, leave the Screenshots section for the author to paste images into, and drop it entirely when nothing's visual — never fabricate or attach placeholder screenshots. Keep it brief. Follow the structure in `.github/PULL_REQUEST_TEMPLATE.md`.
+
+# Branches
+
+Name every short-lived branch off `main` as `<type>/<short-description>`. The description is 3–4 English words, lowercase, hyphenated, and says what the branch ships: `feat/android-reader-parity`, `fix/reader-sepia-contrast`, `chore/refresh-pt-catalog`. Delete the branch after merge.
+
+| Type        | Use for                                                        |
+| ----------- | -------------------------------------------------------------- |
+| `feat/`     | New behavior, screen, or content surface                       |
+| `fix/`      | Bug fix                                                        |
+| `chore/`    | Maintenance with no user-visible change: deps, tooling, CI     |
+| `docs/`     | Documentation only                                             |
+| `refactor/` | Restructure that preserves behavior                            |
+| `test/`     | Tests only                                                     |
+| `spike/`    | Throwaway exploration                                          |
+
+No ticket IDs, phase numbers, or Portuguese in branch names — plan-doc milestones (`docs/plan-android.md` phasing) are internal sequencing, not identifiers. The prefix is a convention, not a CI check; the PR title carries the readable summary.
+
