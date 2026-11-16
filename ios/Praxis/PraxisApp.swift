@@ -645,7 +645,7 @@ struct LibraryView: View {
                 HStack(spacing: 15) {
                     BookCover(title: item.1.title, compact: false).frame(width: 76, height: 104)
                     VStack(alignment: .leading, spacing: 7) {
-                        Text(item.1.title).font(PraxisFont.heading(.title3, weight: .semibold)).multilineTextAlignment(.leading)
+                        Text(item.1.title).font(PraxisFont.heading(.title3, weight: .semibold)).multilineTextAlignment(.leading).lineLimit(2).truncationMode(.tail)
                         if !item.1.displayCredit(archiveName: item.0.full).isEmpty {
                             Text(item.1.displayCredit(archiveName: item.0.full)).font(PraxisFont.body(.subheadline)).foregroundStyle(SystemTokens.Colors.textSecondary)
                         }
