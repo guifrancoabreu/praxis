@@ -126,9 +126,9 @@ fun ReaderScreen(
                 val raw = pageStore.loadHtml(sourceUrl)
                 html = HtmlSanitizer.sanitize(raw, sourceUrl)
             }
+            preferences.recordReadingDay()
         }.onFailure { failed = true }
         Analytics.track(Analytics.Event.WorkOpened)
-        preferences.recordReadingDay()
     }
 
     // Progress is written once the reader settles, like the 5 s debounce on iOS.

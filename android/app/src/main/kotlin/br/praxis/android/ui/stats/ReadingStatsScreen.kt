@@ -35,9 +35,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -49,7 +52,6 @@ import br.praxis.android.data.ReadingHistory
 import br.praxis.android.data.ReadingProgress
 import br.praxis.android.data.ReadingStats
 import br.praxis.android.design.Praxis
-import br.praxis.android.design.PraxisText
 import br.praxis.android.design.Tokens
 import br.praxis.android.design.components.InsetDivider
 
@@ -87,28 +89,26 @@ fun ReadingStatsScreen(onBack: () -> Unit) {
 
 @Composable
 private fun TopBar(title: String, onBack: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .statusBarsPadding()
-            .padding(horizontal = Tokens.Spacing.s1, vertical = Tokens.Spacing.s1),
-        verticalAlignment = Alignment.CenterVertically,
+    Box(
+        modifier = Modifier.fillMaxWidth().statusBarsPadding().height(56.dp),
+        contentAlignment = Alignment.Center,
     ) {
-        IconButton(onClick = onBack) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
+            color = Praxis.colors.textPrimary,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(horizontal = 64.dp),
+        )
+        IconButton(onClick = onBack, modifier = Modifier.align(Alignment.CenterStart).padding(start = Tokens.Spacing.s1)) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = stringResource(R.string.action_back),
                 tint = Praxis.colors.textPrimary,
             )
         }
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleSmall,
-            color = Praxis.colors.textPrimary,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.weight(1f),
-        )
     }
 }
 
@@ -145,7 +145,7 @@ private fun StatsBody(
 
     LazyColumn(
         modifier = Modifier.fillMaxSize().navigationBarsPadding(),
-        contentPadding = PaddingValues(horizontal = Tokens.Spacing.s5, vertical = Tokens.Spacing.s5),
+        contentPadding = PaddingValues(horizontal = Tokens.Spacing.s5, vertical = 18.dp),
         verticalArrangement = Arrangement.spacedBy(Tokens.Spacing.s6),
     ) {
         item { Hero(streak = streak) }
@@ -157,7 +157,7 @@ private fun StatsBody(
                 saved = savedPaths.size,
             )
         }
-        item { ActivitySection(counts = buckets, totalDays = days.size) }
+        item { ActivitySection(counts = buckets) }
         if (mostRead.isNotEmpty()) {
             item { AuthorsSection(entries = mostRead) }
         }
@@ -170,7 +170,6 @@ private fun Hero(streak: Int) {
         Text(
             text = streak.toString(),
             style = MaterialTheme.typography.displayLarge.copy(
-                fontFamily = FontFamily.Serif,
                 fontSize = 64.sp,
                 lineHeight = 72.sp,
                 fontWeight = FontWeight.Medium,
@@ -178,13 +177,13 @@ private fun Hero(streak: Int) {
             color = Praxis.colors.textPrimary,
         )
         Text(
-            text = stringResource(R.string.stats_streak_label),
+            text = pluralStringResource(R.plurals.stats_streak_label, streak),
             style = MaterialTheme.typography.bodyMedium,
             color = Praxis.colors.textSecondary,
         )
         Text(
             text = stringResource(R.string.stats_streak_caption),
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.labelMedium,
             color = Praxis.colors.textSecondary,
         )
     }
@@ -217,32 +216,33 @@ private fun StatTile(label: String, value: String, modifier: Modifier = Modifier
     ) {
         Text(
             text = value,
-            style = MaterialTheme.typography.titleLarge.copy(fontFamily = FontFamily.Serif, fontWeight = FontWeight.SemiBold),
+            style = MaterialTheme.typography.titleLarge.copy(fontSize = 28.sp, lineHeight = 42.sp),
             color = Praxis.colors.textPrimary,
         )
         Text(
             text = label,
-            style = MaterialTheme.typography.labelMedium,
+            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Normal, letterSpacing = 0.sp),
             color = Praxis.colors.textSecondary,
         )
     }
 }
 
 @Composable
-private fun ActivitySection(counts: List<Int>, totalDays: Int) {
+private fun ActivitySection(counts: List<Int>) {
+    val description = stringResource(R.string.stats_activity_accessibility, counts.joinToString(", "))
     Column(verticalArrangement = Arrangement.spacedBy(Tokens.Spacing.s2)) {
         SectionHeading(stringResource(R.string.stats_section_activity))
         Row(
-            modifier = Modifier.fillMaxWidth().height(72.dp),
+            modifier = Modifier.fillMaxWidth().height(72.dp).semantics(mergeDescendants = true) { contentDescription = description },
             verticalAlignment = Alignment.Bottom,
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             counts.forEach { count ->
                 Box(
                     modifier = Modifier
                         .width(14.dp)
-                        .height((count * 9).coerceAtLeast(6).dp)
-                        .background(Praxis.colors.accent, RoundedCornerShape(Tokens.Radius.sm)),
+                        .height((if (count == 0) 2 else count * 9).dp)
+                        .background(if (count == 0) Praxis.colors.separator else Praxis.colors.accent),
                 )
             }
         }
@@ -265,14 +265,14 @@ private fun AuthorsSection(entries: List<Map.Entry<String, Int>>) {
             ) {
                 Text(
                     text = name,
-                    style = MaterialTheme.typography.titleSmall,
+                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Medium),
                     color = Praxis.colors.textPrimary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f),
                 )
                 Text(
-                    text = stringResource(R.string.work_count, count),
+                    text = if (count == 1) "1 texto" else stringResource(R.string.work_count, count),
                     style = MaterialTheme.typography.bodyMedium,
                     color = Praxis.colors.textSecondary,
                 )
@@ -286,36 +286,40 @@ private fun AuthorsSection(entries: List<Map.Entry<String, Int>>) {
 private fun SectionHeading(title: String) {
     Text(
         text = title.uppercase(),
-        style = PraxisText.sectionLabel,
+        style = MaterialTheme.typography.bodyMedium.copy(
+            fontWeight = FontWeight.SemiBold,
+            letterSpacing = 0.8.sp,
+        ),
         color = Praxis.colors.textSecondary,
     )
 }
 
 @Composable
 private fun EmptyStats() {
-    Box(modifier = Modifier.fillMaxSize().navigationBarsPadding(), contentAlignment = Alignment.Center) {
-        Column(
-            modifier = Modifier.padding(horizontal = Tokens.Spacing.s8),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Icon(
-                imageVector = Icons.Filled.BarChart,
-                contentDescription = null,
-                tint = Praxis.colors.accent,
-                modifier = Modifier.size(28.dp),
-            )
-            Text(
-                text = stringResource(R.string.stats_empty_title),
-                style = MaterialTheme.typography.titleSmall,
-                color = Praxis.colors.textPrimary,
-                modifier = Modifier.padding(top = Tokens.Spacing.s3),
-            )
-            Text(
-                text = stringResource(R.string.stats_empty_body),
-                style = MaterialTheme.typography.bodyMedium,
-                color = Praxis.colors.textSecondary,
-                modifier = Modifier.padding(top = Tokens.Spacing.s1),
-            )
-        }
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = Tokens.Spacing.s5, vertical = 18.dp)
+            .clip(RoundedCornerShape(Tokens.Radius.xl))
+            .background(Praxis.colors.surface)
+            .padding(Tokens.Spacing.s5),
+        verticalArrangement = Arrangement.spacedBy(Tokens.Spacing.s2),
+    ) {
+        Icon(
+            imageVector = Icons.Filled.BarChart,
+            contentDescription = null,
+            tint = Praxis.colors.accent,
+            modifier = Modifier.size(28.dp),
+        )
+        Text(
+            text = stringResource(R.string.stats_empty_title),
+            style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp, lineHeight = 30.sp),
+            color = Praxis.colors.textPrimary,
+        )
+        Text(
+            text = stringResource(R.string.stats_empty_body),
+            style = MaterialTheme.typography.bodyMedium,
+            color = Praxis.colors.textSecondary,
+        )
     }
 }

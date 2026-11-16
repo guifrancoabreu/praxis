@@ -143,7 +143,7 @@ class PraxisPreferences(private val context: Context) {
                 keys.add(0, key)
                 true
             }
-            prefs[Keys.finishedWorkIDs] = json.encodeToString(keys.take(400))
+            prefs[Keys.finishedWorkIDs] = json.encodeToString(keys)
         }
         return finished
     }

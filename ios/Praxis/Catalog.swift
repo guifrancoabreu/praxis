@@ -19,7 +19,7 @@ enum Language: String, CaseIterable, Identifiable {
         return Self.spanish[en] ?? en
     }
     func workCount(_ count: Int) -> String {
-        self == .es ? "\(count) obras" : text("\(count) textos", "\(count) works")
+        self == .es ? "\(count) \(count == 1 ? "obra" : "obras")" : text("\(count) \(count == 1 ? "texto" : "textos")", "\(count) \(count == 1 ? "work" : "works")")
     }
     func readingProgress(_ percent: Int) -> String {
         if self == .pt { return "\(percent)% lido" }
@@ -741,11 +741,11 @@ enum ReadingStats {
         return key(year: components.year ?? 1970, month: components.month ?? 1, day: components.day ?? 1)
     }
 
-    /// Union of stored days and today, newest first, capped at 400 entries.
+    /// Union of stored days and today, newest first.
     static func mergeReadingDays(existing: [String], today: String) -> [String] {
         let merged = Set(existing).union([today])
         // ISO day strings sort chronologically as plain text.
-        return Array(merged.sorted(by: >).prefix(400))
+        return merged.sorted(by: >)
     }
 
     /// Consecutive reading days ending today, or ending yesterday when today

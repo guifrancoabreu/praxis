@@ -320,7 +320,10 @@ struct LibraryView: View {
                                     .font(PraxisFont.body(.footnote)).foregroundStyle(SystemTokens.Colors.textSecondary).frame(maxWidth: .infinity, alignment: .center).padding(.vertical, 12)
                                 if query.isEmpty && filter == .all {
                                     supportFooter
-                                    feedbackFooter
+                                    if let value = Bundle.main.object(forInfoDictionaryKey: "PraxisFeedbackURL") as? String,
+                                       let url = URL(string: value), url.scheme == "https", url.host != nil {
+                                        feedbackFooter
+                                    }
                                     privacyFooter
                                 }
                             }
@@ -1470,7 +1473,6 @@ struct ReaderView: View {
         .task(id: work.path + language.rawValue) { await load() }
         .onAppear {
             Analytics.track(.workOpened)
-            stampReadingDay()
         }
         .onDisappear { flushProgress() }
         .onChange(of: scenePhase) { _, phase in if phase != .active { flushProgress() } }
@@ -1489,6 +1491,7 @@ struct ReaderView: View {
                 html = try await PageStore.load(components?.url ?? sourceURL)
                 pdfData = nil
             }
+            stampReadingDay()
             var entries = storedEntries
             let priorProgress = entries.first(where: { $0.path == work.path })?.progress ?? initialProgress
             entries.removeAll { $0.path == work.path }
@@ -1716,7 +1719,7 @@ struct ReadingStatsView: View {
             Text("\(streak)")
                 .font(PraxisFont.fixed(64, weight: .medium, heading: true))
                 .foregroundStyle(SystemTokens.Colors.textPrimary)
-            Text(language.text("dias seguidos", "days in a row"))
+            Text(language.text(streak == 1 ? "dia seguido" : "dias seguidos", streak == 1 ? "day in a row" : "days in a row"))
                 .font(PraxisFont.body(.subheadline))
                 .foregroundStyle(SystemTokens.Colors.textSecondary)
             Text(language.text("Lendo todos os dias você constrói o hábito.", "Reading every day builds the habit."))
@@ -1730,7 +1733,7 @@ struct ReadingStatsView: View {
     private var statGrid: some View {
         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
             statTile(finishedCount, language.text("Concluídos", "Finished"))
-            statTile(readCount, language.text("Lidos", "Read"))
+            statTile(readCount, language.text("Abertos recentemente", "Recently opened"))
             statTile(days.count, language.text("Dias de leitura", "Reading days"))
             statTile(savedCount, language.text("Salvos", "Saved"))
         }
@@ -1757,14 +1760,14 @@ struct ReadingStatsView: View {
             HStack(alignment: .bottom, spacing: 8) {
                 ForEach(Array(bucketCounts.enumerated()), id: \.offset) { _, count in
                     Rectangle()
-                        .fill(SystemTokens.Colors.accent)
-                        .frame(width: 14, height: max(6, CGFloat(count) * 9))
+                        .fill(count == 0 ? SystemTokens.Colors.separator : SystemTokens.Colors.accent)
+                        .frame(width: 14, height: count == 0 ? 2 : CGFloat(count) * 9)
                 }
             }
             .frame(height: 72, alignment: .bottom)
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel(language.text("\(days.count) dias de leitura", "\(days.count) reading days"))
-            Text(language.text("Últimas 12 semanas", "Last 12 weeks"))
+            .accessibilityLabel(language.text("Dias de leitura por semana, das mais antigas às mais recentes: \(bucketCounts.map(String.init).joined(separator: ", "))", "Reading days per week, oldest to newest: \(bucketCounts.map(String.init).joined(separator: ", "))"))
+            Text(language.text("Últimas 12 semanas · 0 a 7 dias por semana", "Last 12 weeks · 0 to 7 days per week"))
                 .font(PraxisFont.body(.caption))
                 .foregroundStyle(SystemTokens.Colors.textSecondary)
         }
@@ -1773,7 +1776,7 @@ struct ReadingStatsView: View {
 
     private var authorsSection: some View {
         VStack(alignment: .leading, spacing: 0) {
-            heading(language.text("Autores mais lidos", "Most-read authors"))
+            heading(language.text("Autores abertos recentemente", "Recently opened authors"))
                 .padding(.bottom, 8)
             ForEach(Array(mostReadAuthors.enumerated()), id: \.offset) { index, author in
                 HStack {

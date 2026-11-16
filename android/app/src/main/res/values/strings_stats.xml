@@ -3,15 +3,16 @@
     <string name="stats_title">Estatísticas</string>
     <string name="stats_card_title">Estatísticas de leitura</string>
     <string name="stats_card_subtitle">Seu progresso, sequência e obras concluídas</string>
-    <string name="stats_streak_label">dias seguidos</string>
+    <plurals name="stats_streak_label"><item quantity="one">dia seguido</item><item quantity="other">dias seguidos</item></plurals>
     <string name="stats_streak_caption">Lendo todos os dias você constrói o hábito.</string>
     <string name="stats_tile_finished">Concluídos</string>
-    <string name="stats_tile_read">Lidos</string>
+    <string name="stats_tile_read">Abertos recentemente</string>
     <string name="stats_tile_days">Dias de leitura</string>
     <string name="stats_tile_saved">Salvos</string>
     <string name="stats_section_activity">Atividade</string>
-    <string name="stats_activity_caption">Últimas 12 semanas</string>
-    <string name="stats_section_authors">Autores mais lidos</string>
+    <string name="stats_activity_caption">Últimas 12 semanas · 0 a 7 dias por semana</string>
+    <string name="stats_activity_accessibility">Dias de leitura por semana, das mais antigas às mais recentes: %1$s</string>
+    <string name="stats_section_authors">Autores abertos recentemente</string>
     <string name="stats_empty_title">Nenhuma leitura ainda</string>
     <string name="stats_empty_body">Abra um texto para começar a acompanhar seu progresso.</string>
 </resources>

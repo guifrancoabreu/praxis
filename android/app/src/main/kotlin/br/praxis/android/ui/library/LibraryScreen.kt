@@ -56,6 +56,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import br.praxis.android.AppGraph
+import br.praxis.android.BuildConfig
 import br.praxis.android.R
 import br.praxis.android.data.Analytics
 import br.praxis.android.data.Author
@@ -71,7 +72,6 @@ import br.praxis.android.data.TextSearch
 import br.praxis.android.data.Work
 import br.praxis.android.design.Praxis
 import br.praxis.android.design.PraxisFonts
-import br.praxis.android.design.PraxisText
 import br.praxis.android.design.Tokens
 import br.praxis.android.design.components.AuthorArtwork
 import br.praxis.android.design.components.BookCover
@@ -376,7 +376,10 @@ private fun LibrarySectionHeader(
     Row(modifier = modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Text(
             text = title.uppercase(),
-            style = PraxisText.sectionLabel,
+            style = MaterialTheme.typography.labelMedium.copy(
+                fontWeight = FontWeight.SemiBold,
+                letterSpacing = 0.8.sp,
+            ),
             color = Praxis.colors.textSecondary,
             modifier = Modifier.weight(1f),
         )
@@ -430,7 +433,7 @@ private fun FeaturedCard(title: String, credit: String, onClick: () -> Unit, mod
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = title,
-                style = PraxisText.featuredTitle,
+                style = MaterialTheme.typography.titleLarge.copy(fontFamily = PraxisFonts.Heading),
                 color = Praxis.colors.textPrimary,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
@@ -446,7 +449,8 @@ private fun FeaturedCard(title: String, credit: String, onClick: () -> Unit, mod
             Spacer(Modifier.height(Tokens.Spacing.s3))
             Text(
                 text = stringResource(R.string.action_start_reading),
-                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.SemiBold,
                 color = Praxis.colors.accent,
             )
         }
@@ -514,7 +518,7 @@ private fun ContinueReadingCard(
             if (credit.isNotEmpty()) {
                 Text(
                     text = credit,
-                    style = PraxisText.caption,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = Praxis.colors.textSecondary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -528,7 +532,7 @@ private fun ContinueReadingCard(
             Spacer(Modifier.height(Tokens.Spacing.s1))
             Text(
                 text = stringResource(R.string.progress_in_section, (progress.progress * 100).toInt()),
-                style = PraxisText.caption,
+                style = MaterialTheme.typography.labelMedium,
                 color = Praxis.colors.textSecondary,
             )
         }
@@ -565,14 +569,15 @@ private fun WriterCard(author: Author, onClick: () -> Unit) {
         Spacer(Modifier.height(Tokens.Spacing.s2))
         Text(
             text = author.full,
-            style = PraxisText.authorName,
+            style = MaterialTheme.typography.bodyLarge.copy(fontFamily = PraxisFonts.Heading),
+            fontWeight = FontWeight.SemiBold,
             color = Praxis.colors.textPrimary,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
         Text(
             text = workCountLabel(author.works.size),
-            style = PraxisText.caption,
+            style = MaterialTheme.typography.bodyMedium,
             color = Praxis.colors.textSecondary,
         )
     }
@@ -681,7 +686,7 @@ private fun WorkRow(work: Work, author: String, onClick: () -> Unit) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = work.title,
-                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Medium),
+                style = MaterialTheme.typography.titleSmall.copy(fontFamily = PraxisFonts.Heading),
                 color = Praxis.colors.textPrimary,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
@@ -698,7 +703,7 @@ private fun WorkRow(work: Work, author: String, onClick: () -> Unit) {
             if (work.date.isNotEmpty()) {
                 Text(
                     text = work.date,
-                    style = PraxisText.caption,
+                    style = MaterialTheme.typography.labelMedium,
                     color = Praxis.colors.textSecondary,
                 )
             }
@@ -755,16 +760,14 @@ private fun StatsCard(onClick: () -> Unit) {
             .clickable(onClick = onClick)
             .padding(Tokens.Spacing.s4),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(14.dp),
+        horizontalArrangement = Arrangement.spacedBy(13.dp),
     ) {
-        RoundIconTile(diameter = 42.dp) {
-            Icon(
-                imageVector = Icons.Filled.BarChart,
-                contentDescription = null,
-                tint = Praxis.colors.accent,
-                modifier = Modifier.size(20.dp),
-            )
-        }
+        Icon(
+            imageVector = Icons.Filled.BarChart,
+            contentDescription = null,
+            tint = Praxis.colors.accent,
+            modifier = Modifier.size(22.dp),
+        )
         Column(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(Tokens.Spacing.s1),
@@ -778,8 +781,8 @@ private fun StatsCard(onClick: () -> Unit) {
             )
             Text(
                 text = stringResource(R.string.stats_card_subtitle),
-                style = MaterialTheme.typography.labelLarge,
-                color = Praxis.colors.accent,
+                style = MaterialTheme.typography.bodyMedium,
+                color = Praxis.colors.textSecondary,
             )
         }
         Chevron()
@@ -821,6 +824,7 @@ private fun Footer(onOpenSupport: () -> Unit, onOpenFeedback: () -> Unit, onOpen
             }
             Chevron()
         }
+        if (runCatching { java.net.URI(BuildConfig.FEEDBACK_URL) }.getOrNull()?.let { it.scheme == "https" && !it.host.isNullOrBlank() } == true) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -844,6 +848,7 @@ private fun Footer(onOpenSupport: () -> Unit, onOpenFeedback: () -> Unit, onOpen
                 Text(text = stringResource(R.string.feedback_card_body), style = MaterialTheme.typography.bodyMedium, color = Praxis.colors.textSecondary)
             }
             Chevron()
+        }
         }
         Text(
             text = stringResource(R.string.footer_privacy),

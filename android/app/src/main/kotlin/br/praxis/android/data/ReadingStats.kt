@@ -11,9 +11,9 @@ object ReadingStats {
     /** Local ISO day, the shape stored in `readingDays`. */
     fun today(): String = LocalDate.now().toString()
 
-    /** Union of the stored days and today, newest first, bounded to 400 entries. */
+    /** Union of the stored days and today, newest first. */
     fun mergeReadingDays(existing: List<String>, today: String): List<String> =
-        (existing + today).distinct().sortedDescending().take(400)
+        (existing + today).distinct().sortedDescending()
 
     /**
      * Consecutive days ending today. A day not read yet counts as still alive, so the walk starts

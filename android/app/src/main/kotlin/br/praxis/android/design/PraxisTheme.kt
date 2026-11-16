@@ -44,7 +44,7 @@ private val lightColors = PraxisColors(
     secondarySurface = Tokens.Colors.secondarySurfaceLight,
     textPrimary = Color(0xFF000000),
     textSecondary = Color(0xFF524D47),
-    separator = Color(0x21000000),
+    separator = Color(0x123C3C43),
     coverOchre = Tokens.Colors.coverOchre,
     coverRust = Tokens.Colors.coverRust,
     coverOlive = Tokens.Colors.coverOlive,
@@ -62,8 +62,8 @@ private val darkColors = PraxisColors(
     surface = Tokens.Colors.surfaceDark,
     secondarySurface = Tokens.Colors.secondarySurfaceDark,
     textPrimary = Color(0xFFFFFFFF),
-    textSecondary = Color(0xFFA9A39D),
-    separator = Color(0x2BFFFFFF),
+    textSecondary = Color(0x99EBEBF5),
+    separator = Color(0x20545458),
     coverOchre = Tokens.Colors.coverOchre,
     coverRust = Tokens.Colors.coverRust,
     coverOlive = Tokens.Colors.coverOlive,
@@ -141,23 +141,6 @@ val PraxisTypography = Typography(
         fontWeight = FontWeight.SemiBold,
     ),
 )
-
-/**
- * Text roles Material3's scale doesn't express, mirroring the iOS app's system text styles.
- */
-object PraxisText {
-    /** Inter 12, iOS `.caption`: credits, counts, progress and year lines. */
-    val caption = TextStyle(fontFamily = PraxisFonts.Body, fontSize = 12.sp, lineHeight = 15.sp)
-    /** Inter 15 semibold, iOS `.subheadline` semibold: uppercase section headers. */
-    val sectionLabel = TextStyle(
-        fontFamily = PraxisFonts.Body, fontWeight = FontWeight.SemiBold,
-        fontSize = 15.sp, lineHeight = 18.sp, letterSpacing = 0.8.sp,
-    )
-    /** Literata 15 semibold, iOS `.subheadline` heading: author names in grids. */
-    val authorName = TextStyle(fontFamily = PraxisFonts.Heading, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, lineHeight = 22.sp)
-    /** Literata 20 semibold, iOS `.title3` heading: quick-start card title. */
-    val featuredTitle = TextStyle(fontFamily = PraxisFonts.Heading, fontWeight = FontWeight.SemiBold, fontSize = 20.sp, lineHeight = 30.sp)
-}
 
 private val LocalColors = staticCompositionLocalOf { lightColors }
 

@@ -21,10 +21,10 @@ final class ReadingStatsTests: XCTestCase {
         XCTAssertEqual(merged, ["2024-01-03", "2024-01-01"])
     }
 
-    func testMergeCapsAtFourHundredDaysNewestFirst() {
+    func testMergeRetainsMoreThanFourHundredDays() {
         let existing = (0..<450).map { ReadingStats.shift("2024-06-01", by: -$0) }
         let merged = ReadingStats.mergeReadingDays(existing: existing, today: "2024-06-02")
-        XCTAssertEqual(merged.count, 400)
+        XCTAssertEqual(merged.count, 451)
         XCTAssertEqual(merged.first, "2024-06-02")
         XCTAssertEqual(merged, merged.sorted(by: >), "Days must stay newest first.")
     }

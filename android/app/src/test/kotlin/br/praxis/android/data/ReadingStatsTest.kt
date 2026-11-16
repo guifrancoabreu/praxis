@@ -16,10 +16,10 @@ class ReadingStatsTest {
     }
 
     @Test
-    fun `mergeReadingDays caps the list at 400`() {
+    fun `mergeReadingDays retains more than 400 days`() {
         val many = (1L..401L).map { day(-it) }
         val merged = ReadingStats.mergeReadingDays(many, "2026-11-16")
-        assertEquals(400, merged.size)
+        assertEquals(402, merged.size)
         assertEquals("2026-11-16", merged.first())
     }
 
