@@ -19,6 +19,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SegmentedButton
@@ -28,12 +30,15 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import br.praxis.android.R
 import br.praxis.android.data.ReaderAppearance
 import br.praxis.android.design.Praxis
@@ -171,6 +176,9 @@ fun ReadingThemeSheet(
             }
 
             if (appearance.theme == "custom") {
+                ColorEditorRow(stringResource(R.string.appearance_background), appearance.background) { onChange(appearance.withColors(background = it)) }
+                ColorEditorRow(stringResource(R.string.appearance_foreground), appearance.foreground) { onChange(appearance.withColors(foreground = it)) }
+                ColorEditorRow(stringResource(R.string.appearance_links), appearance.link) { onChange(appearance.withColors(link = it)) }
                 val textRatio = ReaderAppearance.contrastRatio(appearance.foreground, appearance.background)
                 val linkRatio = ReaderAppearance.contrastRatio(appearance.link, appearance.background)
                 Text(
@@ -197,6 +205,45 @@ fun ReadingThemeSheet(
             }
         }
     }
+}
+
+@Composable
+private fun ColorEditorRow(label: String, hex: String, onChange: (String) -> Unit) {
+    val open = remember { mutableStateOf(false) }
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(top = Tokens.Spacing.s2),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(Tokens.Spacing.s3),
+    ) {
+        Text(label, style = MaterialTheme.typography.bodyMedium, color = Praxis.colors.textPrimary, modifier = Modifier.weight(1f))
+        Box(Modifier.size(28.dp).background(hexColor(hex), CircleShape).border(1.dp, Praxis.colors.separator, CircleShape))
+        TextButton(onClick = { open.value = true }) { Text(hex.uppercase(), color = Praxis.colors.accent) }
+    }
+    if (open.value) ColorEditorDialog(label, hex, onChange) { open.value = false }
+}
+
+@Composable
+private fun ColorEditorDialog(label: String, hex: String, onChange: (String) -> Unit, onDismiss: () -> Unit) {
+    val raw = (hex.removePrefix("#").toLongOrNull(16) ?: 0xFBFAF7).toInt()
+    val red = remember { mutableStateOf(((raw shr 16) and 255).toFloat()) }
+    val green = remember { mutableStateOf(((raw shr 8) and 255).toFloat()) }
+    val blue = remember { mutableStateOf((raw and 255).toFloat()) }
+    val selected = String.format(Locale.ROOT, "#%02x%02x%02x", red.value.roundToInt(), green.value.roundToInt(), blue.value.roundToInt())
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(label) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(Tokens.Spacing.s1)) {
+                Box(Modifier.fillMaxWidth().height(40.dp).background(hexColor(selected), RoundedCornerShape(Tokens.Radius.sm)))
+                listOf("R" to red, "G" to green, "B" to blue).forEach { (channel, value) ->
+                    Text("$channel · ${value.value.roundToInt()}", style = MaterialTheme.typography.labelMedium)
+                    Slider(value = value.value, onValueChange = { value.value = it }, valueRange = 0f..255f)
+                }
+            }
+        },
+        confirmButton = { Button(onClick = { onChange(selected); onDismiss() }) { Text("OK") } },
+        properties = DialogProperties(usePlatformDefaultWidth = true),
+    )
 }
 
 @Composable

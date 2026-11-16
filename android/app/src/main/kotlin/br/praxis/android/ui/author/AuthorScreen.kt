@@ -16,9 +16,9 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Public
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,8 +32,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -48,14 +46,17 @@ import br.praxis.android.data.Work
 import br.praxis.android.design.Praxis
 import br.praxis.android.design.Tokens
 import br.praxis.android.design.components.AuthorArtwork
-import br.praxis.android.design.components.BookCover
 import br.praxis.android.design.components.Chevron
 import br.praxis.android.design.components.InsetDivider
 
 /** Author profile, mirroring AuthorView: portrait card, biography and the works by section. */
 @Composable
-fun AuthorScreen(authorId: String, onBack: () -> Unit, onOpenWork: (Author, Work) -> Unit) {
-    val context = LocalContext.current
+fun AuthorScreen(
+    authorId: String,
+    onBack: () -> Unit,
+    onOpenWork: (Author, Work) -> Unit,
+    onOpenArchiveLink: (String, String) -> Unit,
+) {
     var catalog by remember { mutableStateOf<Catalog?>(null) }
     var expanded by remember { mutableStateOf(false) }
 
@@ -101,7 +102,13 @@ fun AuthorScreen(authorId: String, onBack: () -> Unit, onOpenWork: (Author, Work
                     color = Praxis.colors.textSecondary,
                 )
             }
-            else -> AuthorContent(author, expanded, onToggleExpanded = { expanded = !expanded }, onOpenWork = onOpenWork)
+            else -> AuthorContent(
+                author,
+                expanded,
+                onToggleExpanded = { expanded = !expanded },
+                onOpenWork = onOpenWork,
+                onOpenArchiveLink = onOpenArchiveLink,
+            )
         }
     }
 }
@@ -112,19 +119,18 @@ private fun AuthorContent(
     expanded: Boolean,
     onToggleExpanded: () -> Unit,
     onOpenWork: (Author, Work) -> Unit,
+    onOpenArchiveLink: (String, String) -> Unit,
 ) {
+    val biographyTitle = stringResource(R.string.author_biography)
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         item {
-            val cardShape = RoundedCornerShape(Tokens.Radius.lg)
             Column(
                 modifier = Modifier
+                    .fillMaxWidth()
                     .padding(horizontal = Tokens.Spacing.s5)
-                    .padding(top = Tokens.Spacing.s3)
-                    .clip(cardShape)
-                    .background(Praxis.colors.surface)
-                    .padding(Tokens.Spacing.s4),
+                    .padding(top = Tokens.Spacing.s3),
             ) {
-                Row(horizontalArrangement = Arrangement.spacedBy(Tokens.Spacing.s4)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(14.dp), verticalAlignment = Alignment.Top) {
                     AuthorArtwork(
                         name = author.full,
                         modifier = Modifier.size(92.dp, 112.dp),
@@ -142,15 +148,33 @@ private fun AuthorContent(
                         if (author.displayDates.isNotEmpty()) {
                             Text(
                                 text = author.displayDates,
-                                style = MaterialTheme.typography.bodyLarge,
+                                style = MaterialTheme.typography.bodyMedium,
                                 color = Praxis.colors.textSecondary,
                             )
                         }
                         if (author.country.isNotEmpty()) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(Tokens.Spacing.s1),
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Public,
+                                    contentDescription = null,
+                                    tint = Praxis.colors.textSecondary,
+                                    modifier = Modifier.size(16.dp),
+                                )
+                                Text(
+                                    text = author.country,
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = Praxis.colors.textSecondary,
+                                )
+                            }
+                        }
+                        author.groups.forEach { group ->
                             Text(
-                                text = author.country,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = Praxis.colors.textSecondary,
+                                text = group,
+                                style = MaterialTheme.typography.labelMedium,
+                                color = Praxis.colors.accent,
                             )
                         }
                     }
@@ -175,6 +199,23 @@ private fun AuthorContent(
                             .clickable(onClick = onToggleExpanded),
                     )
                 }
+                author.bioPath?.takeIf { it.isNotEmpty() }?.let { bioPath ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onOpenArchiveLink(bioPath, biographyTitle) }
+                            .padding(top = Tokens.Spacing.s3),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = stringResource(R.string.author_biography),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = Praxis.colors.accent,
+                            modifier = Modifier.weight(1f),
+                        )
+                        Chevron()
+                    }
+                }
             }
         }
 
@@ -197,6 +238,7 @@ private fun AuthorContent(
             }
             items(works, key = { it.path }) { work ->
                 WorkEntry(work = work, onClick = { onOpenWork(author, work) })
+                InsetDivider(startPadding = Tokens.Spacing.s5)
             }
         }
     }
@@ -212,14 +254,10 @@ private fun WorkEntry(work: Work, onClick: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(Tokens.Spacing.s3),
     ) {
-        BookCover(
-            title = work.title,
-            modifier = Modifier.width(50.dp).height(68.dp),
-        )
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = work.title,
-                style = MaterialTheme.typography.titleSmall,
+                style = MaterialTheme.typography.bodyLarge,
                 color = Praxis.colors.textPrimary,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,

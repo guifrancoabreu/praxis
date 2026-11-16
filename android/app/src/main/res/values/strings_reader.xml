@@ -22,6 +22,9 @@
     <string name="appearance_justified">Justificado</string>
     <string name="appearance_section_colors">Cores</string>
     <string name="appearance_custom_colors">Personalizar cores</string>
+    <string name="appearance_background">Fundo</string>
+    <string name="appearance_foreground">Texto</string>
+    <string name="appearance_links">Links</string>
     <string name="appearance_restore">Restaurar padrão</string>
     <string name="appearance_contrast">Contraste do texto: %1$s</string>
     <string name="appearance_contrast_links">Contraste dos links: %1$s</string>

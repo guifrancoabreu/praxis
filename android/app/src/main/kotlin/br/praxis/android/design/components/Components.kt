@@ -19,7 +19,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -30,6 +35,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -61,7 +67,13 @@ fun BookCover(title: String, modifier: Modifier = Modifier, compact: Boolean = t
             modifier = Modifier
                 .fillMaxWidth()
                 .height(boxHeight)
-                .shadow(elevation = Tokens.Shadow.coverRadius, shape = shape, clip = false)
+                .shadow(
+                    elevation = Tokens.Shadow.coverRadius,
+                    shape = shape,
+                    clip = false,
+                    ambientColor = Color.Black.copy(alpha = Tokens.Opacity.coverShadow),
+                    spotColor = Color.Black.copy(alpha = Tokens.Opacity.coverShadow),
+                )
                 .clip(shape)
                 .background(tone)
                 .border(1.dp, Color.Black.copy(alpha = Tokens.Opacity.coverOutline), shape),
@@ -78,13 +90,18 @@ fun BookCover(title: String, modifier: Modifier = Modifier, compact: Boolean = t
                         .background(Color.White.copy(alpha = 0.72f)),
                 )
                 Spacer(Modifier.weight(1f))
-                Text(
+                BasicText(
                     text = title,
-                    color = Color.White,
-                    fontFamily = FontFamily.Serif,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = if (compact) Tokens.Typography.bookCoverTitleCompact else Tokens.Typography.bookCoverTitle,
-                    lineHeight = if (compact) 11.sp else 12.sp,
+                    style = TextStyle(
+                        color = Color.White,
+                        fontFamily = FontFamily.Serif,
+                        fontWeight = FontWeight.SemiBold,
+                    ),
+                    autoSize = TextAutoSize.StepBased(
+                        minFontSize = if (compact) 6.75.sp else 7.5.sp,
+                        maxFontSize = if (compact) Tokens.Typography.bookCoverTitleCompact else Tokens.Typography.bookCoverTitle,
+                        stepSize = 0.25.sp,
+                    ),
                     maxLines = if (compact) 4 else 5,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -131,7 +148,7 @@ fun SectionHeader(title: String, action: String? = null, onAction: (() -> Unit)?
         if (action != null && onAction != null) {
             Text(
                 text = action,
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.labelLarge,
                 color = Praxis.colors.accent,
                 modifier = Modifier
                     .clip(RoundedCornerShape(Tokens.Radius.sm))
@@ -149,17 +166,17 @@ fun PraxisChip(text: String, selected: Boolean, onClick: () -> Unit, modifier: M
     val content = if (selected) Praxis.colors.chipSelectedContent else Praxis.colors.chipContent
     Box(
         modifier = modifier
-            .heightIn(min = 40.dp)
+            .heightIn(min = 44.dp)
             .clip(CircleShape)
             .background(background)
             .clickable(onClick = onClick)
-            .padding(horizontal = 20.dp, vertical = 10.dp),
+            .padding(horizontal = 15.dp, vertical = 10.dp),
         contentAlignment = Alignment.Center,
     ) {
         Text(
             text = text,
             color = content,
-            style = MaterialTheme.typography.bodyLarge,
+            style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Medium,
             maxLines = 1,
         )
@@ -204,7 +221,13 @@ fun GlassSurface(modifier: Modifier = Modifier, corner: Dp = Tokens.Radius.full,
     val shape = RoundedCornerShape(corner)
     Box(
         modifier = modifier
-            .shadow(elevation = 6.dp, shape = shape, clip = false)
+            .shadow(
+                elevation = 2.dp,
+                shape = shape,
+                clip = false,
+                ambientColor = Color.Black.copy(alpha = Tokens.Opacity.coverShadow),
+                spotColor = Color.Black.copy(alpha = Tokens.Opacity.coverShadow),
+            )
             .clip(shape)
             .background(Praxis.colors.surface.copy(alpha = 0.96f))
             .border(BorderStroke(1.dp, Praxis.colors.separator), shape),
@@ -225,12 +248,11 @@ fun InsetDivider(modifier: Modifier = Modifier, startPadding: Dp = Tokens.Spacin
 
 @Composable
 fun Chevron(modifier: Modifier = Modifier) {
-    Text(
-        text = "›",
-        color = Praxis.colors.textSecondary,
-        fontSize = 20.sp,
-        fontWeight = FontWeight.Medium,
-        modifier = modifier,
+    Icon(
+        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+        contentDescription = null,
+        tint = Praxis.colors.textSecondary,
+        modifier = modifier.size(18.dp),
     )
 }
 

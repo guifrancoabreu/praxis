@@ -72,6 +72,14 @@ private fun PraxisNavHost() {
                             "&workId=${android.net.Uri.encode(work.id)}",
                     )
                 },
+                onOpenArchiveLink = { url, title ->
+                    navController.navigate(
+                        "reader?path=${android.net.Uri.encode(url)}" +
+                            "&title=${android.net.Uri.encode(title)}" +
+                            "&author=" +
+                            "&workId=",
+                    )
+                },
             )
         }
 
@@ -140,6 +148,12 @@ private fun PraxisNavHost() {
                 author = args?.getString("author").orEmpty(),
                 workId = args?.getString("workId")?.takeIf { it.isNotBlank() },
                 onBack = { navController.popBackStack() },
+                onOpenArchiveLink = { url, title ->
+                    navController.navigate(
+                        "reader?path=${android.net.Uri.encode(url)}" +
+                            "&title=${android.net.Uri.encode(title)}&author=&workId=",
+                    )
+                },
             )
         }
     }

@@ -49,8 +49,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import br.praxis.android.AppGraph
 import br.praxis.android.R
@@ -74,7 +76,6 @@ import br.praxis.android.design.components.Chevron
 import br.praxis.android.design.components.GlassSurface
 import br.praxis.android.design.components.InsetDivider
 import br.praxis.android.design.components.PraxisChip
-import br.praxis.android.design.components.SectionHeader
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -214,7 +215,7 @@ private fun LibraryContent(
                 LibraryFilter.all -> {
                     if (grouped.isNotEmpty()) {
                         item {
-                            SectionHeader(
+                            LibrarySectionHeader(
                                 title = stringResource(R.string.section_continue_reading),
                                 action = stringResource(R.string.action_see_all),
                                 onAction = { onFilter(LibraryFilter.readingHistory) },
@@ -229,6 +230,12 @@ private fun LibraryContent(
                         }
                     } else if (featured != null) {
                         item {
+                            LibrarySectionHeader(
+                                title = stringResource(R.string.section_start_here),
+                                modifier = Modifier.padding(horizontal = horizontal, vertical = Tokens.Spacing.s2),
+                            )
+                        }
+                        item {
                             FeaturedCard(
                                 title = featured.second.title,
                                 credit = featured.first.full,
@@ -239,7 +246,7 @@ private fun LibraryContent(
                     }
 
                     item {
-                        SectionHeader(
+                        LibrarySectionHeader(
                             title = stringResource(R.string.section_popular_writers),
                             action = stringResource(R.string.action_see_all),
                             onAction = { onFilter(LibraryFilter.writers) },
@@ -259,7 +266,7 @@ private fun LibraryContent(
 
                     if (savedWorks.isNotEmpty()) {
                         item {
-                            SectionHeader(
+                            LibrarySectionHeader(
                                 title = stringResource(R.string.section_saved),
                                 action = stringResource(R.string.action_see_all),
                                 onAction = { onFilter(LibraryFilter.saved) },
@@ -272,14 +279,14 @@ private fun LibraryContent(
                     }
 
                     item {
-                        SectionHeader(
+                        LibrarySectionHeader(
                             title = stringResource(R.string.section_library),
                             action = stringResource(R.string.action_see_all),
                             onAction = { onFilter(LibraryFilter.works) },
                             modifier = Modifier.padding(horizontal = horizontal, vertical = Tokens.Spacing.s2),
                         )
                     }
-                    item { WorkList(popularWorks, onOpenWork = onOpenWork) }
+                    item { WorkList(popularWorks.take(8), onOpenWork = onOpenWork) }
                 }
 
                 LibraryFilter.writers -> item { WriterList(catalog.authors, onOpenAuthor) }
@@ -323,19 +330,56 @@ private fun Header() {
             .fillMaxWidth()
             .statusBarsPadding()
             .padding(horizontal = horizontal)
-            .padding(top = Tokens.Spacing.s6, bottom = Tokens.Spacing.s3),
+            .padding(top = Tokens.Spacing.s3, bottom = Tokens.Spacing.s3),
     ) {
         Text(
             text = stringResource(R.string.library_title),
-            style = MaterialTheme.typography.displayLarge,
+            style = MaterialTheme.typography.headlineLarge.copy(
+                fontFamily = FontFamily.Serif,
+                fontSize = 34.sp,
+                lineHeight = 41.sp,
+                fontWeight = FontWeight.Medium,
+                letterSpacing = (-0.5).sp,
+            ),
             color = Praxis.colors.textPrimary,
         )
         Spacer(Modifier.height(Tokens.Spacing.s1))
         Text(
             text = stringResource(R.string.library_subtitle),
-            style = MaterialTheme.typography.bodyLarge,
+            style = MaterialTheme.typography.bodyMedium,
             color = Praxis.colors.textSecondary,
         )
+    }
+}
+
+@Composable
+private fun LibrarySectionHeader(
+    title: String,
+    action: String? = null,
+    onAction: (() -> Unit)? = null,
+    modifier: Modifier = Modifier,
+) {
+    Row(modifier = modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Text(
+            text = title.uppercase(),
+            style = MaterialTheme.typography.labelMedium.copy(
+                fontWeight = FontWeight.SemiBold,
+                letterSpacing = 0.8.sp,
+            ),
+            color = Praxis.colors.textSecondary,
+            modifier = Modifier.weight(1f),
+        )
+        if (action != null && onAction != null) {
+            Text(
+                text = action,
+                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
+                color = Praxis.colors.accent,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(Tokens.Radius.sm))
+                    .clickable(onClick = onAction)
+                    .padding(horizontal = Tokens.Spacing.s1, vertical = Tokens.Spacing.s1),
+            )
+        }
     }
 }
 
@@ -375,7 +419,7 @@ private fun FeaturedCard(title: String, credit: String, onClick: () -> Unit, mod
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.titleLarge.copy(fontFamily = FontFamily.Serif),
                 color = Praxis.colors.textPrimary,
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis,
@@ -392,6 +436,7 @@ private fun FeaturedCard(title: String, credit: String, onClick: () -> Unit, mod
             Text(
                 text = stringResource(R.string.action_start_reading),
                 style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.SemiBold,
                 color = Praxis.colors.accent,
             )
         }
@@ -468,7 +513,7 @@ private fun WriterCard(author: Author, onClick: () -> Unit) {
         Spacer(Modifier.height(Tokens.Spacing.s2))
         Text(
             text = author.full,
-            style = MaterialTheme.typography.bodyLarge,
+            style = MaterialTheme.typography.bodyLarge.copy(fontFamily = FontFamily.Serif),
             fontWeight = FontWeight.SemiBold,
             color = Praxis.colors.textPrimary,
             maxLines = 1,
@@ -502,7 +547,7 @@ private fun WriterList(authors: List<Author>, onOpenAuthor: (Author) -> Unit) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = author.full,
-                        style = MaterialTheme.typography.titleSmall,
+                        style = MaterialTheme.typography.titleSmall.copy(fontFamily = FontFamily.Serif),
                         color = Praxis.colors.textPrimary,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -585,7 +630,7 @@ private fun WorkRow(work: Work, author: String, onClick: () -> Unit) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = work.title,
-                style = MaterialTheme.typography.titleSmall,
+                style = MaterialTheme.typography.titleSmall.copy(fontFamily = FontFamily.Serif),
                 color = Praxis.colors.textPrimary,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
@@ -805,7 +850,7 @@ private fun LazyListScope.searchResults(
     }
     if (authors.isNotEmpty()) {
         item {
-            SectionHeader(
+            LibrarySectionHeader(
                 title = stringResource(R.string.filter_writers),
                 modifier = Modifier.padding(horizontal = horizontal, vertical = Tokens.Spacing.s2),
             )
@@ -814,7 +859,7 @@ private fun LazyListScope.searchResults(
     }
     if (works.isNotEmpty()) {
         item {
-            SectionHeader(
+            LibrarySectionHeader(
                 title = stringResource(R.string.filter_works),
                 modifier = Modifier.padding(horizontal = horizontal, vertical = Tokens.Spacing.s2),
             )
@@ -823,7 +868,7 @@ private fun LazyListScope.searchResults(
     }
     if (themes.isNotEmpty()) {
         item {
-            SectionHeader(
+            LibrarySectionHeader(
                 title = stringResource(R.string.filter_topics),
                 modifier = Modifier.padding(horizontal = horizontal, vertical = Tokens.Spacing.s2),
             )

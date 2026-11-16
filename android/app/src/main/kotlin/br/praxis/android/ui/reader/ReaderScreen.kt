@@ -71,9 +71,14 @@ import br.praxis.android.design.Praxis
 import br.praxis.android.design.Tokens
 import br.praxis.android.design.components.GlassSurface
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+
+private val progressSaveScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
 @Composable
 fun ReaderScreen(
@@ -82,12 +87,13 @@ fun ReaderScreen(
     author: String,
     workId: String?,
     onBack: () -> Unit,
+    onOpenArchiveLink: (String, String) -> Unit,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val preferences = remember { PraxisPreferences(context.applicationContext) }
     val pageStore = remember { PageStore(context.applicationContext) }
-    val readings by preferences.recentReadings.collectAsStateWithLifecycle(initialValue = emptyList())
+    val readings by preferences.recentReadings.collectAsStateWithLifecycle<List<ReadingProgress>?>(initialValue = null)
     val appearance by preferences.readerAppearance.collectAsStateWithLifecycle(initialValue = ReaderAppearance())
     val savedPaths by preferences.savedWorkPaths.collectAsStateWithLifecycle(initialValue = emptyList())
     val baseUrl = Language.pt.base
@@ -100,7 +106,7 @@ fun ReaderScreen(
     var showAppearance by remember { mutableStateOf(false) }
     var pendingProgress by remember { mutableStateOf<Double?>(null) }
     val initialProgress = remember(readings) {
-        readings.firstOrNull { it.path == workPath || (workId != null && it.workId == workId) }?.progress ?: 0.0
+        readings?.firstOrNull { it.path == workPath || (workId != null && it.workId == workId) }?.progress ?: 0.0
     }
 
     val isSaved = savedPaths.contains(workPath)
@@ -127,7 +133,7 @@ fun ReaderScreen(
 
     fun flush(progress: Double?) {
         if (progress == null) return
-        scope.launch { preferences.recordReading(ReadingProgress(workPath, title, author, progress, workId)) }
+        progressSaveScope.launch { preferences.recordReading(ReadingProgress(workPath, title, author, progress, workId)) }
     }
 
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -167,9 +173,15 @@ fun ReaderScreen(
         Box(modifier = Modifier.fillMaxSize()) {
             when {
                 failed -> ReaderMessage(stringResource(R.string.reader_error), stringResource(R.string.reader_error_body))
+                readings == null -> Loading()
                 isPdf -> {
                     val bytes = pdfBytes
-                    if (bytes == null) Loading() else PdfPages(bytes) { progress -> pendingProgress = progress }
+                    if (bytes == null) Loading() else PdfPages(
+                        bytes = bytes,
+                        initialProgress = initialProgress,
+                        onProgress = { progress -> pendingProgress = progress },
+                        onFailure = { failed = true },
+                    )
                 }
                 else -> {
                     val content = html
@@ -182,7 +194,16 @@ fun ReaderScreen(
                             appearance = appearance,
                             initialProgress = initialProgress,
                             onProgress = { pendingProgress = it },
-                            onLink = { url, _ -> openLink(context, url) },
+                            onLink = { url, linkTitle ->
+                                val uri = Uri.parse(url)
+                                if (uri.scheme in listOf("http", "https") &&
+                                    uri.host?.lowercase() in listOf("marxists.org", "www.marxists.org")) {
+                                    flush(pendingProgress)
+                                    onOpenArchiveLink(url, linkTitle.ifBlank { uri.lastPathSegment.orEmpty() })
+                                } else if (uri.scheme in listOf("http", "https")) {
+                                    openLink(context, url)
+                                }
+                            },
                         )
                     }
                 }
@@ -200,7 +221,6 @@ fun ReaderScreen(
 }
 
 private fun openLink(context: android.content.Context, url: String) {
-    // Archive links stay inside the reader; anything else belongs to the system browser.
     runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }
 }
 
@@ -307,8 +327,8 @@ private fun ReaderWebView(
                 }
                 addJavascriptInterface(
                     ReaderBridge(
-                        onProgress = { value -> latestProgress.value(value) },
-                        onLink = { url, title -> latestLink.value(url, title) },
+                        onProgress = { value -> post { latestProgress.value(value) } },
+                        onLink = { url, title -> post { latestLink.value(url, title) } },
                     ),
                     "PraxisBridge",
                 )
@@ -322,50 +342,86 @@ private fun ReaderWebView(
 }
 
 @Composable
-private fun PdfPages(bytes: ByteArray, onProgress: (Double) -> Unit) {
+private fun PdfPages(
+    bytes: ByteArray,
+    initialProgress: Double,
+    onProgress: (Double) -> Unit,
+    onFailure: () -> Unit,
+) {
     val context = LocalContext.current
-    var pages by remember(bytes) { mutableStateOf<List<Bitmap>>(emptyList()) }
+    var pageCount by remember(bytes) { mutableStateOf<Int?>(null) }
+    var loadFailed by remember(bytes) { mutableStateOf(false) }
+    val file = remember(bytes) { java.io.File(context.cacheDir, "reader-${bytes.contentHashCode()}.pdf") }
 
     LaunchedEffect(bytes) {
-        pages = withContext(Dispatchers.IO) {
-            val file = java.io.File(context.cacheDir, "reader.pdf")
-            file.writeBytes(bytes)
-            ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY).use { descriptor ->
-                PdfRenderer(descriptor).use { renderer ->
-                    (0 until renderer.pageCount).mapNotNull { index ->
-                        runCatching {
-                            renderer.openPage(index).use { page ->
-                                val width = 1080
-                                val height = (width.toFloat() / page.width * page.height).toInt()
-                                Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888).also { bitmap ->
-                                    bitmap.eraseColor(android.graphics.Color.WHITE)
-                                    page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
-                                }
-                            }
-                        }.getOrNull()
-                    }
+        runCatching {
+            withContext(Dispatchers.IO) {
+                file.writeBytes(bytes)
+                ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY).use { descriptor ->
+                    PdfRenderer(descriptor).use { renderer -> renderer.pageCount }
                 }
             }
+        }.onSuccess { count ->
+            if (count > 0) pageCount = count else { loadFailed = true; onFailure() }
         }
+            .onFailure { if (it is CancellationException) throw it; loadFailed = true; onFailure() }
     }
 
-    if (pages.isEmpty()) {
+    val count = pageCount
+    if (loadFailed) {
+        ReaderMessage(stringResource(R.string.reader_error), stringResource(R.string.reader_error_body))
+        return
+    }
+    if (count == null) {
         Loading()
         return
     }
 
+    val initialPage = (initialProgress.coerceIn(0.0, 1.0) * (count - 1).coerceAtLeast(0)).toInt()
+    val listState = androidx.compose.foundation.lazy.rememberLazyListState(initialFirstVisibleItemIndex = initialPage)
+    LaunchedEffect(listState, count) {
+        androidx.compose.runtime.snapshotFlow {
+            if (count > 1) listState.firstVisibleItemIndex.toDouble() / (count - 1) else 1.0
+        }.collect(onProgress)
+    }
+
     LazyColumn(
+        state = listState,
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = Tokens.Spacing.s8),
     ) {
-        items(pages.size) { index ->
-            Image(
-                bitmap = pages[index].asImageBitmap(),
-                contentDescription = null,
-                modifier = Modifier.fillMaxWidth(),
-            )
-            LaunchedEffect(index) {
-                onProgress(if (pages.size > 1) index.toDouble() / (pages.size - 1) else 1.0)
+        items(count) { index ->
+            var bitmap by remember(bytes, index) { mutableStateOf<Bitmap?>(null) }
+            var renderFailed by remember(bytes, index) { mutableStateOf(false) }
+            LaunchedEffect(bytes, index) {
+                runCatching {
+                    withContext(Dispatchers.IO) {
+                        ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY).use { descriptor ->
+                            PdfRenderer(descriptor).use { renderer ->
+                                renderer.openPage(index).use { page ->
+                                    val width = 1080
+                                    val height = (width.toFloat() / page.width * page.height).toInt().coerceAtLeast(1)
+                                    Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888).also { rendered ->
+                                        rendered.eraseColor(android.graphics.Color.WHITE)
+                                        page.render(rendered, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }.onSuccess { bitmap = it }
+                    .onFailure { if (it is CancellationException) throw it; renderFailed = true; onFailure() }
+            }
+            when {
+                bitmap != null -> Image(
+                    bitmap = bitmap!!.asImageBitmap(),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                renderFailed -> ReaderMessage(stringResource(R.string.reader_error), stringResource(R.string.reader_error_body))
+                else -> Box(Modifier.fillMaxWidth().height(300.dp), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = Praxis.colors.accent)
+                }
             }
         }
     }

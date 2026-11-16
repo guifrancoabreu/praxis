@@ -37,7 +37,7 @@ import br.praxis.android.design.Praxis
 import br.praxis.android.design.Tokens
 import br.praxis.android.design.components.SectionHeader
 
-private const val TELEMETRY_DECK_PRIVACY_URL = "https://telemetrydeck.com/privacy/"
+private const val TELEMETRY_DECK_PRIVACY_URL = "https://telemetrydeck.com/docs/guides/privacy-faq/"
 
 /**
  * The privacy policy, mirroring PrivacyPolicyView on iOS: the same Portuguese copy, laid out as
@@ -64,7 +64,7 @@ fun PrivacyScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(Tokens.Spacing.s5)
                 .navigationBarsPadding(),
-            verticalArrangement = Arrangement.spacedBy(Tokens.Spacing.s5),
+            verticalArrangement = Arrangement.spacedBy(Tokens.Spacing.s6),
         ) {
             Text(
                 text = stringResource(R.string.privacy_intro),

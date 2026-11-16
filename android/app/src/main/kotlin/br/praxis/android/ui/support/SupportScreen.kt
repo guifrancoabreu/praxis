@@ -62,7 +62,7 @@ fun SupportScreen(onBack: () -> Unit, onOpenUrl: (String) -> Unit, onDestination
                 .verticalScroll(rememberScrollState())
                 .padding(Tokens.Spacing.s5)
                 .navigationBarsPadding(),
-            verticalArrangement = Arrangement.spacedBy(Tokens.Spacing.s5),
+            verticalArrangement = Arrangement.spacedBy(Tokens.Spacing.s6),
         ) {
             Lead()
             SupportSection(
@@ -177,7 +177,7 @@ private fun SupportCard(title: String, action: String, icon: ImageVector, onClic
             .clickable(onClick = onClick)
             .padding(Tokens.Spacing.s4),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(Tokens.Spacing.s3),
+        horizontalArrangement = Arrangement.spacedBy(14.dp),
     ) {
         RoundIconTile(diameter = 42.dp) {
             Icon(
