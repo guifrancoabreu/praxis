@@ -24,7 +24,9 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0.0"
-        resourceConfigurations += listOf("pt", "pt-rBR")
+        resourceConfigurations += listOf("pt", "pt-rBR", "en", "es")
+        val feedbackUrl = providers.gradleProperty("feedbackUrl").orElse("").get()
+        buildConfigField("String", "FEEDBACK_URL", "\"${feedbackUrl.replace("\\", "\\\\").replace("\"", "\\\"")}\"")
     }
 
     // Catalogs and reader assets are shared with the iOS app; both are read straight from the
@@ -70,6 +72,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     packaging {

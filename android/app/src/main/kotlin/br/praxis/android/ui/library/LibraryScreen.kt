@@ -25,13 +25,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.ChatBubbleOutline
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -49,11 +50,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import br.praxis.android.AppGraph
+import br.praxis.android.BuildConfig
 import br.praxis.android.R
 import br.praxis.android.data.Analytics
 import br.praxis.android.data.Author
@@ -76,6 +79,7 @@ import br.praxis.android.design.components.Chevron
 import br.praxis.android.design.components.GlassSurface
 import br.praxis.android.design.components.InsetDivider
 import br.praxis.android.design.components.PraxisChip
+import br.praxis.android.design.components.RoundIconTile
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -88,7 +92,9 @@ fun LibraryScreen(
     onOpenAuthor: (Author) -> Unit,
     onOpenCollection: (CatalogCollection) -> Unit,
     onOpenSupport: () -> Unit,
+    onOpenFeedback: () -> Unit,
     onOpenPrivacy: () -> Unit,
+    onOpenStats: () -> Unit,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -132,7 +138,9 @@ fun LibraryScreen(
                 onOpenAuthor = onOpenAuthor,
                 onOpenCollection = onOpenCollection,
                 onOpenSupport = onOpenSupport,
+                onOpenFeedback = onOpenFeedback,
                 onOpenPrivacy = onOpenPrivacy,
+                onOpenStats = onOpenStats,
             )
         }
 
@@ -188,7 +196,9 @@ private fun LibraryContent(
     onOpenAuthor: (Author) -> Unit,
     onOpenCollection: (CatalogCollection) -> Unit,
     onOpenSupport: () -> Unit,
+    onOpenFeedback: () -> Unit,
     onOpenPrivacy: () -> Unit,
+    onOpenStats: () -> Unit,
 ) {
     val searching = query.isNotBlank()
     val popularWriters = remember(catalog) { Popular.authors(catalog, Language.pt) }
@@ -243,6 +253,10 @@ private fun LibraryContent(
                                 modifier = Modifier.padding(horizontal = horizontal, vertical = Tokens.Spacing.s3),
                             )
                         }
+                    }
+
+                    if (grouped.isNotEmpty()) {
+                        item { StatsCard(onClick = onOpenStats) }
                     }
 
                     item {
@@ -317,7 +331,7 @@ private fun LibraryContent(
                 }
             }
 
-            item { Footer(onOpenSupport = onOpenSupport, onOpenPrivacy = onOpenPrivacy) }
+            item { Footer(onOpenSupport = onOpenSupport, onOpenFeedback = onOpenFeedback, onOpenPrivacy = onOpenPrivacy) }
             item { CatalogFooter(catalog.generated) }
         }
     }
@@ -337,7 +351,7 @@ private fun Header() {
             style = MaterialTheme.typography.headlineLarge.copy(
                 fontFamily = PraxisFonts.Heading,
                 fontSize = 34.sp,
-                lineHeight = 41.sp,
+                lineHeight = 50.sp,
                 fontWeight = FontWeight.Medium,
                 letterSpacing = (-0.5).sp,
             ),
@@ -445,59 +459,101 @@ private fun FeaturedCard(title: String, credit: String, onClick: () -> Unit, mod
 
 @Composable
 private fun ContinueReadingShelf(readings: List<ReadingProgress>, catalog: Catalog, onOpenWork: (ReadingProgress) -> Unit) {
-    LazyRow(
-        contentPadding = PaddingValues(horizontal = horizontal),
-        horizontalArrangement = Arrangement.spacedBy(Tokens.Spacing.s3),
-    ) {
-        items(readings, key = { it.id }) { progress ->
-            val shape = RoundedCornerShape(Tokens.Radius.lg)
-            Row(
-                modifier = Modifier
-                    .width(236.dp)
-                    .clip(shape)
-                    .background(Praxis.colors.surface)
-                    .border(1.dp, Praxis.colors.separator, shape)
-                    .clickable { onOpenWork(progress) }
-                    .padding(Tokens.Spacing.s3),
-                horizontalArrangement = Arrangement.spacedBy(Tokens.Spacing.s3),
-            ) {
-                BookCover(title = progress.title, modifier = Modifier.width(64.dp).height(86.dp))
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = progress.title,
-                        style = MaterialTheme.typography.titleSmall,
-                        color = Praxis.colors.textPrimary,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                    val credit = progress.author.ifEmpty {
-                        catalog.authors.firstOrNull { author -> author.works.any { it.path == progress.path } }?.full.orEmpty()
-                    }
-                    if (credit.isNotEmpty()) {
-                        Text(
-                            text = credit,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = Praxis.colors.textSecondary,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                    }
-                    Spacer(Modifier.height(Tokens.Spacing.s2))
-                    LinearProgressIndicator(
-                        progress = { progress.progress.toFloat().coerceIn(0f, 1f) },
-                        color = Praxis.colors.accent,
-                        trackColor = Praxis.colors.separator,
-                        modifier = Modifier.fillMaxWidth().height(3.dp),
-                    )
-                    Spacer(Modifier.height(Tokens.Spacing.s1))
-                    Text(
-                        text = stringResource(R.string.progress_in_section, (progress.progress * 100).toInt()),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = Praxis.colors.textSecondary,
-                    )
-                }
+    if (readings.size == 1) {
+        ContinueReadingCard(
+            progress = readings.first(),
+            catalog = catalog,
+            onOpenWork = onOpenWork,
+            modifier = Modifier.padding(horizontal = horizontal).fillMaxWidth(),
+            barModifier = Modifier.width(160.dp).height(3.dp),
+        )
+    } else {
+        LazyRow(
+            contentPadding = PaddingValues(horizontal = horizontal),
+            horizontalArrangement = Arrangement.spacedBy(Tokens.Spacing.s3),
+        ) {
+            items(readings, key = { it.id }) { progress ->
+                ContinueReadingCard(
+                    progress = progress,
+                    catalog = catalog,
+                    onOpenWork = onOpenWork,
+                    modifier = Modifier.width(236.dp),
+                    barModifier = Modifier.fillMaxWidth().height(3.dp),
+                )
             }
         }
+    }
+}
+
+@Composable
+private fun ContinueReadingCard(
+    progress: ReadingProgress,
+    catalog: Catalog,
+    onOpenWork: (ReadingProgress) -> Unit,
+    modifier: Modifier = Modifier,
+    barModifier: Modifier = Modifier,
+) {
+    val shape = RoundedCornerShape(Tokens.Radius.lg)
+    Row(
+        modifier = modifier
+            .clip(shape)
+            .background(Praxis.colors.surface)
+            .border(1.dp, Praxis.colors.separator, shape)
+            .clickable { onOpenWork(progress) }
+            .padding(Tokens.Spacing.s3),
+        horizontalArrangement = Arrangement.spacedBy(Tokens.Spacing.s3),
+    ) {
+        BookCover(title = progress.title, modifier = Modifier.width(64.dp).height(86.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = progress.title,
+                style = MaterialTheme.typography.titleSmall,
+                color = Praxis.colors.textPrimary,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
+            val credit = progress.author.ifEmpty {
+                catalog.authors.firstOrNull { author -> author.works.any { it.path == progress.path } }?.full.orEmpty()
+            }
+            if (credit.isNotEmpty()) {
+                Text(
+                    text = credit,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Praxis.colors.textSecondary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+            Spacer(Modifier.height(Tokens.Spacing.s2))
+            ProgressBar(
+                fraction = progress.progress.toFloat().coerceIn(0f, 1f),
+                modifier = barModifier,
+            )
+            Spacer(Modifier.height(Tokens.Spacing.s1))
+            Text(
+                text = stringResource(R.string.progress_in_section, (progress.progress * 100).toInt()),
+                style = MaterialTheme.typography.labelMedium,
+                color = Praxis.colors.textSecondary,
+            )
+        }
+    }
+}
+
+@Composable
+private fun ProgressBar(fraction: Float, modifier: Modifier = Modifier) {
+    val shape = RoundedCornerShape(Tokens.Radius.full)
+    Box(
+        modifier = modifier
+            .clip(shape)
+            .background(Praxis.colors.separator),
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(fraction.coerceIn(0f, 1f))
+                .height(3.dp)
+                .clip(shape)
+                .background(Praxis.colors.accent),
+        )
     }
 }
 
@@ -692,7 +748,49 @@ private fun CollectionList(collections: List<CatalogCollection>, onOpen: (Catalo
 }
 
 @Composable
-private fun Footer(onOpenSupport: () -> Unit, onOpenPrivacy: () -> Unit) {
+private fun StatsCard(onClick: () -> Unit) {
+    val shape = RoundedCornerShape(Tokens.Radius.lg)
+    Row(
+        modifier = Modifier
+            .padding(horizontal = horizontal, vertical = Tokens.Spacing.s3)
+            .fillMaxWidth()
+            .clip(shape)
+            .background(Praxis.colors.surface)
+            .border(1.dp, Praxis.colors.separator, shape)
+            .clickable(onClick = onClick)
+            .padding(Tokens.Spacing.s4),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(13.dp),
+    ) {
+        Icon(
+            imageVector = Icons.Filled.BarChart,
+            contentDescription = null,
+            tint = Praxis.colors.accent,
+            modifier = Modifier.size(22.dp),
+        )
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(Tokens.Spacing.s1),
+        ) {
+            Text(
+                text = stringResource(R.string.stats_card_title),
+                style = MaterialTheme.typography.titleSmall,
+                color = Praxis.colors.textPrimary,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Text(
+                text = stringResource(R.string.stats_card_subtitle),
+                style = MaterialTheme.typography.bodyMedium,
+                color = Praxis.colors.textSecondary,
+            )
+        }
+        Chevron()
+    }
+}
+
+@Composable
+private fun Footer(onOpenSupport: () -> Unit, onOpenFeedback: () -> Unit, onOpenPrivacy: () -> Unit) {
     val shape = RoundedCornerShape(Tokens.Radius.lg)
     Column(modifier = Modifier.padding(horizontal = horizontal, vertical = Tokens.Spacing.s6)) {
         Row(
@@ -725,6 +823,32 @@ private fun Footer(onOpenSupport: () -> Unit, onOpenPrivacy: () -> Unit) {
                 )
             }
             Chevron()
+        }
+        if (runCatching { java.net.URI(BuildConfig.FEEDBACK_URL) }.getOrNull()?.let { it.scheme == "https" && !it.host.isNullOrBlank() } == true) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = Tokens.Spacing.s2)
+                .clip(shape)
+                .background(Praxis.colors.surface)
+                .border(1.dp, Praxis.colors.separator, shape)
+                .clickable(onClick = onOpenFeedback)
+                .padding(Tokens.Spacing.s4),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(Tokens.Spacing.s3),
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.ChatBubbleOutline,
+                contentDescription = null,
+                tint = Praxis.colors.accent,
+                modifier = Modifier.size(22.dp),
+            )
+            Column(modifier = Modifier.weight(1f)) {
+                Text(text = stringResource(R.string.feedback_title), style = MaterialTheme.typography.titleSmall, color = Praxis.colors.textPrimary)
+                Text(text = stringResource(R.string.feedback_card_body), style = MaterialTheme.typography.bodyMedium, color = Praxis.colors.textSecondary)
+            }
+            Chevron()
+        }
         }
         Text(
             text = stringResource(R.string.footer_privacy),

@@ -31,8 +31,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material.icons.filled.TextFields
+import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -66,6 +68,7 @@ import br.praxis.android.data.PageStore
 import br.praxis.android.data.PraxisPreferences
 import br.praxis.android.data.ReaderAppearance
 import br.praxis.android.data.ReaderScripts
+import br.praxis.android.data.ReadingHistory
 import br.praxis.android.data.ReadingProgress
 import br.praxis.android.design.Praxis
 import br.praxis.android.design.Tokens
@@ -96,9 +99,11 @@ fun ReaderScreen(
     val readings by preferences.recentReadings.collectAsStateWithLifecycle<List<ReadingProgress>?>(initialValue = null)
     val appearance by preferences.readerAppearance.collectAsStateWithLifecycle(initialValue = ReaderAppearance())
     val savedPaths by preferences.savedWorkPaths.collectAsStateWithLifecycle(initialValue = emptyList())
+    val finishedIds by preferences.finishedWorkIDs.collectAsStateWithLifecycle(initialValue = emptyList())
     val baseUrl = Language.pt.base
     val sourceUrl = remember(workPath) { runCatching { java.net.URI(baseUrl).resolve(workPath).toString() }.getOrDefault(baseUrl + workPath) }
     val isPdf = sourceUrl.substringBefore('#').endsWith(".pdf", ignoreCase = true)
+    val finishedKey = workId ?: ReadingHistory.canonicalKey(workPath, baseUrl)
 
     var html by remember { mutableStateOf<String?>(null) }
     var pdfBytes by remember { mutableStateOf<ByteArray?>(null) }
@@ -110,6 +115,7 @@ fun ReaderScreen(
     }
 
     val isSaved = savedPaths.contains(workPath)
+    val isFinished = finishedKey in finishedIds
 
     LaunchedEffect(workPath, sourceUrl) {
         failed = false
@@ -120,6 +126,7 @@ fun ReaderScreen(
                 val raw = pageStore.loadHtml(sourceUrl)
                 html = HtmlSanitizer.sanitize(raw, sourceUrl)
             }
+            preferences.recordReadingDay()
         }.onFailure { failed = true }
         Analytics.track(Analytics.Event.WorkOpened)
     }
@@ -129,11 +136,15 @@ fun ReaderScreen(
         val value = pendingProgress ?: return@LaunchedEffect
         delay(5_000)
         preferences.recordReading(ReadingProgress(workPath, title, author, value, workId))
+        preferences.recordReadingDay()
     }
 
     fun flush(progress: Double?) {
         if (progress == null) return
-        progressSaveScope.launch { preferences.recordReading(ReadingProgress(workPath, title, author, progress, workId)) }
+        progressSaveScope.launch {
+            preferences.recordReading(ReadingProgress(workPath, title, author, progress, workId))
+            preferences.recordReadingDay()
+        }
     }
 
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -152,6 +163,7 @@ fun ReaderScreen(
         ReaderToolbar(
             title = title,
             isSaved = isSaved,
+            isFinished = isFinished,
             showAppearance = !isPdf,
             onBack = { flush(pendingProgress); onBack() },
             onToggleSaved = {
@@ -160,6 +172,7 @@ fun ReaderScreen(
                     Analytics.track(Analytics.Event.BookmarkChanged(saved))
                 }
             },
+            onToggleFinished = { scope.launch { preferences.toggleFinished(finishedKey) } },
             onAppearance = {
                 showAppearance = true
                 Analytics.track(Analytics.Event.ReaderAppearanceOpened)
@@ -228,9 +241,11 @@ private fun openLink(context: android.content.Context, url: String) {
 private fun ReaderToolbar(
     title: String,
     isSaved: Boolean,
+    isFinished: Boolean,
     showAppearance: Boolean,
     onBack: () -> Unit,
     onToggleSaved: () -> Unit,
+    onToggleFinished: () -> Unit,
     onAppearance: () -> Unit,
     onOpenSource: () -> Unit,
 ) {
@@ -266,6 +281,13 @@ private fun ReaderToolbar(
                     tint = Praxis.colors.accent,
                 )
             }
+        }
+        IconButton(onClick = onToggleFinished) {
+            Icon(
+                imageVector = if (isFinished) Icons.Filled.CheckCircle else Icons.Outlined.CheckCircle,
+                contentDescription = stringResource(if (isFinished) R.string.reader_unmark_finished else R.string.reader_mark_finished),
+                tint = Praxis.colors.accent,
+            )
         }
         IconButton(onClick = onToggleSaved) {
             Icon(

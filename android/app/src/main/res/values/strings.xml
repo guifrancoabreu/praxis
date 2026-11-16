@@ -56,11 +56,25 @@
     <string name="support_archive_title">Marxists.org</string>
     <string name="support_archive_action">Doar ao Marxists.org</string>
 
+    <!-- Feedback -->
+    <string name="feedback_title">Enviar feedback</string>
+    <string name="feedback_card_body">Conte um problema ou compartilhe uma sugestão.</string>
+    <string name="feedback_intro">Sua mensagem ajuda a melhorar o Praxis. Envie um relato de erro ou uma sugestão.</string>
+    <string name="feedback_type_label">Tipo de mensagem</string>
+    <string name="feedback_bug">Problema</string>
+    <string name="feedback_suggestion">Sugestão</string>
+    <string name="feedback_details">Detalhes</string>
+    <string name="feedback_email">E-mail</string>
+    <string name="feedback_email_required">Obrigatório para que possamos responder.</string>
+    <string name="feedback_send">Enviar</string>
+    <string name="feedback_success">Obrigado. Seu feedback foi enviado.</string>
+    <string name="feedback_error">Não foi possível enviar. Tente novamente mais tarde.</string>
+
     <!-- PrivacyPolicyCopy, Portuguese variant -->
     <string name="privacy_title">Privacidade</string>
     <string name="privacy_intro">O Praxis não exige uma conta. Não vendemos dados nem usamos anúncios. Seus dados de leitura ficam no aparelho, salvo quando você autoriza o envio opcional de análises descrito abaixo.</string>
     <string name="privacy_on_device_title">No seu aparelho</string>
-    <string name="privacy_on_device_body">Favoritos, histórico, posição de leitura, idioma, ordenação e aparência são guardados no armazenamento do app para manter sua biblioteca como você deixou. Textos e PDFs abertos também podem ficar no cache local, limitado a 100 MB. Esses dados não são enviados à equipe do app.</string>
+    <string name="privacy_on_device_body">Favoritos, histórico, posição de leitura, dias de leitura, textos concluídos, idioma, ordenação e aparência são guardados no armazenamento do app para manter sua biblioteca como você deixou. Textos e PDFs abertos também podem ficar no cache local, limitado a 100 MB. Esses dados não são enviados à equipe do app.</string>
     <string name="privacy_archive_title">Conteúdo do arquivo</string>
     <string name="privacy_archive_body">Ao abrir um texto ou PDF, ou ao carregar um retrato, o app solicita esse conteúdo diretamente a marxists.org. O servidor do arquivo pode ver qual página ou arquivo foi solicitado e recebe dados técnicos da conexão, como seu endereço IP. O app não controla as práticas de privacidade do arquivo.</string>
     <string name="privacy_analytics_title">Análises opcionais</string>
@@ -70,7 +84,7 @@
     <string name="privacy_analytics_consent_detail">Opcional e desativado por padrão. Você pode mudar esta escolha a qualquer momento.</string>
     <string name="privacy_analytics_policy_link">Política de privacidade do TelemetryDeck</string>
     <string name="privacy_third_party_title">Serviços externos</string>
-    <string name="privacy_third_party_body">Links de apoio podem abrir sites como Ko-fi ou Marxists.org. Ao sair do app, valem as políticas desses serviços. O TelemetryDeck recebe análises somente quando você ativa a opção acima.</string>
+    <string name="privacy_third_party_body">Links de apoio podem abrir sites como Ko-fi ou Marxists.org. Ao sair do app, valem as políticas desses serviços. O TelemetryDeck recebe análises somente quando você ativa a opção acima. Se você enviar feedback, sua mensagem e seu e-mail serão enviados voluntariamente pelo Cloudflare e pelo Resend para que a equipe possa responder.</string>
     <string name="privacy_retention_title">Armazenamento e remoção</string>
     <string name="privacy_retention_body">As preferências e o histórico ficam no armazenamento local do app até você apagar o app. O cache apaga arquivos antigos quando passa de 100 MB. Desative as análises acima para interromper o envio de novos eventos. Eventos já recebidos pelo TelemetryDeck seguem a retenção do plano; no plano gratuito atual, são três meses. O serviço permite excluir dados por mês, mas não localizar e excluir os dados de uma instalação específica. Consulte a política do serviço para detalhes.</string>
     <string name="privacy_contact_title">Contato</string>

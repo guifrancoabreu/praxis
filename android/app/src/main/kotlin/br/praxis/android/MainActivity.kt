@@ -13,6 +13,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import br.praxis.android.data.Analytics
 import br.praxis.android.ui.privacy.PrivacyScreen
 import br.praxis.android.ui.support.SupportScreen
+import br.praxis.android.ui.feedback.FeedbackScreen
 import kotlinx.coroutines.launch
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -24,6 +25,7 @@ import br.praxis.android.ui.author.AuthorScreen
 import br.praxis.android.ui.collection.CollectionScreen
 import br.praxis.android.ui.library.LibraryScreen
 import br.praxis.android.ui.reader.ReaderScreen
+import br.praxis.android.ui.stats.ReadingStatsScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,7 +55,9 @@ private fun PraxisNavHost() {
                 onOpenAuthor = { author -> navController.navigate("author/${android.net.Uri.encode(author.id)}") },
                 onOpenCollection = { collection -> navController.navigate("collection/${android.net.Uri.encode(collection.id)}") },
                 onOpenSupport = { navController.navigate("support") },
+                onOpenFeedback = { navController.navigate("feedback") },
                 onOpenPrivacy = { navController.navigate("privacy") },
+                onOpenStats = { navController.navigate("stats") },
             )
         }
 
@@ -111,6 +115,15 @@ private fun PraxisNavHost() {
                     Analytics.track(Analytics.Event.SupportDestinationOpened(destination))
                 },
             )
+        }
+
+        composable("stats") {
+            ReadingStatsScreen(onBack = { navController.popBackStack() })
+        }
+
+        composable("feedback") {
+            val scope = rememberCoroutineScope()
+            FeedbackScreen(onBack = { navController.popBackStack() }, scope = scope)
         }
 
         composable("privacy") {

@@ -325,6 +325,7 @@
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = GY86582FQG;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Praxis;
+				INFOPLIST_KEY_PraxisFeedbackURL = "$(PRAXIS_FEEDBACK_URL)";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -353,6 +354,7 @@
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = GY86582FQG;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Praxis;
+				INFOPLIST_KEY_PraxisFeedbackURL = "$(PRAXIS_FEEDBACK_URL)";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
