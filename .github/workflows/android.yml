@@ -29,6 +29,8 @@ jobs:
           java-version: "21"
 
       - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
 
       - name: Design tokens are in sync
         run: python3 tools/gen_tokens.py --check
