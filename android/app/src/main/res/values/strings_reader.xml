@@ -5,6 +5,8 @@
     <string name="reader_unsave">Remover dos salvos</string>
     <string name="reader_source">Abrir no arquivo</string>
     <string name="reader_appearance">Aparência do texto</string>
+    <string name="reader_mark_finished">Marcar como concluído</string>
+    <string name="reader_unmark_finished">Desmarcar como concluído</string>
     <string name="reader_error">Não foi possível abrir</string>
     <string name="reader_error_body">Verifique a conexão e tente novamente.</string>
 

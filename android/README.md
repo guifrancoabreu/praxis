@@ -19,6 +19,10 @@ export ANDROID_HOME=$HOME/Library/Android/sdk
 ./gradlew installDebug     # with a device or emulator attached
 ```
 
+Set the feedback service URL with the Gradle property `feedbackUrl` when building, for example
+`./gradlew assembleDebug -PfeedbackUrl=https://example.com/api/feedback`. The URL is compiled into
+the app; service credentials must stay on the server.
+
 The debug build uses the `br.praxis.android.debug` application id so it can sit next to a release
 install.
 

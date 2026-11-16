@@ -75,63 +75,68 @@ private val darkColors = PraxisColors(
     chipContent = Color(0xFFFFFFFF),
 )
 
-/** iOS text styles the app actually uses, sized in sp so the system font scale still applies. */
+/**
+ * iOS text styles the app actually uses, sized in sp so the system font scale still applies.
+ * Heading styles use Literata's natural 1.485 leading and body/label styles Inter's 1.210,
+ * taken from the hhea metrics of app/src/main/res/font/literata.ttf and inter.ttf. This matches
+ * iOS, which never sets an explicit line height.
+ */
 val PraxisTypography = Typography(
     displayLarge = TextStyle(
         fontFamily = PraxisFonts.Heading,
         fontWeight = FontWeight.Bold,
         fontSize = 34.sp,
-        lineHeight = 41.sp,
+        lineHeight = 50.sp,
         letterSpacing = (-0.4).sp,
     ),
     titleLarge = TextStyle(
         fontFamily = PraxisFonts.Heading,
         fontWeight = FontWeight.SemiBold,
         fontSize = 22.sp,
-        lineHeight = 28.sp,
+        lineHeight = 33.sp,
     ),
     titleMedium = TextStyle(
         fontFamily = PraxisFonts.Heading,
         fontWeight = FontWeight.Medium,
         fontSize = 17.sp,
-        lineHeight = 22.sp,
+        lineHeight = 25.sp,
     ),
     titleSmall = TextStyle(
         fontFamily = PraxisFonts.Heading,
         fontWeight = FontWeight.SemiBold,
         fontSize = 17.sp,
-        lineHeight = 22.sp,
+        lineHeight = 25.sp,
     ),
     bodyLarge = TextStyle(
         fontFamily = PraxisFonts.Body,
         fontSize = 17.sp,
-        lineHeight = 22.sp,
+        lineHeight = 21.sp,
     ),
     bodyMedium = TextStyle(
         fontFamily = PraxisFonts.Body,
         fontSize = 15.sp,
-        lineHeight = 20.sp,
+        lineHeight = 18.sp,
     ),
     bodySmall = TextStyle(
         fontFamily = PraxisFonts.Body,
         fontSize = 15.sp,
-        lineHeight = 20.sp,
+        lineHeight = 18.sp,
     ),
     labelLarge = TextStyle(
         fontFamily = PraxisFonts.Body,
         fontSize = 15.sp,
-        lineHeight = 20.sp,
+        lineHeight = 18.sp,
         fontWeight = FontWeight.Medium,
     ),
     labelMedium = TextStyle(
         fontFamily = PraxisFonts.Body,
         fontSize = 13.sp,
-        lineHeight = 18.sp,
+        lineHeight = 16.sp,
     ),
     labelSmall = TextStyle(
         fontFamily = PraxisFonts.Body,
         fontSize = 12.sp,
-        lineHeight = 16.sp,
+        lineHeight = 15.sp,
         letterSpacing = 0.6.sp,
         fontWeight = FontWeight.SemiBold,
     ),

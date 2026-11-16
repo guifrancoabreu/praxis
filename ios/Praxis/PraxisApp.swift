@@ -272,6 +272,7 @@ struct LibraryView: View {
                                     } else if let featuredPopularWork {
                                         startHere(featuredPopularWork)
                                     }
+                                    if hasReadingProgress { statsCard }
                                     if !popularAuthors.isEmpty { writerShelf(popularAuthors, title: language.text("Autores populares", "Popular writers")) }
                                     if !savedWorks.isEmpty { savedPreview }
                                     popularWorkList(Array(popularWorks.prefix(8)), title: language.text("Biblioteca", "Library"), showAll: true)
@@ -319,6 +320,7 @@ struct LibraryView: View {
                                     .font(PraxisFont.body(.footnote)).foregroundStyle(SystemTokens.Colors.textSecondary).frame(maxWidth: .infinity, alignment: .center).padding(.vertical, 12)
                                 if query.isEmpty && filter == .all {
                                     supportFooter
+                                    feedbackFooter
                                     privacyFooter
                                 }
                             }
@@ -469,6 +471,38 @@ struct LibraryView: View {
         }.buttonStyle(.plain)
     }
 
+    private var statsCard: some View {
+        NavigationLink { ReadingStatsView(language: language, catalog: catalog, knownWorkPaths: knownWorkPaths) } label: {
+            HStack(spacing: 13) {
+                Image(systemName: "chart.bar").font(.title3).foregroundStyle(SystemTokens.Colors.accent)
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(language.text("Estatísticas de leitura", "Reading stats")).font(PraxisFont.heading(.headline, weight: .semibold)).foregroundStyle(SystemTokens.Colors.textPrimary)
+                    Text(language.text("Seu progresso, sequência e obras concluídas", "Your progress, streak and finished works")).font(PraxisFont.body(.subheadline)).foregroundStyle(SystemTokens.Colors.textSecondary)
+                }
+                Spacer()
+                Image(systemName: "chevron.right").font(.caption.weight(.semibold)).foregroundStyle(SystemTokens.Colors.textSecondary)
+            }.padding(16).frame(maxWidth: .infinity, alignment: .leading)
+                .background(SystemTokens.Colors.surface, in: RoundedRectangle(cornerRadius: RefTokens.Radius.lg, style: .continuous))
+                .overlay(RoundedRectangle(cornerRadius: RefTokens.Radius.lg, style: .continuous).stroke(SystemTokens.Colors.separator, lineWidth: 1))
+        }.buttonStyle(.plain)
+    }
+
+    private var feedbackFooter: some View {
+        NavigationLink { FeedbackView(language: language) } label: {
+            HStack(spacing: 13) {
+                Image(systemName: "bubble.left").font(.title3).foregroundStyle(SystemTokens.Colors.accent)
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(FeedbackCopy.forLanguage(language).title).font(.system(.headline, design: .serif, weight: .semibold)).foregroundStyle(SystemTokens.Colors.textPrimary)
+                    Text(FeedbackCopy.forLanguage(language).lead).font(.subheadline).foregroundStyle(SystemTokens.Colors.textSecondary)
+                }
+                Spacer()
+                Image(systemName: "chevron.right").font(.caption.weight(.semibold)).foregroundStyle(SystemTokens.Colors.textSecondary)
+            }.padding(16).frame(maxWidth: .infinity, alignment: .leading)
+                .background(SystemTokens.Colors.surface, in: RoundedRectangle(cornerRadius: RefTokens.Radius.lg, style: .continuous))
+                .overlay(RoundedRectangle(cornerRadius: RefTokens.Radius.lg, style: .continuous).stroke(SystemTokens.Colors.separator, lineWidth: 1))
+        }.buttonStyle(.plain)
+    }
+
     private var privacyFooter: some View {
         NavigationLink { PrivacyPolicyView(language: language) } label: {
             Text(PrivacyPolicyCopy.forLanguage(language).title)
@@ -596,46 +630,57 @@ struct LibraryView: View {
                 Button(language.text("Ver histórico", "Full history")) { filterSelection.selectProgrammatically(.readingHistory) }
                     .font(PraxisFont.body(.subheadline, weight: .medium)).foregroundStyle(SystemTokens.Colors.accent).frame(minHeight: 44).contentShape(Rectangle())
             }
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(alignment: .top, spacing: 12) {
-                    ForEach(entries) { entry in
-                        let credit = catalog?.credit(forPath: entry.path, base: baseURL) ?? entry.author
-                        NavigationLink { ReaderView(work: entry.work, authorName: credit, language: language, knownWorkPaths: knownWorkPaths, catalog: catalog) } label: {
-                            HStack(alignment: .top, spacing: 11) {
-                                    BookCover(title: entry.title, compact: false).frame(width: 64, height: 86)
-                                    VStack(alignment: .leading, spacing: 5) {
-                                        Text(entry.title)
-                                            .font(PraxisFont.heading(.headline, weight: .semibold))
-                                            .multilineTextAlignment(.leading)
-                                            .lineLimit(2)
-                                            .truncationMode(.tail)
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                        if !credit.isEmpty {
-                                            Text(credit)
-                                                .font(PraxisFont.body(.caption))
-                                                .foregroundStyle(SystemTokens.Colors.textSecondary)
-                                                .lineLimit(1)
-                                                .truncationMode(.tail)
-                                        }
-                                        Spacer(minLength: 2)
-                                        ProgressView(value: entry.progress).tint(SystemTokens.Colors.accent)
-                                        Text(language.sectionProgress(Int(entry.progress * 100)))
-                                            .font(PraxisFont.body(.caption)).foregroundStyle(SystemTokens.Colors.textSecondary)
-                                    }
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .frame(minHeight: 86, alignment: .topLeading)
-                                }
-                            .padding(12).frame(width: 236, alignment: .leading)
-                            .background(SystemTokens.Colors.surface, in: RoundedRectangle(cornerRadius: RefTokens.Radius.lg, style: .continuous))
-                            .overlay(RoundedRectangle(cornerRadius: RefTokens.Radius.lg, style: .continuous).stroke(SystemTokens.Colors.separator, lineWidth: 1))
-                            .contentShape(RoundedRectangle(cornerRadius: RefTokens.Radius.lg, style: .continuous))
+            if entries.count == 1 {
+                continueReadingCard(entries[0], width: nil)
+            } else {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(alignment: .top, spacing: 12) {
+                        ForEach(entries) { entry in
+                            continueReadingCard(entry, width: 236)
                         }
-                        .accessibilityIdentifier("continueReading.card")
-                        .buttonStyle(.plain).foregroundStyle(SystemTokens.Colors.textPrimary)
                     }
-                }
-            }.contentMargins(.trailing, 2).scrollTargetBehavior(.viewAligned)
+                }.contentMargins(.trailing, 2).scrollTargetBehavior(.viewAligned)
+            }
         }
+    }
+
+    @ViewBuilder
+    private func continueReadingCard(_ entry: ReadingProgress, width: CGFloat?) -> some View {
+        let credit = catalog?.credit(forPath: entry.path, base: baseURL) ?? entry.author
+        NavigationLink { ReaderView(work: entry.work, authorName: credit, language: language, knownWorkPaths: knownWorkPaths, catalog: catalog) } label: {
+            HStack(alignment: .top, spacing: 11) {
+                BookCover(title: entry.title, compact: false).frame(width: 64, height: 86)
+                VStack(alignment: .leading, spacing: 5) {
+                    Text(entry.title)
+                        .font(PraxisFont.heading(.headline, weight: .semibold))
+                        .multilineTextAlignment(.leading)
+                        .lineLimit(2)
+                        .truncationMode(.tail)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    if !credit.isEmpty {
+                        Text(credit)
+                            .font(PraxisFont.body(.caption))
+                            .foregroundStyle(SystemTokens.Colors.textSecondary)
+                            .lineLimit(1)
+                            .truncationMode(.tail)
+                    }
+                    Spacer(minLength: 2)
+                    ProgressView(value: entry.progress).tint(SystemTokens.Colors.accent).frame(maxWidth: 160, alignment: .leading)
+                    Text(language.sectionProgress(Int(entry.progress * 100)))
+                        .font(PraxisFont.body(.caption)).foregroundStyle(SystemTokens.Colors.textSecondary)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .frame(minHeight: 86, alignment: .topLeading)
+            }
+            .padding(12)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .frame(width: width, alignment: .leading)
+            .background(SystemTokens.Colors.surface, in: RoundedRectangle(cornerRadius: RefTokens.Radius.lg, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: RefTokens.Radius.lg, style: .continuous).stroke(SystemTokens.Colors.separator, lineWidth: 1))
+            .contentShape(RoundedRectangle(cornerRadius: RefTokens.Radius.lg, style: .continuous))
+        }
+        .accessibilityIdentifier("continueReading.card")
+        .buttonStyle(.plain).foregroundStyle(SystemTokens.Colors.textPrimary)
     }
 
     private func startHere(_ item: (Author, Work)) -> some View {
@@ -990,6 +1035,63 @@ struct CollectionDetailView: View {
     }
 }
 
+struct FeedbackView: View {
+    let language: Language
+    @State private var type = "bug"
+    @State private var details = ""
+    @State private var email = ""
+    @State private var sending = false
+    @State private var sent = false
+    @State private var failed = false
+    private var copy: FeedbackCopy { .forLanguage(language) }
+    private var valid: Bool {
+        let address = email.trimmingCharacters(in: .whitespacesAndNewlines)
+        return !details.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && details.utf16.count <= 5000 && address.utf16.count <= 254 && address.range(of: #"^[^\s@]+@[^\s@]+\.[^\s@]+$"#, options: .regularExpression) != nil
+    }
+
+    var body: some View {
+        Form {
+            Section {
+                Picker(copy.type, selection: $type) {
+                    Text(copy.bug).tag("bug")
+                    Text(copy.suggestion).tag("suggestion")
+                }.pickerStyle(.segmented)
+            } header: { Text(copy.type) }
+            Section {
+                TextEditor(text: $details).frame(minHeight: 140).accessibilityLabel(copy.details)
+            } header: { Text(copy.details) } footer: { Text(copy.detailsHint) }
+            Section {
+                TextField(copy.email, text: $email).keyboardType(.emailAddress).textContentType(.emailAddress).textInputAutocapitalization(.never).autocorrectionDisabled()
+            } header: { Text(copy.email) } footer: { Text(copy.emailHint) }
+            Section {
+                Button(sending ? copy.sending : copy.send) { Task { await send() } }
+                    .disabled(!valid || sending)
+                if sent { Text(copy.success).foregroundStyle(SystemTokens.Colors.textSecondary) }
+                if failed { Text(copy.error).foregroundStyle(SystemTokens.Colors.textSecondary) }
+            }
+        }
+        .disabled(sending)
+        .navigationTitle(copy.title).navigationBarTitleDisplayMode(.inline)
+        .scrollContentBackground(.hidden).background(SystemTokens.Colors.background.ignoresSafeArea())
+    }
+
+    @MainActor private func send() async {
+        guard valid, let value = Bundle.main.object(forInfoDictionaryKey: "PraxisFeedbackURL") as? String,
+              let url = URL(string: value), url.scheme == "https", url.host != nil else { failed = true; return }
+        sending = true; failed = false; sent = false
+        defer { sending = false }
+        do {
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.httpBody = try JSONSerialization.data(withJSONObject: ["type": type, "details": details.trimmingCharacters(in: .whitespacesAndNewlines), "email": email.trimmingCharacters(in: .whitespacesAndNewlines)])
+            let (_, response) = try await URLSession.shared.data(for: request)
+            guard let response = response as? HTTPURLResponse, response.statusCode == 200 else { failed = true; return }
+            details = ""; email = ""; sent = true
+        } catch { failed = true }
+    }
+}
+
 struct SupportView: View {
     let language: Language
     private let koFiURL = URL(string: "https://ko-fi.com/guifranco")!
@@ -1255,6 +1357,8 @@ struct ReaderView: View {
     let catalog: Catalog?
     @AppStorage("savedWorkPaths") private var savedWorkPaths = "[]"
     @AppStorage("recentReadings") private var recentReadings = "[]"
+    @AppStorage("readingDays") private var readingDays = "[]"
+    @AppStorage("finishedWorkIDs") private var finishedWorkIDs = "[]"
     @AppStorage("readerAppearance") private var appearanceData = ""
     @State private var appearance: ReaderAppearance
     @State private var showAppearance = false
@@ -1271,6 +1375,9 @@ struct ReaderView: View {
     private var isPDF: Bool { sourceURL?.pathExtension.lowercased() == "pdf" }
     private var isSaved: Bool {
         ((try? JSONDecoder().decode([String].self, from: Data(savedWorkPaths.utf8))) ?? []).contains(work.path)
+    }
+    private var isFinished: Bool {
+        ((try? JSONDecoder().decode([String].self, from: Data(finishedWorkIDs.utf8))) ?? []).contains(identity.id)
     }
     private var identity: ReadingWork {
         if let workIdentity { return workIdentity }
@@ -1343,6 +1450,10 @@ struct ReaderView: View {
                 }
             }
             ToolbarItem(placement: .primaryAction) {
+                Button { toggleFinished() } label: { Image(systemName: isFinished ? "checkmark.circle.fill" : "checkmark.circle") }
+                    .accessibilityLabel(language.text(isFinished ? "Desmarcar como concluído" : "Marcar como concluído", isFinished ? "Unmark as finished" : "Mark as finished"))
+            }
+            ToolbarItem(placement: .primaryAction) {
                 Button { toggleSaved() } label: { Image(systemName: isSaved ? "bookmark.fill" : "bookmark") }
                     .accessibilityLabel(language.text(isSaved ? "Remover dos salvos" : "Salvar texto", isSaved ? "Remove from saved" : "Save work"))
             }
@@ -1357,7 +1468,10 @@ struct ReaderView: View {
         .sheet(isPresented: $showAppearance) { ReaderAppearanceView(appearance: $appearance, language: language).presentationDetents([.medium, .large]) }
         .onChange(of: appearance) { _, updated in appearanceData = updated.encoded }
         .task(id: work.path + language.rawValue) { await load() }
-        .onAppear { Analytics.track(.workOpened) }
+        .onAppear {
+            Analytics.track(.workOpened)
+            stampReadingDay()
+        }
         .onDisappear { flushProgress() }
         .onChange(of: scenePhase) { _, phase in if phase != .active { flushProgress() } }
     }
@@ -1389,6 +1503,17 @@ struct ReaderView: View {
         savedWorkPaths = String(data: (try? JSONEncoder().encode(paths)) ?? Data("[]".utf8), encoding: .utf8) ?? "[]"
         Analytics.track(.bookmarkChanged(isSaved: paths.contains(work.path)))
     }
+    private func toggleFinished() {
+        var ids = (try? JSONDecoder().decode([String].self, from: Data(finishedWorkIDs.utf8))) ?? []
+        if ids.contains(identity.id) { ids.removeAll { $0 == identity.id } }
+        else { ids.insert(identity.id, at: 0) }
+        finishedWorkIDs = String(data: (try? JSONEncoder().encode(ids)) ?? Data("[]".utf8), encoding: .utf8) ?? "[]"
+    }
+    private func stampReadingDay() {
+        let existing = (try? JSONDecoder().decode([String].self, from: Data(readingDays.utf8))) ?? []
+        let merged = ReadingStats.mergeReadingDays(existing: existing, today: ReadingStats.todayKey())
+        readingDays = String(data: (try? JSONEncoder().encode(merged)) ?? Data("[]".utf8), encoding: .utf8) ?? "[]"
+    }
     private func saveProgress(_ progress: Double) {
         pendingProgress = min(1, max(0, progress))
         if scenePhase != .active { flushProgress(); return }
@@ -1410,6 +1535,7 @@ struct ReaderView: View {
         entries[index].progress = progress
         entries[index].workID = entries[index].workID ?? identity.id
         recentReadings = String(data: (try? JSONEncoder().encode(entries)) ?? Data("[]".utf8), encoding: .utf8) ?? "[]"
+        stampReadingDay()
     }
 
 }
@@ -1525,4 +1651,164 @@ struct ReaderWebView: UIViewRepresentable {
     static let hostShim = """
     window.__praxisHost = { progress: (value) => window.webkit.messageHandlers.readerProgress.postMessage(value), link: (url, title) => window.webkit.messageHandlers.readerLink.postMessage({url, title}) };
     """
+}
+
+struct ReadingStatsView: View {
+    let language: Language
+    let catalog: Catalog?
+    let knownWorkPaths: Set<String>
+    @AppStorage("recentReadings") private var recentReadings = "[]"
+    @AppStorage("savedWorkPaths") private var savedWorkPaths = "[]"
+    @AppStorage("readingDays") private var readingDays = "[]"
+    @AppStorage("finishedWorkIDs") private var finishedWorkIDs = "[]"
+
+    private var baseURL: URL { URL(string: language.base) ?? URL(string: "https://www.marxists.org/")! }
+    private var groupedEntries: [ReadingProgress] {
+        ReadingHistory.history(fromJSON: recentReadings, base: baseURL, knownWorkPaths: knownWorkPaths)
+    }
+    private var days: Set<String> { Set(decoded(readingDays)) }
+    private var finishedCount: Int { decoded(finishedWorkIDs).count }
+    private var savedCount: Int { decoded(savedWorkPaths).count }
+    private var readCount: Int { groupedEntries.count }
+    private var streak: Int { ReadingStats.currentStreak(days: days, today: ReadingStats.todayKey()) }
+    private var bucketCounts: [Int] { ReadingStats.weekBucketCounts(days: days, today: ReadingStats.todayKey()) }
+    private var mostReadAuthors: [(name: String, count: Int)] {
+        var counts: [String: Int] = [:]
+        for entry in groupedEntries {
+            let credit = catalog?.credit(forPath: entry.path, base: baseURL) ?? entry.author
+            let name = credit.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !name.isEmpty else { continue }
+            counts[name, default: 0] += 1
+        }
+        return counts.sorted { lhs, rhs in
+            lhs.value == rhs.value
+                ? lhs.key.localizedStandardCompare(rhs.key) == .orderedAscending
+                : lhs.value > rhs.value
+        }.prefix(5).map { (name: $0.key, count: $0.value) }
+    }
+    private func decoded(_ json: String) -> [String] {
+        (try? JSONDecoder().decode([String].self, from: Data(json.utf8))) ?? []
+    }
+
+    var body: some View {
+        ScrollView {
+            LazyVStack(alignment: .leading, spacing: RefTokens.Spacing.s6) {
+                if groupedEntries.isEmpty {
+                    emptyState
+                } else {
+                    hero
+                    statGrid
+                    activitySection
+                    if !mostReadAuthors.isEmpty { authorsSection }
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 18)
+        }
+        .background(SystemTokens.Colors.background.ignoresSafeArea())
+        .navigationTitle(language.text("Estatísticas", "Reading stats"))
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(SystemTokens.Colors.background, for: .navigationBar)
+    }
+
+    private var hero: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("\(streak)")
+                .font(PraxisFont.fixed(64, weight: .medium, heading: true))
+                .foregroundStyle(SystemTokens.Colors.textPrimary)
+            Text(language.text("dias seguidos", "days in a row"))
+                .font(PraxisFont.body(.subheadline))
+                .foregroundStyle(SystemTokens.Colors.textSecondary)
+            Text(language.text("Lendo todos os dias você constrói o hábito.", "Reading every day builds the habit."))
+                .font(PraxisFont.body(.footnote))
+                .foregroundStyle(SystemTokens.Colors.textSecondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .accessibilityElement(children: .combine)
+    }
+
+    private var statGrid: some View {
+        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+            statTile(finishedCount, language.text("Concluídos", "Finished"))
+            statTile(readCount, language.text("Lidos", "Read"))
+            statTile(days.count, language.text("Dias de leitura", "Reading days"))
+            statTile(savedCount, language.text("Salvos", "Saved"))
+        }
+    }
+
+    private func statTile(_ value: Int, _ label: String) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("\(value)")
+                .font(PraxisFont.heading(.title, weight: .semibold))
+                .foregroundStyle(SystemTokens.Colors.textPrimary)
+            Text(label)
+                .font(PraxisFont.body(.caption))
+                .foregroundStyle(SystemTokens.Colors.textSecondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(16)
+        .background(SystemTokens.Colors.surface, in: RoundedRectangle(cornerRadius: RefTokens.Radius.lg, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: RefTokens.Radius.lg, style: .continuous).stroke(SystemTokens.Colors.separator, lineWidth: 1))
+    }
+
+    private var activitySection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            heading(language.text("Atividade", "Activity"))
+            HStack(alignment: .bottom, spacing: 8) {
+                ForEach(Array(bucketCounts.enumerated()), id: \.offset) { _, count in
+                    Rectangle()
+                        .fill(SystemTokens.Colors.accent)
+                        .frame(width: 14, height: max(6, CGFloat(count) * 9))
+                }
+            }
+            .frame(height: 72, alignment: .bottom)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(language.text("\(days.count) dias de leitura", "\(days.count) reading days"))
+            Text(language.text("Últimas 12 semanas", "Last 12 weeks"))
+                .font(PraxisFont.body(.caption))
+                .foregroundStyle(SystemTokens.Colors.textSecondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var authorsSection: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            heading(language.text("Autores mais lidos", "Most-read authors"))
+                .padding(.bottom, 8)
+            ForEach(Array(mostReadAuthors.enumerated()), id: \.offset) { index, author in
+                HStack {
+                    Text(author.name)
+                        .font(PraxisFont.heading(.headline, weight: .medium))
+                        .foregroundStyle(SystemTokens.Colors.textPrimary)
+                    Spacer(minLength: 8)
+                    Text(language.workCount(author.count))
+                        .font(PraxisFont.body(.subheadline))
+                        .foregroundStyle(SystemTokens.Colors.textSecondary)
+                }
+                .padding(.vertical, 9)
+                if index < mostReadAuthors.count - 1 {
+                    Rectangle().fill(SystemTokens.Colors.separator).frame(height: 1)
+                }
+            }
+        }
+    }
+
+    private var emptyState: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Image(systemName: "chart.bar").font(.title2).foregroundStyle(SystemTokens.Colors.accent).padding(.bottom, 4)
+            Text(language.text("Nenhuma leitura ainda", "No reading yet"))
+                .font(PraxisFont.heading(.title3, weight: .semibold))
+            Text(language.text("Abra um texto para começar a acompanhar seu progresso.", "Open a work to start tracking your progress."))
+                .font(PraxisFont.body(.subheadline))
+                .foregroundStyle(SystemTokens.Colors.textSecondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(20)
+        .background(SystemTokens.Colors.surface, in: RoundedRectangle(cornerRadius: RefTokens.Radius.xl, style: .continuous))
+    }
+
+    private func heading(_ title: String) -> some View {
+        Text(title.uppercased()).font(PraxisFont.body(.subheadline, weight: .semibold)).tracking(0.8).foregroundStyle(SystemTokens.Colors.textSecondary)
+            .accessibilityAddTraits(.isHeader)
+    }
 }

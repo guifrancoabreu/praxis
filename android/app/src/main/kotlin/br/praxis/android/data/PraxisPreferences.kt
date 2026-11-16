@@ -27,6 +27,8 @@ class PraxisPreferences(private val context: Context) {
         val glossaryPeopleOnly = booleanPreferencesKey("glossaryPeopleOnly")
         val analyticsConsent = booleanPreferencesKey("analyticsConsent")
         val analyticsPromptAnswered = booleanPreferencesKey("analyticsPromptAnswered")
+        val readingDays = stringPreferencesKey("readingDays")
+        val finishedWorkIDs = stringPreferencesKey("finishedWorkIDs")
     }
 
     private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true }
@@ -41,6 +43,14 @@ class PraxisPreferences(private val context: Context) {
 
     val recentReadings: Flow<List<ReadingProgress>> = context.dataStore.data.map { prefs ->
         decodeReadings(prefs[Keys.recentReadings])
+    }
+
+    val readingDays: Flow<List<String>> = context.dataStore.data.map { prefs ->
+        decodeStrings(prefs[Keys.readingDays])
+    }
+
+    val finishedWorkIDs: Flow<List<String>> = context.dataStore.data.map { prefs ->
+        decodeStrings(prefs[Keys.finishedWorkIDs])
     }
 
     val readerAppearance: Flow<ReaderAppearance> = context.dataStore.data.map { prefs ->
@@ -114,11 +124,38 @@ class PraxisPreferences(private val context: Context) {
         }
     }
 
+    /** Stamps today as a reading day, newest first, exactly like the iOS `readingDays` list. */
+    suspend fun recordReadingDay() {
+        context.dataStore.edit { prefs ->
+            val merged = ReadingStats.mergeReadingDays(decodeStrings(prefs[Keys.readingDays]), ReadingStats.today())
+            prefs[Keys.readingDays] = json.encodeToString(merged)
+        }
+    }
+
+    /** Toggles a finished work, newest first, the counterpart of the iOS check button. */
+    suspend fun toggleFinished(key: String): Boolean {
+        var finished = false
+        context.dataStore.edit { prefs ->
+            val keys = decodeStrings(prefs[Keys.finishedWorkIDs]).toMutableList()
+            finished = if (keys.remove(key)) {
+                false
+            } else {
+                keys.add(0, key)
+                true
+            }
+            prefs[Keys.finishedWorkIDs] = json.encodeToString(keys.take(400))
+        }
+        return finished
+    }
+
     private suspend fun edit(key: Preferences.Key<String>, value: String) {
         context.dataStore.edit { it[key] = value }
     }
 
     private fun decodePaths(raw: String?): List<String> =
+        if (raw.isNullOrBlank()) emptyList() else runCatching { json.decodeFromString<List<String>>(raw) }.getOrDefault(emptyList())
+
+    private fun decodeStrings(raw: String?): List<String> =
         if (raw.isNullOrBlank()) emptyList() else runCatching { json.decodeFromString<List<String>>(raw) }.getOrDefault(emptyList())
 
     private fun decodeReadings(raw: String?): List<ReadingProgress> =

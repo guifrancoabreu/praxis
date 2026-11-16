@@ -90,7 +90,16 @@ enum Language: String, CaseIterable, Identifiable {
         "CURRENTLY READING": "LEYENDO", "A good place to start": "Un buen texto para empezar", "FROM THE ARCHIVE": "DEL ARCHIVO",
         "Start reading": "Empezar a leer", "See all": "Ver todos", "All": "Todo", "Saved": "Guardados",
         "Decrease text size": "Reducir tamaño del texto", "Increase text size": "Aumentar tamaño del texto", "Reset text size": "Restablecer tamaño",
-        "Remove from saved": "Quitar de guardados", "Save work": "Guardar texto"
+        "Remove from saved": "Quitar de guardados", "Save work": "Guardar texto",
+        "Reading stats": "Estadísticas", "days in a row": "días seguidos",
+        "Reading every day builds the habit.": "Leyendo a diario construyes el hábito.",
+        "Finished": "Terminados", "Read": "Leídos", "Reading days": "Días de lectura",
+        "Activity": "Actividad", "Last 12 weeks": "Últimas 12 semanas",
+        "Most-read authors": "Autores más leídos",
+        "No reading yet": "Aún no has leído",
+        "Open a work to start tracking your progress.": "Abre un texto para empezar a seguir tu progreso.",
+        "Mark as finished": "Marcar como terminado", "Unmark as finished": "Desmarcar como terminado",
+        "Your progress, streak and finished works": "Tu progreso, racha y obras terminadas"
     ]
 }
 
@@ -122,7 +131,7 @@ struct PrivacyPolicyCopy {
                 title: "Privacidade",
                 intro: "O Praxis não exige uma conta. Não vendemos dados nem usamos anúncios. Seus dados de leitura ficam no aparelho, salvo quando você autoriza o envio opcional de análises descrito abaixo.",
                 onDeviceTitle: "No seu aparelho",
-                onDeviceBody: "Favoritos, histórico, posição de leitura, idioma, ordenação e aparência são guardados no armazenamento do app para manter sua biblioteca como você deixou. Textos e PDFs abertos também podem ficar no cache local, limitado a 100 MB. Esses dados não são enviados à equipe do app.",
+                onDeviceBody: "Favoritos, histórico, posição de leitura, dias de leitura, textos concluídos, idioma, ordenação e aparência são guardados no armazenamento do app para manter sua biblioteca como você deixou. Textos e PDFs abertos também podem ficar no cache local, limitado a 100 MB. Esses dados não são enviados à equipe do app.",
                 archiveTitle: "Conteúdo do arquivo",
                 archiveBody: "Ao abrir um texto ou PDF, ou ao carregar um retrato, o app solicita esse conteúdo diretamente a marxists.org. O servidor do arquivo pode ver qual página ou arquivo foi solicitado e recebe dados técnicos da conexão, como seu endereço IP. O app não controla as práticas de privacidade do arquivo.",
                 analyticsTitle: "Análises opcionais",
@@ -132,7 +141,7 @@ struct PrivacyPolicyCopy {
                 analyticsConsentDetail: "Opcional e desativado por padrão. Você pode mudar esta escolha a qualquer momento.",
                 analyticsPolicyLink: "Política de privacidade do TelemetryDeck",
                 thirdPartyTitle: "Serviços externos",
-                thirdPartyBody: "Links de apoio podem abrir sites como Ko-fi ou Marxists.org. Ao sair do app, valem as políticas desses serviços. O TelemetryDeck recebe análises somente quando você ativa a opção acima.",
+                thirdPartyBody: "Links de apoio podem abrir sites como Ko-fi ou Marxists.org. Ao sair do app, valem as políticas desses serviços. O TelemetryDeck recebe análises somente quando você ativa a opção acima. Se você enviar feedback, sua mensagem e seu e-mail passam pela Cloudflare e pelo Resend para chegar à equipe e permitir uma resposta.",
                 retentionTitle: "Armazenamento e remoção",
                 retentionBody: "As preferências e o histórico ficam no armazenamento local do app até você apagar o app. O cache apaga arquivos antigos quando passa de 100 MB. Desative as análises acima para interromper o envio de novos eventos. Eventos já recebidos pelo TelemetryDeck seguem a retenção do plano; no plano gratuito atual, são três meses. O serviço permite excluir dados por mês, mas não localizar e excluir os dados de uma instalação específica. Consulte a política do serviço para detalhes.",
                 contactTitle: "Contato",
@@ -144,7 +153,7 @@ struct PrivacyPolicyCopy {
                 title: "Privacy",
                 intro: "Praxis does not require an account. We do not sell data or use ads. Reading data stays on your device unless you choose to share the optional analytics described below.",
                 onDeviceTitle: "On your device",
-                onDeviceBody: "Saved works, reading history, reading position, language, sorting, and reader appearance are stored in the app so your library stays as you left it. Opened texts and PDFs may also be kept in a local cache capped at 100 MB. This data is not sent to the app team.",
+                onDeviceBody: "Saved works, reading history, reading position, reading days, finished works, language, sorting, and reader appearance are stored in the app so your library stays as you left it. Opened texts and PDFs may also be kept in a local cache capped at 100 MB. This data is not sent to the app team.",
                 archiveTitle: "Archive content",
                 archiveBody: "When you open a text or PDF, or when a portrait loads, the app requests that content directly from marxists.org. The archive’s server can see which page or file was requested and receives connection details such as your IP address. The app does not control the archive’s privacy practices.",
                 analyticsTitle: "Optional analytics",
@@ -154,7 +163,7 @@ struct PrivacyPolicyCopy {
                 analyticsConsentDetail: "Optional and off by default. You can change this choice at any time.",
                 analyticsPolicyLink: "TelemetryDeck privacy policy",
                 thirdPartyTitle: "External services",
-                thirdPartyBody: "Support links may open sites such as Ko-fi or Marxists.org. Their policies apply after you leave the app. TelemetryDeck receives analytics only when you turn on the option above.",
+                thirdPartyBody: "Support links may open sites such as Ko-fi or Marxists.org. Their policies apply after you leave the app. TelemetryDeck receives analytics only when you turn on the option above. If you send feedback, your message and email pass through Cloudflare and Resend to reach the team and allow a reply.",
                 retentionTitle: "Storage and deletion",
                 retentionBody: "Preferences and reading history stay in the app’s local storage until you delete the app. The cache removes older files when it exceeds 100 MB. Turn off analytics above to stop new events from being sent. Events received by TelemetryDeck follow your plan’s retention period; the current free plan keeps them for three months. The service lets customers delete data by month, but it cannot locate and delete data from one specific installation. See its policy for details.",
                 contactTitle: "Contact",
@@ -166,7 +175,7 @@ struct PrivacyPolicyCopy {
                 title: "Privacidad",
                 intro: "Praxis no requiere una cuenta. No vendemos datos ni usamos anuncios. Los datos de lectura permanecen en tu dispositivo, salvo que aceptes compartir las analíticas opcionales descritas abajo.",
                 onDeviceTitle: "En tu dispositivo",
-                onDeviceBody: "Los textos guardados, el historial, la posición de lectura, el idioma, el orden y la apariencia del lector se guardan en la app para conservar tu biblioteca. Los textos y PDF abiertos también pueden permanecer en una caché local limitada a 100 MB. Estos datos no se envían al equipo de la app.",
+                onDeviceBody: "Los textos guardados, el historial, la posición de lectura, los días de lectura, los textos terminados, el idioma, el orden y la apariencia del lector se guardan en la app para conservar tu biblioteca. Los textos y PDF abiertos también pueden permanecer en una caché local limitada a 100 MB. Estos datos no se envían al equipo de la app.",
                 archiveTitle: "Contenido del archivo",
                 archiveBody: "Al abrir un texto o PDF, o al cargar un retrato, la app solicita ese contenido directamente a marxists.org. El servidor del archivo puede ver qué página o archivo se solicitó y recibe datos técnicos de conexión, como tu dirección IP. La app no controla las prácticas de privacidad del archivo.",
                 analyticsTitle: "Analíticas opcionales",
@@ -176,7 +185,7 @@ struct PrivacyPolicyCopy {
                 analyticsConsentDetail: "Opcional y desactivado por defecto. Puedes cambiar esta elección cuando quieras.",
                 analyticsPolicyLink: "Política de privacidad de TelemetryDeck",
                 thirdPartyTitle: "Servicios externos",
-                thirdPartyBody: "Los enlaces de apoyo pueden abrir sitios como Ko-fi o Marxists.org. Al salir de la app, se aplican las políticas de esos servicios. TelemetryDeck recibe analíticas solo si activas la opción anterior.",
+                thirdPartyBody: "Los enlaces de apoyo pueden abrir sitios como Ko-fi o Marxists.org. Al salir de la app, se aplican las políticas de esos servicios. TelemetryDeck recibe analíticas solo si activas la opción anterior. Si envías comentarios, tu mensaje y correo pasan por Cloudflare y Resend para llegar al equipo y permitir una respuesta.",
                 retentionTitle: "Almacenamiento y eliminación",
                 retentionBody: "Las preferencias y el historial permanecen en el almacenamiento local de la app hasta que borres la app. La caché elimina archivos antiguos al superar 100 MB. Desactiva las analíticas arriba para detener el envío de nuevos eventos. Los eventos recibidos por TelemetryDeck siguen la retención de tu plan; el plan gratuito actual los conserva durante tres meses. El servicio permite borrar datos por mes, pero no localizar y borrar los datos de una instalación específica. Consulta su política para más detalles.",
                 contactTitle: "Contacto",
@@ -723,3 +732,85 @@ enum ReadingHistory {
     }
 }
 
+/// Pure, device-local reading statistics. Kept free of SwiftUI so the same
+/// rules can be tested with `swift test` and mirrored by the Android app.
+enum ReadingStats {
+    /// Device-local calendar day, as `"yyyy-MM-dd"`.
+    static func todayKey(now: Date = Date(), calendar: Calendar = .current) -> String {
+        let components = calendar.dateComponents([.year, .month, .day], from: now)
+        return key(year: components.year ?? 1970, month: components.month ?? 1, day: components.day ?? 1)
+    }
+
+    /// Union of stored days and today, newest first, capped at 400 entries.
+    static func mergeReadingDays(existing: [String], today: String) -> [String] {
+        let merged = Set(existing).union([today])
+        // ISO day strings sort chronologically as plain text.
+        return Array(merged.sorted(by: >).prefix(400))
+    }
+
+    /// Consecutive reading days ending today, or ending yesterday when today
+    /// has not been read yet. Two missed days break the streak.
+    static func currentStreak(days: Set<String>, today: String) -> Int {
+        guard !days.isEmpty else { return 0 }
+        var cursor = days.contains(today) ? today : shift(today, by: -1)
+        var count = 0
+        while days.contains(cursor) {
+            count += 1
+            let previous = shift(cursor, by: -1)
+            guard previous != cursor else { break }
+            cursor = previous
+        }
+        return count
+    }
+
+    /// Rolling 7-day windows, oldest first. Bucket `i` ends at
+    /// `today - (weeks - 1 - i) * 7` and starts six days before it.
+    static func weekBucketCounts(days: Set<String>, today: String, weeks: Int = 12) -> [Int] {
+        guard weeks > 0 else { return [] }
+        return (0..<weeks).map { index in
+            let end = shift(today, by: -(weeks - 1 - index) * 7)
+            let start = shift(end, by: -6)
+            return min(7, max(0, days.filter { $0 >= start && $0 <= end }.count))
+        }
+    }
+
+    /// Shifts a `"yyyy-MM-dd"` day by a number of days using a fixed UTC
+    /// Gregorian calendar so the result never depends on the device time zone.
+    static func shift(_ day: String, by days: Int) -> String {
+        let calendar = utcCalendar()
+        guard let date = date(fromDay: day), let shifted = calendar.date(byAdding: .day, value: days, to: date) else { return day }
+        let components = calendar.dateComponents([.year, .month, .day], from: shifted)
+        return key(year: components.year ?? 0, month: components.month ?? 1, day: components.day ?? 1)
+    }
+
+    private static func key(year: Int, month: Int, day: Int) -> String {
+        String(format: "%04d-%02d-%02d", year, month, day)
+    }
+
+    private static func utcCalendar() -> Calendar {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0) ?? TimeZone.current
+        return calendar
+    }
+
+    private static func date(fromDay day: String) -> Date? {
+        let parts = day.split(separator: "-").map { Int($0) }
+        guard parts.count == 3, let year = parts[0], let month = parts[1], let dayOfMonth = parts[2] else { return nil }
+        var components = DateComponents()
+        components.year = year
+        components.month = month
+        components.day = dayOfMonth
+        return utcCalendar().date(from: components)
+    }
+}
+
+struct FeedbackCopy {
+    let title, lead, type, bug, suggestion, details, detailsHint, email, emailHint, send, sending, success, error: String
+    static func forLanguage(_ language: Language) -> FeedbackCopy {
+        switch language {
+        case .pt: return .init(title: "Feedback", lead: "Relate um problema ou sugira uma melhoria", type: "Tipo de feedback", bug: "Problema", suggestion: "Sugestão", details: "Detalhes", detailsHint: "Descreva o problema ou a melhoria em até 5.000 caracteres.", email: "E-mail", emailHint: "Usaremos seu e-mail para responder ao seu feedback.", send: "Enviar feedback", sending: "Enviando…", success: "Feedback enviado. Obrigado!", error: "Não foi possível enviar. Confira sua conexão e tente novamente.")
+        case .en: return .init(title: "Feedback", lead: "Report a problem or suggest an improvement", type: "Feedback type", bug: "Problem", suggestion: "Suggestion", details: "Details", detailsHint: "Describe the problem or improvement in up to 5,000 characters.", email: "Email", emailHint: "We'll use your email to reply to your feedback.", send: "Send feedback", sending: "Sending…", success: "Feedback sent. Thank you!", error: "Couldn't send feedback. Check your connection and try again.")
+        case .es: return .init(title: "Comentarios", lead: "Informa un problema o sugiere una mejora", type: "Tipo de comentario", bug: "Problema", suggestion: "Sugerencia", details: "Detalles", detailsHint: "Describe el problema o la mejora en hasta 5.000 caracteres.", email: "Correo electrónico", emailHint: "Usaremos tu correo para responder a tu comentario.", send: "Enviar comentario", sending: "Enviando…", success: "Comentario enviado. ¡Gracias!", error: "No se pudo enviar. Comprueba tu conexión e inténtalo de nuevo.")
+        }
+    }
+}
