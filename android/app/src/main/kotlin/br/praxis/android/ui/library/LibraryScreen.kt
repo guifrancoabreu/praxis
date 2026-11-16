@@ -71,6 +71,7 @@ import br.praxis.android.data.TextSearch
 import br.praxis.android.data.Work
 import br.praxis.android.design.Praxis
 import br.praxis.android.design.PraxisFonts
+import br.praxis.android.design.PraxisText
 import br.praxis.android.design.Tokens
 import br.praxis.android.design.components.AuthorArtwork
 import br.praxis.android.design.components.BookCover
@@ -375,10 +376,7 @@ private fun LibrarySectionHeader(
     Row(modifier = modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Text(
             text = title.uppercase(),
-            style = MaterialTheme.typography.labelMedium.copy(
-                fontWeight = FontWeight.SemiBold,
-                letterSpacing = 0.8.sp,
-            ),
+            style = PraxisText.sectionLabel,
             color = Praxis.colors.textSecondary,
             modifier = Modifier.weight(1f),
         )
@@ -432,7 +430,7 @@ private fun FeaturedCard(title: String, credit: String, onClick: () -> Unit, mod
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleLarge.copy(fontFamily = PraxisFonts.Heading),
+                style = PraxisText.featuredTitle,
                 color = Praxis.colors.textPrimary,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
@@ -448,8 +446,7 @@ private fun FeaturedCard(title: String, credit: String, onClick: () -> Unit, mod
             Spacer(Modifier.height(Tokens.Spacing.s3))
             Text(
                 text = stringResource(R.string.action_start_reading),
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.SemiBold,
+                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
                 color = Praxis.colors.accent,
             )
         }
@@ -517,7 +514,7 @@ private fun ContinueReadingCard(
             if (credit.isNotEmpty()) {
                 Text(
                     text = credit,
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = PraxisText.caption,
                     color = Praxis.colors.textSecondary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -531,7 +528,7 @@ private fun ContinueReadingCard(
             Spacer(Modifier.height(Tokens.Spacing.s1))
             Text(
                 text = stringResource(R.string.progress_in_section, (progress.progress * 100).toInt()),
-                style = MaterialTheme.typography.labelMedium,
+                style = PraxisText.caption,
                 color = Praxis.colors.textSecondary,
             )
         }
@@ -568,15 +565,14 @@ private fun WriterCard(author: Author, onClick: () -> Unit) {
         Spacer(Modifier.height(Tokens.Spacing.s2))
         Text(
             text = author.full,
-            style = MaterialTheme.typography.bodyLarge.copy(fontFamily = PraxisFonts.Heading),
-            fontWeight = FontWeight.SemiBold,
+            style = PraxisText.authorName,
             color = Praxis.colors.textPrimary,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
         Text(
             text = workCountLabel(author.works.size),
-            style = MaterialTheme.typography.bodyMedium,
+            style = PraxisText.caption,
             color = Praxis.colors.textSecondary,
         )
     }
@@ -685,7 +681,7 @@ private fun WorkRow(work: Work, author: String, onClick: () -> Unit) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = work.title,
-                style = MaterialTheme.typography.titleSmall.copy(fontFamily = PraxisFonts.Heading),
+                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Medium),
                 color = Praxis.colors.textPrimary,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
@@ -702,7 +698,7 @@ private fun WorkRow(work: Work, author: String, onClick: () -> Unit) {
             if (work.date.isNotEmpty()) {
                 Text(
                     text = work.date,
-                    style = MaterialTheme.typography.labelMedium,
+                    style = PraxisText.caption,
                     color = Praxis.colors.textSecondary,
                 )
             }

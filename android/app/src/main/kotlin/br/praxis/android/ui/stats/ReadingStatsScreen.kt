@@ -49,6 +49,7 @@ import br.praxis.android.data.ReadingHistory
 import br.praxis.android.data.ReadingProgress
 import br.praxis.android.data.ReadingStats
 import br.praxis.android.design.Praxis
+import br.praxis.android.design.PraxisText
 import br.praxis.android.design.Tokens
 import br.praxis.android.design.components.InsetDivider
 
@@ -285,10 +286,7 @@ private fun AuthorsSection(entries: List<Map.Entry<String, Int>>) {
 private fun SectionHeading(title: String) {
     Text(
         text = title.uppercase(),
-        style = MaterialTheme.typography.labelMedium.copy(
-            fontWeight = FontWeight.SemiBold,
-            letterSpacing = 0.8.sp,
-        ),
+        style = PraxisText.sectionLabel,
         color = Praxis.colors.textSecondary,
     )
 }

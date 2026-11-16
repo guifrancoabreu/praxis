@@ -142,6 +142,23 @@ val PraxisTypography = Typography(
     ),
 )
 
+/**
+ * Text roles Material3's scale doesn't express, mirroring the iOS app's system text styles.
+ */
+object PraxisText {
+    /** Inter 12, iOS `.caption`: credits, counts, progress and year lines. */
+    val caption = TextStyle(fontFamily = PraxisFonts.Body, fontSize = 12.sp, lineHeight = 15.sp)
+    /** Inter 15 semibold, iOS `.subheadline` semibold: uppercase section headers. */
+    val sectionLabel = TextStyle(
+        fontFamily = PraxisFonts.Body, fontWeight = FontWeight.SemiBold,
+        fontSize = 15.sp, lineHeight = 18.sp, letterSpacing = 0.8.sp,
+    )
+    /** Literata 15 semibold, iOS `.subheadline` heading: author names in grids. */
+    val authorName = TextStyle(fontFamily = PraxisFonts.Heading, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, lineHeight = 22.sp)
+    /** Literata 20 semibold, iOS `.title3` heading: quick-start card title. */
+    val featuredTitle = TextStyle(fontFamily = PraxisFonts.Heading, fontWeight = FontWeight.SemiBold, fontSize = 20.sp, lineHeight = 30.sp)
+}
+
 private val LocalColors = staticCompositionLocalOf { lightColors }
 
 object Praxis {
