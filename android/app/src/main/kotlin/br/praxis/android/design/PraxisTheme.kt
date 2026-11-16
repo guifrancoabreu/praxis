@@ -9,7 +9,6 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
@@ -79,52 +78,58 @@ private val darkColors = PraxisColors(
 /** iOS text styles the app actually uses, sized in sp so the system font scale still applies. */
 val PraxisTypography = Typography(
     displayLarge = TextStyle(
-        fontFamily = FontFamily.Serif,
+        fontFamily = PraxisFonts.Heading,
         fontWeight = FontWeight.Bold,
         fontSize = 34.sp,
         lineHeight = 41.sp,
         letterSpacing = (-0.4).sp,
     ),
     titleLarge = TextStyle(
-        fontFamily = FontFamily.Serif,
+        fontFamily = PraxisFonts.Heading,
         fontWeight = FontWeight.SemiBold,
         fontSize = 22.sp,
         lineHeight = 28.sp,
     ),
     titleMedium = TextStyle(
-        fontFamily = FontFamily.Serif,
+        fontFamily = PraxisFonts.Heading,
         fontWeight = FontWeight.Medium,
         fontSize = 17.sp,
         lineHeight = 22.sp,
     ),
     titleSmall = TextStyle(
-        fontFamily = FontFamily.Serif,
+        fontFamily = PraxisFonts.Heading,
         fontWeight = FontWeight.SemiBold,
         fontSize = 17.sp,
         lineHeight = 22.sp,
     ),
     bodyLarge = TextStyle(
+        fontFamily = PraxisFonts.Body,
         fontSize = 17.sp,
         lineHeight = 22.sp,
     ),
     bodyMedium = TextStyle(
+        fontFamily = PraxisFonts.Body,
         fontSize = 15.sp,
         lineHeight = 20.sp,
     ),
     bodySmall = TextStyle(
+        fontFamily = PraxisFonts.Body,
         fontSize = 15.sp,
         lineHeight = 20.sp,
     ),
     labelLarge = TextStyle(
+        fontFamily = PraxisFonts.Body,
         fontSize = 15.sp,
         lineHeight = 20.sp,
         fontWeight = FontWeight.Medium,
     ),
     labelMedium = TextStyle(
+        fontFamily = PraxisFonts.Body,
         fontSize = 13.sp,
         lineHeight = 18.sp,
     ),
     labelSmall = TextStyle(
+        fontFamily = PraxisFonts.Body,
         fontSize = 12.sp,
         lineHeight = 16.sp,
         letterSpacing = 0.6.sp,

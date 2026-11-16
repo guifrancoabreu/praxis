@@ -31,6 +31,11 @@
 		A0000000000000000000005C /* shared/reader/reader-link.js in Resources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000005B /* shared/reader/reader-link.js */; };
 		A0000000000000000000005E /* shared/reader/reader-progress.js in Resources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000005D /* shared/reader/reader-progress.js */; };
 		A00000000000000000000060 /* shared/reader/reader-images.js in Resources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000005F /* shared/reader/reader-images.js */; };
+		A00000000000000000000065 /* Praxis/Fonts/inter.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000061 /* Praxis/Fonts/inter.ttf */; };
+		A00000000000000000000066 /* Praxis/Fonts/literata.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000062 /* Praxis/Fonts/literata.ttf */; };
+		A00000000000000000000068 /* Praxis/PraxisFonts.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000067 /* Praxis/PraxisFonts.swift */; };
+		A00000000000000000000069 /* Praxis/Fonts/inter_license.txt in Resources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000063 /* Praxis/Fonts/inter_license.txt */; };
+		A0000000000000000000006A /* Praxis/Fonts/literata_license.txt in Resources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000064 /* Praxis/Fonts/literata_license.txt */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -69,6 +74,11 @@
 		A0000000000000000000005B /* shared/reader/reader-link.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "../shared/reader/reader-link.js"; sourceTree = "<group>"; };
 		A0000000000000000000005D /* shared/reader/reader-progress.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "../shared/reader/reader-progress.js"; sourceTree = "<group>"; };
 		A0000000000000000000005F /* shared/reader/reader-images.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "../shared/reader/reader-images.js"; sourceTree = "<group>"; };
+		A00000000000000000000061 /* Praxis/Fonts/inter.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Praxis/Fonts/inter.ttf; sourceTree = "<group>"; };
+		A00000000000000000000062 /* Praxis/Fonts/literata.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Praxis/Fonts/literata.ttf; sourceTree = "<group>"; };
+		A00000000000000000000063 /* Praxis/Fonts/inter_license.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Praxis/Fonts/inter_license.txt; sourceTree = "<group>"; };
+		A00000000000000000000064 /* Praxis/Fonts/literata_license.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Praxis/Fonts/literata_license.txt; sourceTree = "<group>"; };
+		A00000000000000000000067 /* Praxis/PraxisFonts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Praxis/PraxisFonts.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -94,6 +104,7 @@
 			isa = PBXGroup;
 			children = (
 				A0000000000000000000000B /* Praxis/PraxisApp.swift */,
+				A00000000000000000000067 /* Praxis/PraxisFonts.swift */,
 				A00000000000000000000031 /* Praxis/PageStore.swift */,
 				A00000000000000000000035 /* Praxis/FilterBarSelection.swift */,
 				A00000000000000000000042 /* PraxisUITests/LibraryFilterScrollTests.swift */,
@@ -116,6 +127,10 @@
 				A0000000000000000000005D /* shared/reader/reader-progress.js */,
 				A0000000000000000000005F /* shared/reader/reader-images.js */,
 				A00000000000000000000027 /* Praxis/Assets.xcassets */,
+				A00000000000000000000061 /* Praxis/Fonts/inter.ttf */,
+				A00000000000000000000062 /* Praxis/Fonts/literata.ttf */,
+				A00000000000000000000063 /* Praxis/Fonts/inter_license.txt */,
+				A00000000000000000000064 /* Praxis/Fonts/literata_license.txt */,
 				A00000000000000000000005 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -226,6 +241,10 @@
 				A0000000000000000000005C /* shared/reader/reader-link.js in Resources */,
 				A0000000000000000000005E /* shared/reader/reader-progress.js in Resources */,
 				A00000000000000000000060 /* shared/reader/reader-images.js in Resources */,
+				A00000000000000000000065 /* Praxis/Fonts/inter.ttf in Resources */,
+				A00000000000000000000066 /* Praxis/Fonts/literata.ttf in Resources */,
+				A00000000000000000000069 /* Praxis/Fonts/inter_license.txt in Resources */,
+				A0000000000000000000006A /* Praxis/Fonts/literata_license.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -254,6 +273,7 @@
 				A00000000000000000000028 /* Praxis/Components.swift in Sources */,
 				A0000000000000000000001F /* Praxis/Analytics.swift in Sources */,
 				A00000000000000000000056 /* Praxis/ReaderAssets.swift in Sources */,
+				A00000000000000000000068 /* Praxis/PraxisFonts.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

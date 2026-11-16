@@ -21,8 +21,8 @@ struct BookCover: View {
                     Rectangle().fill(.white.opacity(0.72)).frame(width: proxy.size.width * 0.28, height: 2)
                     Spacer(minLength: 6)
                     Text(title)
-                        .font(.system(size: compact ? RefTokens.Typography.bookCoverTitleCompact : RefTokens.Typography.bookCoverTitle,
-                                      weight: .semibold, design: .serif))
+                        .font(PraxisFont.fixed(compact ? RefTokens.Typography.bookCoverTitleCompact : RefTokens.Typography.bookCoverTitle,
+                                               weight: .semibold, heading: true))
                         .lineLimit(compact ? 4 : 5).minimumScaleFactor(0.75).foregroundStyle(.white)
                     Spacer(minLength: 5)
                     Text(imprint).font(.system(size: RefTokens.Typography.bookCoverBrand, weight: .bold, design: .rounded))
@@ -46,9 +46,9 @@ struct ListRow: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: RefTokens.Spacing.s1) {
-            Text(title).font(.system(.headline, design: .serif, weight: .medium))
+            Text(title).font(PraxisFont.heading(.headline, weight: .medium))
             if let subtitle, !subtitle.isEmpty {
-                Text(subtitle).font(.subheadline).foregroundStyle(SystemTokens.Colors.textSecondary)
+                Text(subtitle).font(PraxisFont.body(.subheadline)).foregroundStyle(SystemTokens.Colors.textSecondary)
             }
         }
         .padding(.vertical, RefTokens.Spacing.s1)

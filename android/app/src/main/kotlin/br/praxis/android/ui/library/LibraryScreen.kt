@@ -49,7 +49,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -69,6 +68,7 @@ import br.praxis.android.data.ReadingProgress
 import br.praxis.android.data.TextSearch
 import br.praxis.android.data.Work
 import br.praxis.android.design.Praxis
+import br.praxis.android.design.PraxisFonts
 import br.praxis.android.design.Tokens
 import br.praxis.android.design.components.AuthorArtwork
 import br.praxis.android.design.components.BookCover
@@ -335,7 +335,7 @@ private fun Header() {
         Text(
             text = stringResource(R.string.library_title),
             style = MaterialTheme.typography.headlineLarge.copy(
-                fontFamily = FontFamily.Serif,
+                fontFamily = PraxisFonts.Heading,
                 fontSize = 34.sp,
                 lineHeight = 41.sp,
                 fontWeight = FontWeight.Medium,
@@ -419,7 +419,7 @@ private fun FeaturedCard(title: String, credit: String, onClick: () -> Unit, mod
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleLarge.copy(fontFamily = FontFamily.Serif),
+                style = MaterialTheme.typography.titleLarge.copy(fontFamily = PraxisFonts.Heading),
                 color = Praxis.colors.textPrimary,
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis,
@@ -513,7 +513,7 @@ private fun WriterCard(author: Author, onClick: () -> Unit) {
         Spacer(Modifier.height(Tokens.Spacing.s2))
         Text(
             text = author.full,
-            style = MaterialTheme.typography.bodyLarge.copy(fontFamily = FontFamily.Serif),
+            style = MaterialTheme.typography.bodyLarge.copy(fontFamily = PraxisFonts.Heading),
             fontWeight = FontWeight.SemiBold,
             color = Praxis.colors.textPrimary,
             maxLines = 1,
@@ -547,7 +547,7 @@ private fun WriterList(authors: List<Author>, onOpenAuthor: (Author) -> Unit) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = author.full,
-                        style = MaterialTheme.typography.titleSmall.copy(fontFamily = FontFamily.Serif),
+                        style = MaterialTheme.typography.titleSmall.copy(fontFamily = PraxisFonts.Heading),
                         color = Praxis.colors.textPrimary,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -630,7 +630,7 @@ private fun WorkRow(work: Work, author: String, onClick: () -> Unit) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = work.title,
-                style = MaterialTheme.typography.titleSmall.copy(fontFamily = FontFamily.Serif),
+                style = MaterialTheme.typography.titleSmall.copy(fontFamily = PraxisFonts.Heading),
                 color = Praxis.colors.textPrimary,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,

@@ -33,7 +33,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
@@ -42,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import br.praxis.android.design.Praxis
+import br.praxis.android.design.PraxisFonts
 import br.praxis.android.design.Tokens
 
 /**
@@ -94,7 +94,7 @@ fun BookCover(title: String, modifier: Modifier = Modifier, compact: Boolean = t
                     text = title,
                     style = TextStyle(
                         color = Color.White,
-                        fontFamily = FontFamily.Serif,
+                        fontFamily = PraxisFonts.Heading,
                         fontWeight = FontWeight.SemiBold,
                     ),
                     autoSize = TextAutoSize.StepBased(

@@ -29,7 +29,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import br.praxis.android.AppGraph
 import br.praxis.android.R
@@ -37,6 +36,7 @@ import br.praxis.android.data.CatalogCollection
 import br.praxis.android.data.CatalogItem
 import br.praxis.android.data.Language
 import br.praxis.android.design.Praxis
+import br.praxis.android.design.PraxisFonts
 import br.praxis.android.design.Tokens
 import br.praxis.android.design.components.Chevron
 import br.praxis.android.design.components.InsetDivider
@@ -137,7 +137,7 @@ private fun CollectionContent(
                         Text(
                             text = item.title,
                             style = MaterialTheme.typography.bodyLarge,
-                            fontFamily = FontFamily.Serif,
+                            fontFamily = PraxisFonts.Heading,
                             color = Praxis.colors.textPrimary,
                             modifier = Modifier.weight(1f),
                         )
