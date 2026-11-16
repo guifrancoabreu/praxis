@@ -1,0 +1,30 @@
+name: Shared content
+
+on:
+  push:
+    paths:
+      - "shared/**"
+      - "design/**"
+      - "tools/**"
+      - "ios/Praxis/RefTokens.swift"
+      - ".github/workflows/shared-checks.yml"
+  pull_request:
+    paths:
+      - "shared/**"
+      - "design/**"
+      - "tools/**"
+      - "ios/Praxis/RefTokens.swift"
+      - ".github/workflows/shared-checks.yml"
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Catalogs and reader assets live in shared/
+        run: python3 tools/check_shared.py
+      - name: Design tokens match every platform
+        run: python3 tools/gen_tokens.py --check

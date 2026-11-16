@@ -7,24 +7,35 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A00000000000000000000032 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000033 /* PrivacyInfo.xcprivacy */; };
-		A00000000000000000000034 /* Praxis/FilterBarSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000035 /* Praxis/FilterBarSelection.swift */; };
-		A00000000000000000000030 /* Praxis/PageStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000031 /* Praxis/PageStore.swift */; };
-		A00000000000000000000028 /* Praxis/Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000029 /* Praxis/Components.swift */; };
-		A00000000000000000000022 /* Praxis/RefTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000023 /* Praxis/RefTokens.swift */; };
-		A00000000000000000000024 /* Praxis/SystemTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000025 /* Praxis/SystemTokens.swift */; };
 		A0000000000000000000000E /* Praxis/PraxisApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000000B /* Praxis/PraxisApp.swift */; };
-		A0000000000000000000000F /* Praxis/Resources/catalog-pt.json in Resources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000000C /* Praxis/Resources/catalog-pt.json */; };
-		A00000000000000000000010 /* Praxis/Resources/catalog-en.json in Resources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000000D /* Praxis/Resources/catalog-en.json */; };
+		A0000000000000000000000F /* shared/catalog/catalog-pt.json in Resources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000000C /* shared/catalog/catalog-pt.json */; };
+		A00000000000000000000010 /* shared/catalog/catalog-en.json in Resources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000000D /* shared/catalog/catalog-en.json */; };
 		A00000000000000000000016 /* Praxis/Catalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000015 /* Praxis/Catalog.swift */; };
-		A00000000000000000000018 /* Praxis/Resources/catalog-es.json in Resources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000017 /* Praxis/Resources/catalog-es.json */; };
+		A00000000000000000000018 /* shared/catalog/catalog-es.json in Resources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000017 /* shared/catalog/catalog-es.json */; };
 		A0000000000000000000001A /* Praxis/DesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000019 /* Praxis/DesignSystem.swift */; };
 		A0000000000000000000001E /* TelemetryDeck in Frameworks */ = {isa = PBXBuildFile; productRef = A0000000000000000000001D /* TelemetryDeck */; };
 		A0000000000000000000001F /* Praxis/Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000001B /* Praxis/Analytics.swift */; };
 		A00000000000000000000020 /* Praxis/PortraitCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000021 /* Praxis/PortraitCache.swift */; };
+		A00000000000000000000022 /* Praxis/RefTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000023 /* Praxis/RefTokens.swift */; };
+		A00000000000000000000024 /* Praxis/SystemTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000025 /* Praxis/SystemTokens.swift */; };
 		A00000000000000000000026 /* Praxis/Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000027 /* Praxis/Assets.xcassets */; };
-		A00000000000000000000043 /* LibraryFilterScrollTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000042 /* LibraryFilterScrollTests.swift */; };
-		A0000000000000000000004D /* ContinueReadingCardTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000004C /* ContinueReadingCardTests.swift */; };
+		A00000000000000000000028 /* Praxis/Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000029 /* Praxis/Components.swift */; };
+		A00000000000000000000030 /* Praxis/PageStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000031 /* Praxis/PageStore.swift */; };
+		A00000000000000000000032 /* Praxis/PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000033 /* Praxis/PrivacyInfo.xcprivacy */; };
+		A00000000000000000000034 /* Praxis/FilterBarSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000035 /* Praxis/FilterBarSelection.swift */; };
+		A00000000000000000000043 /* PraxisUITests/LibraryFilterScrollTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000042 /* PraxisUITests/LibraryFilterScrollTests.swift */; };
+		A0000000000000000000004D /* PraxisUITests/ContinueReadingCardTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000004C /* PraxisUITests/ContinueReadingCardTests.swift */; };
+		A00000000000000000000056 /* Praxis/ReaderAssets.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000052 /* Praxis/ReaderAssets.swift */; };
+		A00000000000000000000058 /* shared/reader/reader.css in Resources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000057 /* shared/reader/reader.css */; };
+		A0000000000000000000005A /* shared/reader/reader.js in Resources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000059 /* shared/reader/reader.js */; };
+		A0000000000000000000005C /* shared/reader/reader-link.js in Resources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000005B /* shared/reader/reader-link.js */; };
+		A0000000000000000000005E /* shared/reader/reader-progress.js in Resources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000005D /* shared/reader/reader-progress.js */; };
+		A00000000000000000000060 /* shared/reader/reader-images.js in Resources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000005F /* shared/reader/reader-images.js */; };
+		A00000000000000000000065 /* Praxis/Fonts/inter.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000061 /* Praxis/Fonts/inter.ttf */; };
+		A00000000000000000000066 /* Praxis/Fonts/literata.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000062 /* Praxis/Fonts/literata.ttf */; };
+		A00000000000000000000068 /* Praxis/PraxisFonts.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000067 /* Praxis/PraxisFonts.swift */; };
+		A00000000000000000000069 /* Praxis/Fonts/inter_license.txt in Resources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000063 /* Praxis/Fonts/inter_license.txt */; };
+		A0000000000000000000006A /* Praxis/Fonts/literata_license.txt in Resources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000064 /* Praxis/Fonts/literata_license.txt */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,25 +49,36 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		A00000000000000000000033 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Praxis/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		A00000000000000000000035 /* Praxis/FilterBarSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Praxis/FilterBarSelection.swift; sourceTree = "<group>"; };
-		A00000000000000000000041 /* PraxisUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PraxisUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		A00000000000000000000042 /* LibraryFilterScrollTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PraxisUITests/LibraryFilterScrollTests.swift; sourceTree = "<group>"; };
-		A0000000000000000000004C /* ContinueReadingCardTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PraxisUITests/ContinueReadingCardTests.swift; sourceTree = "<group>"; };
-		A00000000000000000000031 /* Praxis/PageStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Praxis/PageStore.swift; sourceTree = "<group>"; };
-		A00000000000000000000029 /* Praxis/Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Praxis/Components.swift; sourceTree = "<group>"; };
-		A00000000000000000000023 /* Praxis/RefTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Praxis/RefTokens.swift; sourceTree = "<group>"; };
-		A00000000000000000000025 /* Praxis/SystemTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Praxis/SystemTokens.swift; sourceTree = "<group>"; };
 		A0000000000000000000000A /* Praxis.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; path = Praxis.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A0000000000000000000000B /* Praxis/PraxisApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Praxis/PraxisApp.swift; sourceTree = "<group>"; };
-		A0000000000000000000000C /* Praxis/Resources/catalog-pt.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "Praxis/Resources/catalog-pt.json"; sourceTree = "<group>"; };
-		A0000000000000000000000D /* Praxis/Resources/catalog-en.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "Praxis/Resources/catalog-en.json"; sourceTree = "<group>"; };
+		A0000000000000000000000C /* shared/catalog/catalog-pt.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "../shared/catalog/catalog-pt.json"; sourceTree = "<group>"; };
+		A0000000000000000000000D /* shared/catalog/catalog-en.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "../shared/catalog/catalog-en.json"; sourceTree = "<group>"; };
 		A00000000000000000000015 /* Praxis/Catalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Praxis/Catalog.swift; sourceTree = "<group>"; };
-		A00000000000000000000017 /* Praxis/Resources/catalog-es.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "Praxis/Resources/catalog-es.json"; sourceTree = "<group>"; };
+		A00000000000000000000017 /* shared/catalog/catalog-es.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "../shared/catalog/catalog-es.json"; sourceTree = "<group>"; };
 		A00000000000000000000019 /* Praxis/DesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Praxis/DesignSystem.swift; sourceTree = "<group>"; };
 		A0000000000000000000001B /* Praxis/Analytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Praxis/Analytics.swift; sourceTree = "<group>"; };
 		A00000000000000000000021 /* Praxis/PortraitCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Praxis/PortraitCache.swift; sourceTree = "<group>"; };
+		A00000000000000000000023 /* Praxis/RefTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Praxis/RefTokens.swift; sourceTree = "<group>"; };
+		A00000000000000000000025 /* Praxis/SystemTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Praxis/SystemTokens.swift; sourceTree = "<group>"; };
 		A00000000000000000000027 /* Praxis/Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Praxis/Assets.xcassets; sourceTree = "<group>"; };
+		A00000000000000000000029 /* Praxis/Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Praxis/Components.swift; sourceTree = "<group>"; };
+		A00000000000000000000031 /* Praxis/PageStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Praxis/PageStore.swift; sourceTree = "<group>"; };
+		A00000000000000000000033 /* Praxis/PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Praxis/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		A00000000000000000000035 /* Praxis/FilterBarSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Praxis/FilterBarSelection.swift; sourceTree = "<group>"; };
+		A00000000000000000000041 /* PraxisUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PraxisUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A00000000000000000000042 /* PraxisUITests/LibraryFilterScrollTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PraxisUITests/LibraryFilterScrollTests.swift; sourceTree = "<group>"; };
+		A0000000000000000000004C /* PraxisUITests/ContinueReadingCardTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PraxisUITests/ContinueReadingCardTests.swift; sourceTree = "<group>"; };
+		A00000000000000000000052 /* Praxis/ReaderAssets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Praxis/ReaderAssets.swift"; sourceTree = "<group>"; };
+		A00000000000000000000057 /* shared/reader/reader.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = "../shared/reader/reader.css"; sourceTree = "<group>"; };
+		A00000000000000000000059 /* shared/reader/reader.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "../shared/reader/reader.js"; sourceTree = "<group>"; };
+		A0000000000000000000005B /* shared/reader/reader-link.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "../shared/reader/reader-link.js"; sourceTree = "<group>"; };
+		A0000000000000000000005D /* shared/reader/reader-progress.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "../shared/reader/reader-progress.js"; sourceTree = "<group>"; };
+		A0000000000000000000005F /* shared/reader/reader-images.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "../shared/reader/reader-images.js"; sourceTree = "<group>"; };
+		A00000000000000000000061 /* Praxis/Fonts/inter.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Praxis/Fonts/inter.ttf; sourceTree = "<group>"; };
+		A00000000000000000000062 /* Praxis/Fonts/literata.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Praxis/Fonts/literata.ttf; sourceTree = "<group>"; };
+		A00000000000000000000063 /* Praxis/Fonts/inter_license.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Praxis/Fonts/inter_license.txt; sourceTree = "<group>"; };
+		A00000000000000000000064 /* Praxis/Fonts/literata_license.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Praxis/Fonts/literata_license.txt; sourceTree = "<group>"; };
+		A00000000000000000000067 /* Praxis/PraxisFonts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Praxis/PraxisFonts.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -82,10 +104,11 @@
 			isa = PBXGroup;
 			children = (
 				A0000000000000000000000B /* Praxis/PraxisApp.swift */,
+				A00000000000000000000067 /* Praxis/PraxisFonts.swift */,
 				A00000000000000000000031 /* Praxis/PageStore.swift */,
 				A00000000000000000000035 /* Praxis/FilterBarSelection.swift */,
-				A00000000000000000000042 /* LibraryFilterScrollTests.swift */,
-				A0000000000000000000004C /* ContinueReadingCardTests.swift */,
+				A00000000000000000000042 /* PraxisUITests/LibraryFilterScrollTests.swift */,
+				A0000000000000000000004C /* PraxisUITests/ContinueReadingCardTests.swift */,
 				A00000000000000000000015 /* Praxis/Catalog.swift */,
 				A00000000000000000000021 /* Praxis/PortraitCache.swift */,
 				A00000000000000000000019 /* Praxis/DesignSystem.swift */,
@@ -93,11 +116,21 @@
 				A00000000000000000000025 /* Praxis/SystemTokens.swift */,
 				A00000000000000000000029 /* Praxis/Components.swift */,
 				A0000000000000000000001B /* Praxis/Analytics.swift */,
-				A00000000000000000000033 /* PrivacyInfo.xcprivacy */,
-				A0000000000000000000000C /* Praxis/Resources/catalog-pt.json */,
-				A0000000000000000000000D /* Praxis/Resources/catalog-en.json */,
-				A00000000000000000000017 /* Praxis/Resources/catalog-es.json */,
+				A00000000000000000000033 /* Praxis/PrivacyInfo.xcprivacy */,
+				A0000000000000000000000C /* shared/catalog/catalog-pt.json */,
+				A0000000000000000000000D /* shared/catalog/catalog-en.json */,
+				A00000000000000000000017 /* shared/catalog/catalog-es.json */,
+				A00000000000000000000052 /* Praxis/ReaderAssets.swift */,
+				A00000000000000000000057 /* shared/reader/reader.css */,
+				A00000000000000000000059 /* shared/reader/reader.js */,
+				A0000000000000000000005B /* shared/reader/reader-link.js */,
+				A0000000000000000000005D /* shared/reader/reader-progress.js */,
+				A0000000000000000000005F /* shared/reader/reader-images.js */,
 				A00000000000000000000027 /* Praxis/Assets.xcassets */,
+				A00000000000000000000061 /* Praxis/Fonts/inter.ttf */,
+				A00000000000000000000062 /* Praxis/Fonts/literata.ttf */,
+				A00000000000000000000063 /* Praxis/Fonts/inter_license.txt */,
+				A00000000000000000000064 /* Praxis/Fonts/literata_license.txt */,
 				A00000000000000000000005 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -198,11 +231,20 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A0000000000000000000000F /* Praxis/Resources/catalog-pt.json in Resources */,
-				A00000000000000000000010 /* Praxis/Resources/catalog-en.json in Resources */,
-				A00000000000000000000018 /* Praxis/Resources/catalog-es.json in Resources */,
+				A0000000000000000000000F /* shared/catalog/catalog-pt.json in Resources */,
+				A00000000000000000000010 /* shared/catalog/catalog-en.json in Resources */,
+				A00000000000000000000018 /* shared/catalog/catalog-es.json in Resources */,
 				A00000000000000000000026 /* Praxis/Assets.xcassets in Resources */,
-				A00000000000000000000032 /* PrivacyInfo.xcprivacy in Resources */,
+				A00000000000000000000032 /* Praxis/PrivacyInfo.xcprivacy in Resources */,
+				A00000000000000000000058 /* shared/reader/reader.css in Resources */,
+				A0000000000000000000005A /* shared/reader/reader.js in Resources */,
+				A0000000000000000000005C /* shared/reader/reader-link.js in Resources */,
+				A0000000000000000000005E /* shared/reader/reader-progress.js in Resources */,
+				A00000000000000000000060 /* shared/reader/reader-images.js in Resources */,
+				A00000000000000000000065 /* Praxis/Fonts/inter.ttf in Resources */,
+				A00000000000000000000066 /* Praxis/Fonts/literata.ttf in Resources */,
+				A00000000000000000000069 /* Praxis/Fonts/inter_license.txt in Resources */,
+				A0000000000000000000006A /* Praxis/Fonts/literata_license.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -230,6 +272,8 @@
 				A00000000000000000000024 /* Praxis/SystemTokens.swift in Sources */,
 				A00000000000000000000028 /* Praxis/Components.swift in Sources */,
 				A0000000000000000000001F /* Praxis/Analytics.swift in Sources */,
+				A00000000000000000000056 /* Praxis/ReaderAssets.swift in Sources */,
+				A00000000000000000000068 /* Praxis/PraxisFonts.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -237,8 +281,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A00000000000000000000043 /* LibraryFilterScrollTests.swift in Sources */,
-				A0000000000000000000004D /* ContinueReadingCardTests.swift in Sources */,
+				A00000000000000000000043 /* PraxisUITests/LibraryFilterScrollTests.swift in Sources */,
+				A0000000000000000000004D /* PraxisUITests/ContinueReadingCardTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -270,23 +314,26 @@
 		A00000000000000000000013 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ONLY_ACTIVE_ARCH = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				"ASSETCATALOG_COMPILER_APPICON_NAME[sdk=iphoneos*]" = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = GY86582FQG;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = GY86582FQG;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Praxis;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MARKETING_VERSION = 1.0;
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = br.praxis.ios;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Praxis App Store";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
@@ -299,9 +346,11 @@
 				"ASSETCATALOG_COMPILER_APPICON_NAME[sdk=iphoneos*]" = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = GY86582FQG;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = GY86582FQG;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Praxis;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -311,6 +360,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = br.praxis.ios;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Praxis App Store";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="reader_back">Voltar</string>
+    <string name="reader_save">Salvar texto</string>
+    <string name="reader_unsave">Remover dos salvos</string>
+    <string name="reader_source">Abrir no arquivo</string>
+    <string name="reader_appearance">Aparência do texto</string>
+    <string name="reader_error">Não foi possível abrir</string>
+    <string name="reader_error_body">Verifique a conexão e tente novamente.</string>
+
+    <string name="appearance_title">Aparência do texto</string>
+    <string name="appearance_section_text">Texto</string>
+    <string name="appearance_font">Fonte</string>
+    <string name="appearance_size">Tamanho</string>
+    <string name="appearance_size_value">%1$d px</string>
+    <string name="appearance_line_spacing">Entrelinha</string>
+    <string name="appearance_line_spacing_value">%1$s</string>
+    <string name="appearance_margins">Margens</string>
+    <string name="appearance_margins_value">%1$d</string>
+    <string name="appearance_alignment">Alinhamento</string>
+    <string name="appearance_left">Esquerda</string>
+    <string name="appearance_justified">Justificado</string>
+    <string name="appearance_section_colors">Cores</string>
+    <string name="appearance_custom_colors">Personalizar cores</string>
+    <string name="appearance_background">Fundo</string>
+    <string name="appearance_foreground">Texto</string>
+    <string name="appearance_links">Links</string>
+    <string name="appearance_restore">Restaurar padrão</string>
+    <string name="appearance_contrast">Contraste do texto: %1$s</string>
+    <string name="appearance_contrast_links">Contraste dos links: %1$s</string>
+    <string name="appearance_contrast_pass">AA aprovado</string>
+    <string name="appearance_contrast_fail">abaixo de AA</string>
+
+    <string name="theme_light">Claro</string>
+    <string name="theme_sepia">Sépia</string>
+    <string name="theme_gray">Cinza</string>
+    <string name="theme_dark">Escuro</string>
+    <string name="theme_black">Preto</string>
+    <string name="theme_red">Vermelho</string>
+    <string name="theme_custom">Personalizado</string>
+
+    <string name="settings_restore_description">Volta a leitura para a aparência padrão</string>
+</resources>

@@ -124,16 +124,14 @@ final class CatalogTests: XCTestCase {
     }
 
     func testBundledCatalogSnapshotsDecode() throws {
-        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
         for code in ["pt", "en", "es"] {
-            let catalog = try Catalog.decode(Data(contentsOf: root.appendingPathComponent("Praxis/Resources/catalog-\(code).json")))
+            let catalog = try Catalog.decode(try SharedCatalog.data(for: code))
             XCTAssertGreaterThan(catalog.authors.count, 5)
             XCTAssertTrue(catalog.authors.contains { !$0.works.isEmpty })
         }
     }
 
     private func portugueseCatalog() throws -> Catalog {
-        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
-        return try Catalog.decode(Data(contentsOf: root.appendingPathComponent("Praxis/Resources/catalog-pt.json")))
+        try Catalog.decode(try SharedCatalog.data(for: "pt"))
     }
 }

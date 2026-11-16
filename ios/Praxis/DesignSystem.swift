@@ -1,30 +1,5 @@
 import Foundation
 
-enum ReaderTokens {
-    static let lightBackground = "#FBFAF7"
-    static let lightForeground = "#1D1B19"
-    static let lightLink = "#9A0007"
-    static let darkBackground = "#1C1C1E"
-    static let darkForeground = "#F2F2F7"
-    static let darkLink = "#FF9B96"
-
-    static let stylesheet = """
-    :root { color-scheme: light dark; }
-    html { -webkit-text-size-adjust: 100%; }
-    body { max-width: 44rem; margin: auto; padding: 24px 20px 60px;
-        background: \(lightBackground); color: \(lightForeground);
-        font: -apple-system-body; font-family: Georgia, serif; line-height: 1.65;
-        overflow-wrap: anywhere; }
-    img, table { max-width: 100%; height: auto; }
-    a { color: \(lightLink); }
-    @media (prefers-color-scheme: dark) {
-        body { background: \(darkBackground); color: \(darkForeground); }
-        a { color: \(darkLink); }
-    }
-    """
-}
-
-
 struct ReaderAppearance: Codable, Equatable {
     static let builtInThemes = ["light", "sepia", "gray", "dark", "black", "red"]
     var font = "serif"
@@ -69,9 +44,8 @@ enum ColorContrast {
 
 // Give relative archive links a base without making the initial WebKit navigation remote.
 enum ReaderHTML {
-    static let imageLoadingScript = """
-    document.querySelectorAll('img').forEach((img, i) => { if (i >= 2) img.loading = 'lazy'; img.decoding = 'async'; });
-    """
+    static var imageLoadingScript: String { ReaderAssets.text(.images) }
+
     static func withBaseURL(_ url: URL, in html: String) -> String {
         let escaped = url.absoluteString.replacingOccurrences(of: "&", with: "&amp;")
             .replacingOccurrences(of: "\"", with: "&quot;")
@@ -88,14 +62,7 @@ enum ReaderHTML {
 
 // Limit messages across the WebKit bridge while keeping the final scroll position.
 enum ReaderProgress {
-    static let javascript = """
-    let progressTimer = null;
-    const scheduleReport = () => { if (progressTimer === null) progressTimer = setTimeout(() => { progressTimer = null; report(); }, 500); };
-    const flushReport = () => { if (progressTimer !== null) { clearTimeout(progressTimer); progressTimer = null; report(); } };
-    window.addEventListener('scroll', scheduleReport, { passive: true });
-    window.addEventListener('scrollend', flushReport);
-    window.addEventListener('pagehide', flushReport);
-    """
+    static var javascript: String { ReaderAssets.text(.progress) }
 }
 
 enum ReaderLink {
@@ -118,26 +85,5 @@ enum ReaderLink {
         return .external(url)
     }
 
-    static let javascript = """
-    const scrollToReaderAnchor = (fragment) => {
-        let id; try { id = decodeURIComponent(fragment); } catch (_) { id = fragment; }
-        if (!id || id.toLowerCase() === 'top') { window.scrollTo(0, 0); return true; }
-        const target = document.getElementById(id) || document.getElementsByName(id)[0];
-        if (!target) return false;
-        target.scrollIntoView(); return true;
-    };
-    document.addEventListener('click', event => {
-        const link = event.target.closest && event.target.closest('a[href]');
-        if (!link) return;
-        const href = link.getAttribute('href');
-        if (href === '#') { event.preventDefault(); window.scrollTo(0, 0); return; }
-        let destination, source;
-        try { destination = new URL(href, sourceURL); source = new URL(sourceURL); } catch (_) { return; }
-        if (destination.hash && destination.origin === source.origin && destination.pathname === source.pathname && destination.search === source.search) {
-            event.preventDefault(); scrollToReaderAnchor(destination.hash.slice(1)); return;
-        }
-        event.preventDefault();
-        window.webkit.messageHandlers.readerLink.postMessage({url: destination.href, title: (link.textContent || '').trim()});
-    });
-    """
+    static var javascript: String { ReaderAssets.text(.link) }
 }

@@ -238,10 +238,6 @@ final class ReadingHistoryTests: XCTestCase {
     }
 
     private func portugueseCatalog() throws -> Catalog {
-        let root = URL(fileURLWithPath: #filePath)
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
-        let data = try Data(contentsOf: root.appendingPathComponent("Praxis/Resources/catalog-pt.json"))
-        return try Catalog.decode(data, language: .pt)
+        try Catalog.decode(try SharedCatalog.data(for: "pt"), language: .pt)
     }
 }

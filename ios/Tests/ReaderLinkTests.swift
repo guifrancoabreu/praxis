@@ -19,7 +19,7 @@ final class ReaderLinkTests: XCTestCase {
         const sourceURL = 'https://www.marxists.org/portugues/book/index.htm';
         const URL = function(href, base) { let url = href.startsWith('http') ? href : href.startsWith('#') ? base + href : base.replace(/[^/]*$/, '') + href; let parts = url.match(/^(https?:\\/\\/[^/]+)([^?#]*)(\\?[^#]*)?(#.*)?$/); this.origin=parts[1]; this.pathname=parts[2]; this.search=parts[3] || ''; this.hash=parts[4] || ''; this.href=url; };
         const document = { addEventListener: (_, fn) => listener = fn, getElementById: id => id === 'chapter' ? {scrollIntoView: () => scrolled = id} : null, getElementsByName: () => [] };
-        const window = { scrollTo: () => scrolled = 'top', webkit: {messageHandlers: {readerLink: {postMessage: x => messages.push(x)}}} };
+        const window = { scrollTo: () => scrolled = 'top', __praxisHost: { link: (url, title) => messages.push({url, title}) } };
         const click = href => listener({ target: {closest: () => ({getAttribute: () => href, textContent: ' Chapter '})}, preventDefault: () => prevented++ });
         """)
         context.evaluateScript(ReaderLink.javascript)

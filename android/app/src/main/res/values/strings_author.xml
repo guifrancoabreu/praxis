@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="author_read_more">Ler mais</string>
+    <string name="author_read_less">Ler menos</string>
+    <string name="author_works">Obras</string>
+    <string name="author_biography">Biografia completa</string>
+    <string name="collection_open_in_archive">Abrir no arquivo</string>
+    <string name="progress_in_section">%1$d%% nesta seção</string>
+    <string name="analytics_prompt_title">Ajude a melhorar o Praxis</string>
+    <string name="analytics_prompt_body">Compartilhe dados gerais de uso com o TelemetryDeck para ajudar a melhorar o app. Não enviamos suas buscas, títulos ou posição de leitura. A escolha é opcional e pode ser alterada em Privacidade.</string>
+    <string name="analytics_prompt_share">Compartilhar dados de uso</string>
+    <string name="analytics_prompt_decline">Não compartilhar</string>
+    <string name="footer_support">Apoie o Praxis</string>
+    <string name="footer_support_body">Ajude a manter o app e o acesso ao arquivo.</string>
+    <string name="footer_privacy">Política de privacidade</string>
+</resources>

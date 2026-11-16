@@ -15,3 +15,15 @@ ios/.swiftpm/
 *.xcuserstate
 xcuserdata/
 DerivedData/
+
+# Android
+android/.gradle/
+android/.kotlin/
+android/build/
+android/app/build/
+android/local.properties
+
+# Signing material
+*.jks
+*.keystore
+android/key.properties
