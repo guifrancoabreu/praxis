@@ -63,33 +63,50 @@ Naming choices that keep the two systems from colliding:
 
 Doing this exercise surfaced drift the repo does not currently catch:
 
-- **`primary-foreground` was never tokenized.** The primary button inverts white/black inline (`ios/Praxis/Components.swift:60`, `android/.../components/Components.kt:53`), and Android picks it from `isSystemInDarkTheme()`, so it produces the wrong text color under a forced `PraxisTheme(darkTheme = …)`. Tokenizing it fixes a bug, not just a name.
-- **`separator` disagrees.** iOS uses `.separator` at 0.45 opacity; Android uses fixed `#123C3C43` / `#20545458`.
-- **Chips exist only on Android**, as four extra roles plus three literal hexes, and `chipBackground` (`#E9E4DA`) is one step off `secondarySurface` (`#E8E3D9`). iOS inlines the chip in `PraxisApp.swift:452-453`.
+- **`primary-foreground` was never tokenized.** The primary button inverts white/black inline (`ios/Praxis/Components.swift:60`, `android/.../components/Components.kt:53`), and Android decides it with `isSystemInDarkTheme()` instead of the theme it is given. Nothing forces a theme today, so it renders correctly in the current app — but it latently breaks the moment a theme is forced (a preview, a screenshot harness, a forced-dark setting). Tokenizing it fixes a bug, not just a name.
+- **`separator` disagrees, and Android's is nearly invisible.** iOS uses `.separator` at 0.45 opacity, which lands near 13% (light) and 27% (dark); Android uses fixed `#123C3C43` (7%) and `#20545458` (12.5%) — roughly half as strong. On a 1px line over `#FBFAF7` that is a divider you can barely see.
+- **Chips exist only on Android**, as four extra roles plus three literal hexes, and `chipBackground` (`#E9E4DA`) sits one step off `secondarySurface` (`#E8E3D9`). iOS inlines the chip in `PraxisApp.swift:452-453`.
 - **Material mapping sets only four roles** (`primary`, `background`, `surface`, `on*`), so Material `Card` and `TextField` fall back to framework defaults. Neither platform defines a focus color at all.
-- **Non-color drift:** `44` is still the row height in `ListRow` and `PraxisChip` on both platforms even though `sizing.touchTarget` is 48 and `spacing-pattern.md` §4 retires 44; chip padding is 15/10, off the 4-point scale; heading tracking is `-0.4` on Android and `-0.5` on iOS; and Android has no equivalent for three sizes iOS uses (title1 28, title3 20, caption 12).
+- **Non-color drift:** `44` is still the row height in `ListRow` and `PraxisChip` even though `sizing.touchTarget` is 48 and `spacing-pattern.md` §4 retires 44; chip padding is 15/10, off the 4-point scale; `title3` and `caption` sit 2–3pt apart across platforms; and Android's `-0.4` tracking default leaks into two headings iOS sets at `0`.
 
 The same treatment applies to type. `tokens.json` has no UI type scale — `typography` in it only sizes book-cover artwork — so type is declared three times: `PraxisFonts.swift`, `PraxisApp.swift`, and `PraxisTheme.kt`. One `typography.ui` group, built only from sizes already in use:
 
 | Step | Size / leading | Family / weight | Pairs with (Android) |
 | --- | --- | --- | --- |
 | `display` | 34 / 50 | Literata Bold | `displayLarge` |
-| `title1` | 28 / 42 | Literata Semibold | missing |
+| `title1` | 28 / 42 | Literata Semibold | 28sp, unnamed |
 | `title2` | 22 / 33 | Literata Semibold | `titleLarge` |
-| `title3` | 20 / 30 | Literata Semibold | missing |
+| `title3` | 20 / 30 | Literata Semibold | 22 / 17 where used |
 | `headline` | 17 / 25 | Literata Semibold | `titleSmall` |
 | `heading` | 17 / 25 | Literata Medium | `titleMedium` |
 | `body` | 17 / 21 | Inter Regular | `bodyLarge` |
 | `subhead` | 15 / 18 | Inter Regular | `bodyMedium` |
 | `subhead-medium` | 15 / 18 | Inter Medium | `labelLarge` |
 | `footnote` | 13 / 16 | Inter Regular | `labelMedium` |
-| `caption` | 12 / 15 | Inter Regular | missing |
+| `caption` | 12 / 15 | Inter Regular | 13 / 15 where used |
 | `overline` | 15 / 18, +0.8 tracking, uppercase | Inter Semibold | `labelSmall` |
 | `micro` | 12 / 15, +0.8 tracking | Inter Semibold | `labelSmall` |
 
-Leading comes from the 1.485 Literata / 1.21 Inter ratios already asserted in `PraxisTheme.kt:80-82`, so nothing is invented. Three steps exist only on iOS today; writing the scale down is what makes that visible.
+Leading comes from the 1.485 Literata / 1.21 Inter ratios already asserted in `PraxisTheme.kt:80-82`, so nothing is invented. Two steps have no Android name, and the places they would apply currently render 1–3pt off.
 
-### 4.2 A component registry instead of prose-only contracts
+### 4.2 What fixing this changes on screen
+
+Not much, and that is the point — but worth stating in points, since "tokens" sounds like it should be invisible:
+
+| Fix | Screen effect | Noticeable? |
+| --- | --- | --- |
+| Semantic roles generated | none, values are copied | no |
+| `typography.ui` written down | none until a screen opts in | no |
+| Row height 44 → 48 | +4pt per row, padding only, no reflow; the iOS glossary list grows ~320pt of scroll over 80 rows. Android's `ListRow` has no call sites | subtle |
+| Chip padding 15/10 → `s4`/`s2` | +1pt per side, chip 2pt wider | no |
+| Chip background → `secondarySurface` | 1/255 per channel apart | no |
+| `separator` aligned | Android dividers go from half-strength to iOS's; today they nearly disappear | **clearly visible**, and arguably a fix |
+| `title3` / `caption` named properly | 2–3pt on two Android screens (support sections, featured card, empty-state titles, work date) | subtle |
+| `primary-foreground` tokenized | no pixels today; removes a latent wrong state | no, today |
+
+So the honest framing: this is organization, with two small corrections that a careful eye would already call bugs — half-strength Android dividers and sizes that drifted 2–3pt.
+
+### 4.3 A component registry instead of prose-only contracts
 
 `docs/spacing-pattern.md` already reads like a component contract — it names relationships, allowed values and tap targets. What it cannot do is tell you which components exist on each platform, or fail a build when iOS gains a component Android never gets.
 
@@ -123,7 +140,7 @@ The six components it should carry first are the ones Android already owns and i
 
 It also gives the `PraxisApp.swift` split somewhere to land: 13 screens in 1843 lines, styled ad hoc (`.padding(.horizontal, 20)` where `s5` is the rule), against 10 shared Android composables. Extract a component, register it, delete the local copy.
 
-### 4.3 Behavior vs presentation, for the reader
+### 4.4 Behavior vs presentation, for the reader
 
 UI SDK's real contribution is separating behavior from presentation: keyboard handling, focus recovery, typeahead, dismissal and ARIA state live in the primitive, styling lives with you. That contract is renderer-independent even though the adapters are not, so the questions it asks are worth answering when the reader's controls grow.
 
@@ -139,7 +156,7 @@ If a landing page, public web reader or share-link page is ever on the roadmap, 
 
 | Action | Verdict | Cost | Why |
 | --- | --- | --- | --- |
-| Semantic color layer + UI type scale in `tokens.json`, generated to Swift and Kotlin | Do next | 1–2 days | Removes a hand-maintained twin; the audit already found a forced-theme bug and four color drifts |
+| Semantic color layer + UI type scale in `tokens.json`, generated to Swift and Kotlin | Do next | 1–2 days | Removes a hand-maintained twin; the audit found a latent forced-theme bug and a divider that renders at half strength on Android |
 | Component registry + parity check in CI | Do after the token layer | 2–3 days | Makes `spacing-pattern.md` enforceable and indexes the `PraxisApp.swift` split |
 | Split screens out of `PraxisApp.swift`, registering each component | Incremental, per screen | per screen | Real problem today: 1843 lines, literals that break the spacing rules |
 | Vercel UI SDK in the reader | No | — | Beta, DOM-bound, bundler cost in a WebView |
@@ -152,7 +169,7 @@ Small, behavior-preserving, and it proves the generation path before anything de
 
 - add a `semantic` group (role-paired colors, light and dark), a `reader.*` palette group and a `typography.ui` scale to `design/tokens.json`
 - extend `tools/gen_tokens.py --write` to emit both layers to Swift as well as Kotlin, and `--check` to verify both
-- fix `primary-foreground` while there; it is currently computed from `isSystemInDarkTheme()` on Android and wrong under a forced theme
+- tokenize `primary-foreground` while there; Android derives it from `isSystemInDarkTheme()` instead of the theme it is handed
 - change no screens. Colors resolve from the new layer; nothing moves on screen.
 
 Verify with `python3 tools/gen_tokens.py --check`, `python3 tools/check_shared.py` and `swift test --package-path ios`.
