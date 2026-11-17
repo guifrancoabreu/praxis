@@ -4,7 +4,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -50,7 +49,7 @@ import br.praxis.android.design.Tokens
 /** Full-width primary action, matching the iOS treatment. */
 @Composable
 fun PrimaryButton(text: String, onClick: () -> Unit, enabled: Boolean, modifier: Modifier = Modifier) {
-    val content = if (isSystemInDarkTheme()) Color.Black else Color.White
+    val content = Praxis.colors.primaryContent
     Button(
         onClick = onClick,
         enabled = enabled,
@@ -201,11 +200,11 @@ fun PraxisChip(text: String, selected: Boolean, onClick: () -> Unit, modifier: M
     val content = if (selected) Praxis.colors.chipSelectedContent else Praxis.colors.chipContent
     Box(
         modifier = modifier
-            .heightIn(min = 44.dp)
+            .heightIn(min = Tokens.Sizing.touchTarget)
             .clip(CircleShape)
             .background(background)
             .clickable(onClick = onClick)
-            .padding(horizontal = 15.dp, vertical = 10.dp),
+            .padding(horizontal = Tokens.Spacing.s4, vertical = Tokens.Spacing.s2),
         contentAlignment = Alignment.Center,
     ) {
         Text(
