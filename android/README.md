@@ -19,7 +19,7 @@ export ANDROID_HOME=$HOME/Library/Android/sdk
 ./gradlew installDebug     # with a device or emulator attached
 ```
 
-Set the feedback service URL with the Gradle property `feedbackUrl` when building, for example
+The production feedback URL is configured by default. Override it with the Gradle property `feedbackUrl` when building, for example
 `./gradlew assembleDebug -PfeedbackUrl=https://example.com/api/feedback`. The URL is compiled into
 the app; service credentials must stay on the server.
 

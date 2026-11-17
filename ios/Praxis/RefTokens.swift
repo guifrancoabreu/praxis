@@ -27,6 +27,11 @@ enum RefTokens {
         static let full: CGFloat = 999
     }
 
+    enum Sizing {
+        static let touchTarget: CGFloat = 48
+        static let hairline: CGFloat = 1
+    }
+
     enum Colors {
         static let accentLight = "#940008"
         static let accentDark = "#FF7A7A"

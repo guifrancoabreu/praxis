@@ -14,8 +14,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -32,7 +30,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -40,6 +37,7 @@ import br.praxis.android.R
 import br.praxis.android.data.FeedbackSender
 import br.praxis.android.design.Praxis
 import br.praxis.android.design.Tokens
+import br.praxis.android.design.components.PrimaryButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -98,7 +96,8 @@ fun FeedbackScreen(onBack: () -> Unit, scope: CoroutineScope) {
                 FeedbackResult.Failure -> Text(stringResource(R.string.feedback_error), color = Praxis.colors.accent, style = MaterialTheme.typography.bodyMedium)
                 null -> Unit
             }
-            Button(
+            PrimaryButton(
+                text = if (sending) stringResource(R.string.feedback_sending) else stringResource(R.string.feedback_send),
                 onClick = {
                     sending = true
                     result = null
@@ -114,10 +113,7 @@ fun FeedbackScreen(onBack: () -> Unit, scope: CoroutineScope) {
                 },
                 enabled = details.isNotBlank() && email.isNotBlank() && !emailInvalid && !sending,
                 modifier = Modifier.fillMaxWidth(),
-            ) {
-                if (sending) CircularProgressIndicator()
-                else Text(stringResource(R.string.feedback_send), fontWeight = FontWeight.SemiBold)
-            }
+            )
         }
     }
 }

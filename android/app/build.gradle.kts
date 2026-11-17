@@ -25,7 +25,7 @@ android {
         versionCode = 1
         versionName = "1.0.0"
         resourceConfigurations += listOf("pt", "pt-rBR", "en", "es")
-        val feedbackUrl = providers.gradleProperty("feedbackUrl").orElse("").get()
+        val feedbackUrl = providers.gradleProperty("feedbackUrl").orElse("https://praxis-feedback.guifrancoabr.workers.dev").get()
         buildConfigField("String", "FEEDBACK_URL", "\"${feedbackUrl.replace("\\", "\\\\").replace("\"", "\\\"")}\"")
     }
 

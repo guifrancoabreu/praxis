@@ -30,6 +30,11 @@ object Tokens {
         val full = 999.dp
     }
 
+    object Sizing {
+        val touchTarget = 48.dp
+        val hairline = 1.dp
+    }
+
     object Opacity {
         val separator = 0.45f
         val coverOutline = 0.08f

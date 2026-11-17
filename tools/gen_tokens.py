@@ -26,6 +26,7 @@ KOTLIN = ROOT / "android" / "app" / "src" / "main" / "kotlin" / "br" / "praxis" 
 GROUPS = {
     "Spacing": "spacing",
     "Radius": "radius",
+    "Sizing": "sizing",
     "Colors": "colors",
     "Opacity": "opacity",
     "Shadow": "shadow",
@@ -89,6 +90,7 @@ def kotlin(tokens: dict) -> str:
     sections = [
         ("spacing", "Spacing", lambda k, v: f"val {_lower(k)} = {_num(v)}.dp"),
         ("radius", "Radius", lambda k, v: f"val {_lower(k)} = {_num(v)}.dp"),
+        ("sizing", "Sizing", lambda k, v: f"val {_lower(k)} = {_num(v)}.dp"),
         ("opacity", "Opacity", lambda k, v: f"val {_lower(k)} = {_num(v)}f"),
     ]
     for group, name, render in sections:

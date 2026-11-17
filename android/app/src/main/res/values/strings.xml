@@ -67,6 +67,7 @@
     <string name="feedback_email">E-mail</string>
     <string name="feedback_email_required">Obrigatório para que possamos responder.</string>
     <string name="feedback_send">Enviar</string>
+    <string name="feedback_sending">Enviando…</string>
     <string name="feedback_success">Obrigado. Seu feedback foi enviado.</string>
     <string name="feedback_error">Não foi possível enviar. Tente novamente mais tarde.</string>
 

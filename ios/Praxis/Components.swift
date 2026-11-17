@@ -1,6 +1,22 @@
 #if canImport(SwiftUI) && canImport(UIKit)
 import SwiftUI
 
+/// The primary action treatment, adapted from the shared web button.
+struct PrimaryButtonStyle: ButtonStyle {
+    @Environment(\.isEnabled) private var isEnabled
+    @Environment(\.colorScheme) private var colorScheme
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(PraxisFont.body(.subheadline, weight: .semibold))
+            .frame(maxWidth: .infinity, minHeight: RefTokens.Sizing.touchTarget)
+            .padding(.horizontal, RefTokens.Spacing.s4)
+            .foregroundStyle(colorScheme == .dark ? Color.black : Color.white)
+            .background(SystemTokens.Colors.accent, in: RoundedRectangle(cornerRadius: RefTokens.Radius.md, style: .continuous))
+            .opacity(isEnabled ? (configuration.isPressed ? 0.8 : 1) : 0.5)
+    }
+}
+
 /// A reusable typographic cover for a text or publication.
 struct BookCover: View {
     let title: String

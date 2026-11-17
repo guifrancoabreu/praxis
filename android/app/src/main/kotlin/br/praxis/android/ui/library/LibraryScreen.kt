@@ -52,6 +52,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -80,11 +81,17 @@ import br.praxis.android.design.components.GlassSurface
 import br.praxis.android.design.components.InsetDivider
 import br.praxis.android.design.components.PraxisChip
 import br.praxis.android.design.components.RoundIconTile
+import br.praxis.android.design.components.SectionHeader
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 private val horizontal = Tokens.Spacing.s5
+private object LibrarySpacing {
+    val sections = Tokens.Spacing.s4
+    val filtersToFirstSection = Tokens.Spacing.s0
+    val headingToContent = Tokens.Spacing.s3
+}
 
 @Composable
 fun LibraryScreen(
@@ -214,93 +221,95 @@ private fun LibraryContent(
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = 96.dp),
+        verticalArrangement = Arrangement.spacedBy(LibrarySpacing.sections),
     ) {
         item { Header() }
-        item { FilterBar(catalog = catalog, selected = filter, onSelect = onFilter) }
+        if (searching || filter != LibraryFilter.all) {
+            item { FilterBar(catalog = catalog, selected = filter, onSelect = onFilter) }
+        }
 
         if (searching) {
             searchResults(catalog = catalog, query = query, onOpenWork = onOpenWork, onOpenAuthor = onOpenAuthor, onOpenCollection = onOpenCollection)
         } else {
             when (filter) {
                 LibraryFilter.all -> {
-                    if (grouped.isNotEmpty()) {
-                        item {
-                            LibrarySectionHeader(
-                                title = stringResource(R.string.section_continue_reading),
+                    item {
+                        Column(verticalArrangement = Arrangement.spacedBy(LibrarySpacing.filtersToFirstSection)) {
+                            FilterBar(catalog = catalog, selected = filter, onSelect = onFilter)
+                            if (grouped.isNotEmpty()) {
+                                Column(verticalArrangement = Arrangement.spacedBy(LibrarySpacing.headingToContent)) {
+                                    SectionHeader(
+                                        title = stringResource(R.string.section_continue_reading),
+                                        action = stringResource(R.string.action_see_all),
+                                        onAction = { onFilter(LibraryFilter.readingHistory) },
+                                        modifier = Modifier.padding(horizontal = horizontal),
+                                    )
+                                    ContinueReadingShelf(grouped.take(10), catalog, onOpenWork = { progress ->
+                                        val author = catalog.authors.firstOrNull { it.full == progress.author }
+                                        onOpenWork(author ?: catalog.authors.first(), Work(progress.title, progress.path, readingID = progress.workId))
+                                    })
+                                }
+                            } else if (featured != null) {
+                                Column(verticalArrangement = Arrangement.spacedBy(LibrarySpacing.headingToContent)) {
+                                    SectionHeader(
+                                        title = stringResource(R.string.section_start_here),
+                                        modifier = Modifier.padding(horizontal = horizontal),
+                                    )
+                                    FeaturedCard(
+                                        title = featured.second.title,
+                                        credit = featured.first.full,
+                                        onClick = { onOpenWork(featured.first, featured.second) },
+                                        modifier = Modifier.padding(horizontal = horizontal),
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    item {
+                        Column(verticalArrangement = Arrangement.spacedBy(LibrarySpacing.headingToContent)) {
+                            SectionHeader(
+                                title = stringResource(R.string.section_popular_writers),
                                 action = stringResource(R.string.action_see_all),
-                                onAction = { onFilter(LibraryFilter.readingHistory) },
-                                modifier = Modifier.padding(horizontal = horizontal, vertical = Tokens.Spacing.s2),
+                                onAction = { onFilter(LibraryFilter.writers) },
+                                modifier = Modifier.padding(horizontal = horizontal),
                             )
-                        }
-                        item {
-                            ContinueReadingShelf(grouped.take(10), catalog, onOpenWork = { progress ->
-                                val author = catalog.authors.firstOrNull { it.full == progress.author }
-                                onOpenWork(author ?: catalog.authors.first(), Work(progress.title, progress.path, readingID = progress.workId))
-                            })
-                        }
-                    } else if (featured != null) {
-                        item {
-                            LibrarySectionHeader(
-                                title = stringResource(R.string.section_start_here),
-                                modifier = Modifier.padding(horizontal = horizontal, vertical = Tokens.Spacing.s2),
-                            )
-                        }
-                        item {
-                            FeaturedCard(
-                                title = featured.second.title,
-                                credit = featured.first.full,
-                                onClick = { onOpenWork(featured.first, featured.second) },
-                                modifier = Modifier.padding(horizontal = horizontal, vertical = Tokens.Spacing.s3),
-                            )
-                        }
-                    }
-
-                    if (grouped.isNotEmpty()) {
-                        item { StatsCard(onClick = onOpenStats) }
-                    }
-
-                    item {
-                        LibrarySectionHeader(
-                            title = stringResource(R.string.section_popular_writers),
-                            action = stringResource(R.string.action_see_all),
-                            onAction = { onFilter(LibraryFilter.writers) },
-                            modifier = Modifier.padding(horizontal = horizontal, vertical = Tokens.Spacing.s2),
-                        )
-                    }
-                    item {
-                        LazyRow(
-                            contentPadding = PaddingValues(horizontal = horizontal),
-                            horizontalArrangement = Arrangement.spacedBy(Tokens.Spacing.s4),
-                        ) {
-                            items(popularWriters, key = { it.id }) { author ->
-                                WriterCard(author, onClick = { onOpenAuthor(author) })
+                            LazyRow(
+                                contentPadding = PaddingValues(horizontal = horizontal),
+                                horizontalArrangement = Arrangement.spacedBy(Tokens.Spacing.s3),
+                            ) {
+                                items(popularWriters, key = { it.id }) { author ->
+                                    WriterCard(author, onClick = { onOpenAuthor(author) })
+                                }
                             }
                         }
                     }
 
                     if (savedWorks.isNotEmpty()) {
                         item {
-                            LibrarySectionHeader(
-                                title = stringResource(R.string.section_saved),
-                                action = stringResource(R.string.action_see_all),
-                                onAction = { onFilter(LibraryFilter.saved) },
-                                modifier = Modifier.padding(horizontal = horizontal, vertical = Tokens.Spacing.s2),
-                            )
-                        }
-                        item {
-                            WorkList(savedWorks.take(4), onOpenWork = onOpenWork)
+                            Column(verticalArrangement = Arrangement.spacedBy(LibrarySpacing.headingToContent)) {
+                                SectionHeader(
+                                    title = stringResource(R.string.section_saved),
+                                    action = stringResource(R.string.action_see_all),
+                                    onAction = { onFilter(LibraryFilter.saved) },
+                                    modifier = Modifier.padding(horizontal = horizontal),
+                                )
+                                WorkList(savedWorks.take(4), onOpenWork = onOpenWork)
+                            }
                         }
                     }
 
                     item {
-                        LibrarySectionHeader(
-                            title = stringResource(R.string.section_library),
-                            action = stringResource(R.string.action_see_all),
-                            onAction = { onFilter(LibraryFilter.works) },
-                            modifier = Modifier.padding(horizontal = horizontal, vertical = Tokens.Spacing.s2),
-                        )
+                        Column(verticalArrangement = Arrangement.spacedBy(LibrarySpacing.headingToContent)) {
+                            SectionHeader(
+                                title = stringResource(R.string.section_library),
+                                action = stringResource(R.string.action_see_all),
+                                onAction = { onFilter(LibraryFilter.works) },
+                                modifier = Modifier.padding(horizontal = horizontal),
+                            )
+                            WorkList(popularWorks.take(8), onOpenWork = onOpenWork)
+                        }
                     }
-                    item { WorkList(popularWorks.take(8), onOpenWork = onOpenWork) }
                 }
 
                 LibraryFilter.writers -> item { WriterList(catalog.authors, onOpenAuthor) }
@@ -331,6 +340,9 @@ private fun LibraryContent(
                 }
             }
 
+            if (filter == LibraryFilter.all && grouped.isNotEmpty()) {
+                item { StatsCard(onClick = onOpenStats) }
+            }
             item { Footer(onOpenSupport = onOpenSupport, onOpenFeedback = onOpenFeedback, onOpenPrivacy = onOpenPrivacy) }
             item { CatalogFooter(catalog.generated) }
         }
@@ -344,7 +356,7 @@ private fun Header() {
             .fillMaxWidth()
             .statusBarsPadding()
             .padding(horizontal = horizontal)
-            .padding(top = Tokens.Spacing.s3, bottom = Tokens.Spacing.s3),
+            .padding(top = Tokens.Spacing.s3),
     ) {
         Text(
             text = stringResource(R.string.library_title),
@@ -367,40 +379,9 @@ private fun Header() {
 }
 
 @Composable
-private fun LibrarySectionHeader(
-    title: String,
-    action: String? = null,
-    onAction: (() -> Unit)? = null,
-    modifier: Modifier = Modifier,
-) {
-    Row(modifier = modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Text(
-            text = title.uppercase(),
-            style = MaterialTheme.typography.labelMedium.copy(
-                fontWeight = FontWeight.SemiBold,
-                letterSpacing = 0.8.sp,
-            ),
-            color = Praxis.colors.textSecondary,
-            modifier = Modifier.weight(1f),
-        )
-        if (action != null && onAction != null) {
-            Text(
-                text = action,
-                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
-                color = Praxis.colors.accent,
-                modifier = Modifier
-                    .clip(RoundedCornerShape(Tokens.Radius.sm))
-                    .clickable(onClick = onAction)
-                    .padding(horizontal = Tokens.Spacing.s1, vertical = Tokens.Spacing.s1),
-            )
-        }
-    }
-}
-
-@Composable
 private fun FilterBar(catalog: Catalog, selected: LibraryFilter, onSelect: (LibraryFilter) -> Unit) {
     LazyRow(
-        contentPadding = PaddingValues(horizontal = horizontal, vertical = Tokens.Spacing.s2),
+        contentPadding = PaddingValues(horizontal = horizontal),
         horizontalArrangement = Arrangement.spacedBy(Tokens.Spacing.s2),
     ) {
         items(LibraryFilter.chips(catalog.history.isNotEmpty()), key = { it.name }) { filter ->
@@ -424,7 +405,7 @@ private fun FeaturedCard(title: String, credit: String, onClick: () -> Unit, mod
             .border(1.dp, Praxis.colors.separator, shape)
             .clickable(onClick = onClick)
             .padding(Tokens.Spacing.s4),
-        horizontalArrangement = Arrangement.spacedBy(Tokens.Spacing.s4),
+        horizontalArrangement = Arrangement.spacedBy(Tokens.Spacing.s3),
     ) {
         BookCover(
             title = title,
@@ -516,6 +497,7 @@ private fun ContinueReadingCard(
                 catalog.authors.firstOrNull { author -> author.works.any { it.path == progress.path } }?.full.orEmpty()
             }
             if (credit.isNotEmpty()) {
+                Spacer(Modifier.height(Tokens.Spacing.s1))
                 Text(
                     text = credit,
                     style = MaterialTheme.typography.bodyMedium,
@@ -575,6 +557,7 @@ private fun WriterCard(author: Author, onClick: () -> Unit) {
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
+        Spacer(Modifier.height(Tokens.Spacing.s1))
         Text(
             text = workCountLabel(author.works.size),
             style = MaterialTheme.typography.bodyMedium,
@@ -591,7 +574,7 @@ private fun WriterList(authors: List<Author>, onOpenAuthor: (Author) -> Unit) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { onOpenAuthor(author) }
-                    .padding(vertical = Tokens.Spacing.s2),
+                    .padding(top = if (index == 0) 0.dp else Tokens.Spacing.s2, bottom = Tokens.Spacing.s2),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(Tokens.Spacing.s3),
             ) {
@@ -625,7 +608,12 @@ private fun WriterList(authors: List<Author>, onOpenAuthor: (Author) -> Unit) {
 private fun WorkList(works: List<Pair<Author, Work>>, onOpenWork: (Author, Work) -> Unit) {
     Column(modifier = Modifier.padding(horizontal = horizontal)) {
         works.forEachIndexed { index, (author, work) ->
-            WorkRow(work = work, author = author.full, onClick = { onOpenWork(author, work) })
+            WorkRow(
+                work = work,
+                author = author.full,
+                onClick = { onOpenWork(author, work) },
+                topPadding = if (index == 0) 0.dp else Tokens.Spacing.s3,
+            )
             if (index < works.lastIndex) InsetDivider(startPadding = 68.dp)
         }
     }
@@ -639,7 +627,7 @@ private fun ReadingList(readings: List<ReadingProgress>, onOpenWork: (ReadingPro
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { onOpenWork(progress) }
-                    .padding(vertical = Tokens.Spacing.s3),
+                    .padding(top = if (index == 0) 0.dp else Tokens.Spacing.s3, bottom = Tokens.Spacing.s3),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(Tokens.Spacing.s3),
             ) {
@@ -673,12 +661,12 @@ private fun ReadingList(readings: List<ReadingProgress>, onOpenWork: (ReadingPro
 }
 
 @Composable
-private fun WorkRow(work: Work, author: String, onClick: () -> Unit) {
+private fun WorkRow(work: Work, author: String, onClick: () -> Unit, topPadding: Dp = Tokens.Spacing.s3) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(vertical = Tokens.Spacing.s3),
+            .padding(top = topPadding, bottom = Tokens.Spacing.s3),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(Tokens.Spacing.s3),
     ) {
@@ -752,7 +740,7 @@ private fun StatsCard(onClick: () -> Unit) {
     val shape = RoundedCornerShape(Tokens.Radius.lg)
     Row(
         modifier = Modifier
-            .padding(horizontal = horizontal, vertical = Tokens.Spacing.s3)
+            .padding(horizontal = horizontal)
             .fillMaxWidth()
             .clip(shape)
             .background(Praxis.colors.surface)
@@ -792,7 +780,10 @@ private fun StatsCard(onClick: () -> Unit) {
 @Composable
 private fun Footer(onOpenSupport: () -> Unit, onOpenFeedback: () -> Unit, onOpenPrivacy: () -> Unit) {
     val shape = RoundedCornerShape(Tokens.Radius.lg)
-    Column(modifier = Modifier.padding(horizontal = horizontal, vertical = Tokens.Spacing.s6)) {
+    Column(
+        modifier = Modifier.padding(horizontal = horizontal),
+        verticalArrangement = Arrangement.spacedBy(LibrarySpacing.sections),
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -828,7 +819,6 @@ private fun Footer(onOpenSupport: () -> Unit, onOpenFeedback: () -> Unit, onOpen
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = Tokens.Spacing.s2)
                 .clip(shape)
                 .background(Praxis.colors.surface)
                 .border(1.dp, Praxis.colors.separator, shape)
@@ -852,11 +842,13 @@ private fun Footer(onOpenSupport: () -> Unit, onOpenFeedback: () -> Unit, onOpen
         }
         Text(
             text = stringResource(R.string.footer_privacy),
-            style = MaterialTheme.typography.bodyMedium,
-            color = Praxis.colors.accent,
+            style = MaterialTheme.typography.labelMedium,
+            color = Praxis.colors.textSecondary,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
             modifier = Modifier
-                .padding(top = Tokens.Spacing.s4)
-                .clickable(onClick = onOpenPrivacy),
+                .fillMaxWidth()
+                .clickable(onClick = onOpenPrivacy)
+                .padding(vertical = Tokens.Spacing.s3),
         )
     }
 }
@@ -894,9 +886,10 @@ private fun CatalogFooter(generated: String) {
         text = stringResource(R.string.catalog_updated, formatted),
         style = MaterialTheme.typography.labelMedium,
         color = Praxis.colors.textSecondary,
+        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = horizontal, vertical = Tokens.Spacing.s6),
+            .padding(horizontal = horizontal, vertical = Tokens.Spacing.s3),
     )
 }
 
@@ -974,7 +967,7 @@ private fun LazyListScope.searchResults(
     }
     if (authors.isNotEmpty()) {
         item {
-            LibrarySectionHeader(
+            SectionHeader(
                 title = stringResource(R.string.filter_writers),
                 modifier = Modifier.padding(horizontal = horizontal, vertical = Tokens.Spacing.s2),
             )
@@ -983,7 +976,7 @@ private fun LazyListScope.searchResults(
     }
     if (works.isNotEmpty()) {
         item {
-            LibrarySectionHeader(
+            SectionHeader(
                 title = stringResource(R.string.filter_works),
                 modifier = Modifier.padding(horizontal = horizontal, vertical = Tokens.Spacing.s2),
             )
@@ -992,7 +985,7 @@ private fun LazyListScope.searchResults(
     }
     if (themes.isNotEmpty()) {
         item {
-            LibrarySectionHeader(
+            SectionHeader(
                 title = stringResource(R.string.filter_topics),
                 modifier = Modifier.padding(horizontal = horizontal, vertical = Tokens.Spacing.s2),
             )

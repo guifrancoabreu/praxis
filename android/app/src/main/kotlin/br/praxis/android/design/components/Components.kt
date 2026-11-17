@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -22,6 +23,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
@@ -43,6 +46,26 @@ import coil3.compose.AsyncImage
 import br.praxis.android.design.Praxis
 import br.praxis.android.design.PraxisFonts
 import br.praxis.android.design.Tokens
+
+/** Full-width primary action, matching the iOS treatment. */
+@Composable
+fun PrimaryButton(text: String, onClick: () -> Unit, enabled: Boolean, modifier: Modifier = Modifier) {
+    val content = if (isSystemInDarkTheme()) Color.Black else Color.White
+    Button(
+        onClick = onClick,
+        enabled = enabled,
+        modifier = modifier.fillMaxWidth().heightIn(min = Tokens.Sizing.touchTarget),
+        shape = RoundedCornerShape(Tokens.Radius.md),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Praxis.colors.accent,
+            contentColor = content,
+            disabledContainerColor = Praxis.colors.accent.copy(alpha = 0.5f),
+            disabledContentColor = content.copy(alpha = 0.5f),
+        ),
+    ) {
+        Text(text, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold)
+    }
+}
 
 /**
  * A reusable typographic cover for a text or publication, matching BookCover on iOS: the tone is a
@@ -138,23 +161,35 @@ fun ListRow(title: String, subtitle: String? = null, modifier: Modifier = Modifi
 /** Uppercase section heading with an optional accent action, as used across the library. */
 @Composable
 fun SectionHeader(title: String, action: String? = null, onAction: (() -> Unit)? = null, modifier: Modifier = Modifier) {
-    Row(modifier = modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        modifier = modifier.fillMaxWidth().heightIn(min = Tokens.Sizing.touchTarget),
+        verticalAlignment = Alignment.Bottom,
+    ) {
         Text(
             text = title.uppercase(),
-            style = MaterialTheme.typography.labelSmall,
+            style = MaterialTheme.typography.bodyMedium.copy(
+                fontWeight = FontWeight.SemiBold,
+                letterSpacing = 0.8.sp,
+            ),
             color = Praxis.colors.textSecondary,
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(1f).padding(bottom = Tokens.Spacing.s1),
         )
         if (action != null && onAction != null) {
-            Text(
-                text = action,
-                style = MaterialTheme.typography.labelLarge,
-                color = Praxis.colors.accent,
+            Box(
                 modifier = Modifier
+                    .heightIn(min = Tokens.Sizing.touchTarget)
                     .clip(RoundedCornerShape(Tokens.Radius.sm))
                     .clickable(onClick = onAction)
-                    .padding(horizontal = Tokens.Spacing.s1, vertical = Tokens.Spacing.s1),
-            )
+                    .padding(horizontal = Tokens.Spacing.s1),
+                contentAlignment = Alignment.BottomCenter,
+            ) {
+                Text(
+                    text = action,
+                    style = MaterialTheme.typography.labelLarge,
+                    color = Praxis.colors.accent,
+                    modifier = Modifier.padding(bottom = Tokens.Spacing.s1),
+                )
+            }
         }
     }
 }
