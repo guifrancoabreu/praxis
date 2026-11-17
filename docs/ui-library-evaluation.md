@@ -1,6 +1,6 @@
 # shadcn/ui and Vercel UI SDK — what applies to Praxis
 
-Status: exploration, branch `spike/web-ui-sdk-adoption`. Not a plan of record until reviewed.
+Status: evaluation, branch `refactor/semantic-design-tokens`. Section 7 is what shipped with it; §4.3 is the next step.
 
 ## 1. Short answer
 
@@ -38,7 +38,7 @@ There is also one place where the literal library belongs later: a web surface t
 
 ### 4.1 Semantic tokens, generated for both platforms
 
-Primitive values already flow from `design/tokens.json`: `tools/gen_tokens.py --write` emits `android/.../design/Tokens.kt`, and `--check` diffs the hand-written `ios/Praxis/RefTokens.swift` against the JSON, in CI.
+Primitive values already flowed from `design/tokens.json`, and this branch extends the same mechanism upward: `tools/gen_tokens.py --write` now generates **both** `Tokens.kt` and `RefTokens.swift` (it used to generate Kotlin only, with Swift hand-written and merely diffed), and `--check` fails CI when either file is stale. Adding a role now means editing one JSON file, not two theme layers in two languages.
 
 The layer *above* the primitives does not flow. `ios/Praxis/SystemTokens.swift` (semantic light/dark theme) and `PraxisTheme.kt`'s `PraxisColors` are written twice by hand, and nothing verifies that the two agree. That is shadcn's most transferable idea: name colors by role and pair every surface with its text color, so a screen never picks a raw value.
 
@@ -76,18 +76,18 @@ The same treatment applies to type. `tokens.json` has no UI type scale — `typo
 | `display` | 34 / 50 | Literata Bold | `displayLarge` |
 | `title1` | 28 / 42 | Literata Semibold | 28sp, unnamed |
 | `title2` | 22 / 33 | Literata Semibold | `titleLarge` |
-| `title3` | 20 / 30 | Literata Semibold | 22 / 17 where used |
+| `title3` | 20 / 30 | Literata Semibold | new `title3` style |
 | `headline` | 17 / 25 | Literata Semibold | `titleSmall` |
 | `heading` | 17 / 25 | Literata Medium | `titleMedium` |
 | `body` | 17 / 21 | Inter Regular | `bodyLarge` |
 | `subhead` | 15 / 18 | Inter Regular | `bodyMedium` |
 | `subhead-medium` | 15 / 18 | Inter Medium | `labelLarge` |
 | `footnote` | 13 / 16 | Inter Regular | `labelMedium` |
-| `caption` | 12 / 15 | Inter Regular | 13 / 15 where used |
+| `caption` | 12 / 15 | Inter Regular | new `caption` style |
 | `overline` | 15 / 18, +0.8 tracking, uppercase | Inter Semibold | `labelSmall` |
 | `micro` | 12 / 15, +0.8 tracking | Inter Semibold | `labelSmall` |
 
-Leading comes from the 1.485 Literata / 1.21 Inter ratios already asserted in `PraxisTheme.kt:80-82`, so nothing is invented. Two steps have no Android name, and the places they would apply currently render 1–3pt off.
+Leading comes from the 1.485 Literata / 1.21 Inter ratios already asserted in `PraxisTheme.kt:80-82`, so nothing is invented. Two steps had no Android name; Material has no slot for them, so they exist as `Typography` extensions next to the scale.
 
 ### 4.2 What fixing this changes on screen
 
@@ -163,13 +163,16 @@ If a landing page, public web reader or share-link page is ever on the roadmap, 
 | Community native ports | No, read only | — | Small, unversioned, one AGPL |
 | shadcn/ui on a future web surface | Yes, if one ships | — | The only place the literal library fits |
 
-## 7. First PR
+## 7. What shipped in this branch
 
-Small, behavior-preserving, and it proves the generation path before anything depends on it:
+The first PR does the token layer and the two corrections the audit found. It is deliberately not a visual refresh:
 
-- add a `semantic` group (role-paired colors, light and dark), a `reader.*` palette group and a `typography.ui` scale to `design/tokens.json`
-- extend `tools/gen_tokens.py --write` to emit both layers to Swift as well as Kotlin, and `--check` to verify both
-- tokenize `primary-foreground` while there; Android derives it from `isSystemInDarkTheme()` instead of the theme it is handed
-- change no screens. Colors resolve from the new layer; nothing moves on screen.
+- `design/tokens.json` gains `semantic` (12 role-paired colors), `type-scale` (13 steps) and `reader` (the six palettes, which were duplicated verbatim between `DesignSystem.swift` and `Data/ReaderAppearance.kt`).
+- `tools/gen_tokens.py` generates both platform files and fails CI when either is stale.
+- `SystemTokens` and `PraxisTheme` now compose their themes from `Semantic`, so light/dark values cannot drift between platforms again.
+- `primary-foreground` is tokenized and read from the theme instead of `isSystemInDarkTheme()`, removing the latent forced-theme bug.
+- Android's separator strength now matches iOS's (it was about half), chip padding and row height follow the shared scale, and the two type steps Material has no slot for (`title3`, `caption`) exist on both platforms with the sites that had drifted corrected.
 
-Verify with `python3 tools/gen_tokens.py --check`, `python3 tools/check_shared.py` and `swift test --package-path ios`.
+Still open from this evaluation, in order: the component registry and its parity check (§4.3), then splitting `PraxisApp.swift` screen by screen.
+
+Verify with `python3 tools/gen_tokens.py --check`, `cd android && ./gradlew :app:compileDebugKotlin`, `xcodebuild -project ios/Praxis.xcodeproj -scheme Praxis -destination 'generic/platform=iOS' build` and `swift test --package-path ios`.
