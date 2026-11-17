@@ -224,12 +224,8 @@ private fun LibraryContent(
         verticalArrangement = Arrangement.spacedBy(LibrarySpacing.sections),
     ) {
         item { Header() }
-        if (searching || filter != LibraryFilter.all) {
-            item { FilterBar(catalog = catalog, selected = filter, onSelect = onFilter) }
-        }
-
         if (searching) {
-            searchResults(catalog = catalog, query = query, onOpenWork = onOpenWork, onOpenAuthor = onOpenAuthor, onOpenCollection = onOpenCollection)
+            searchResults(catalog = catalog, query = query, filter = filter, onFilter = onFilter, onOpenWork = onOpenWork, onOpenAuthor = onOpenAuthor, onOpenCollection = onOpenCollection)
         } else {
             when (filter) {
                 LibraryFilter.all -> {
@@ -312,23 +308,28 @@ private fun LibraryContent(
                     }
                 }
 
-                LibraryFilter.writers -> item { WriterList(catalog.authors, onOpenAuthor) }
+                LibraryFilter.writers -> item { FilteredSection(catalog, filter, onFilter, stringResource(R.string.filter_writers)) { WriterList(catalog.authors, onOpenAuthor) } }
                 LibraryFilter.works -> item {
+                    FilteredSection(catalog, filter, onFilter, stringResource(R.string.filter_works)) {
                     WorkList(
                         catalog.authors.flatMap { author -> author.works.map { author to it } },
                         onOpenWork = onOpenWork,
                     )
+                    }
                 }
-                LibraryFilter.topics -> item { CollectionList(catalog.themes, onOpenCollection) }
-                LibraryFilter.history -> item { CollectionList(catalog.history, onOpenCollection) }
+                LibraryFilter.topics -> item { FilteredSection(catalog, filter, onFilter, stringResource(R.string.filter_topics)) { CollectionList(catalog.themes, onOpenCollection) } }
+                LibraryFilter.history -> item { FilteredSection(catalog, filter, onFilter, stringResource(R.string.filter_history)) { CollectionList(catalog.history, onOpenCollection) } }
                 LibraryFilter.saved -> item {
+                    FilteredSection(catalog, filter, onFilter, if (savedWorks.isEmpty()) null else stringResource(R.string.filter_saved)) {
                     if (savedWorks.isEmpty()) {
                         EmptyContent(stringResource(R.string.empty_saved), stringResource(R.string.empty_saved_body))
                     } else {
                         WorkList(savedWorks, onOpenWork = onOpenWork)
                     }
+                    }
                 }
                 LibraryFilter.readingHistory -> item {
+                    FilteredSection(catalog, filter, onFilter, if (grouped.isEmpty()) null else stringResource(R.string.filter_reading_history)) {
                     if (grouped.isEmpty()) {
                         EmptyContent(stringResource(R.string.empty_history), stringResource(R.string.empty_history_body))
                     } else {
@@ -337,14 +338,32 @@ private fun LibraryContent(
                             onOpenWork(author ?: catalog.authors.first(), Work(progress.title, progress.path, readingID = progress.workId))
                         })
                     }
+                    }
                 }
             }
 
-            if (filter == LibraryFilter.all && grouped.isNotEmpty()) {
-                item { StatsCard(onClick = onOpenStats) }
+            if (filter == LibraryFilter.all) {
+                if (grouped.isNotEmpty()) {
+                    item { StatsCard(onClick = onOpenStats) }
+                }
+                item { Footer(onOpenSupport = onOpenSupport, onOpenFeedback = onOpenFeedback, onOpenPrivacy = onOpenPrivacy) }
             }
-            item { Footer(onOpenSupport = onOpenSupport, onOpenFeedback = onOpenFeedback, onOpenPrivacy = onOpenPrivacy) }
             item { CatalogFooter(catalog.generated) }
+        }
+    }
+}
+
+@Composable
+private fun FilteredSection(catalog: Catalog, filter: LibraryFilter, onFilter: (LibraryFilter) -> Unit, title: String?, content: @Composable () -> Unit) {
+    Column {
+        FilterBar(catalog = catalog, selected = filter, onSelect = onFilter)
+        if (title != null) {
+            Column(verticalArrangement = Arrangement.spacedBy(LibrarySpacing.headingToContent)) {
+                SectionHeader(title = title, modifier = Modifier.padding(horizontal = horizontal))
+                content()
+            }
+        } else {
+            content()
         }
     }
 }
@@ -943,6 +962,8 @@ private fun SearchField(query: String, onQueryChange: (String) -> Unit, modifier
 private fun LazyListScope.searchResults(
     catalog: Catalog,
     query: String,
+    filter: LibraryFilter,
+    onFilter: (LibraryFilter) -> Unit,
     onOpenWork: (Author, Work) -> Unit,
     onOpenAuthor: (Author) -> Unit,
     onOpenCollection: (CatalogCollection) -> Unit,
@@ -961,36 +982,40 @@ private fun LazyListScope.searchResults(
 
     if (authors.isEmpty() && works.isEmpty() && themes.isEmpty()) {
         item {
-            EmptyContent(stringResource(R.string.empty_results), stringResource(R.string.empty_results_body))
+            FilteredSection(catalog, filter, onFilter, null) {
+                EmptyContent(stringResource(R.string.empty_results), stringResource(R.string.empty_results_body))
+            }
         }
         return
     }
     if (authors.isNotEmpty()) {
         item {
-            SectionHeader(
-                title = stringResource(R.string.filter_writers),
-                modifier = Modifier.padding(horizontal = horizontal, vertical = Tokens.Spacing.s2),
-            )
+            FilteredSection(catalog, filter, onFilter, stringResource(R.string.filter_writers)) { WriterList(authors, onOpenAuthor) }
         }
-        item { WriterList(authors, onOpenAuthor) }
     }
     if (works.isNotEmpty()) {
         item {
-            SectionHeader(
-                title = stringResource(R.string.filter_works),
-                modifier = Modifier.padding(horizontal = horizontal, vertical = Tokens.Spacing.s2),
-            )
+            if (authors.isEmpty()) {
+                FilteredSection(catalog, filter, onFilter, stringResource(R.string.filter_works)) { WorkList(works, onOpenWork) }
+            } else {
+                Column(verticalArrangement = Arrangement.spacedBy(LibrarySpacing.headingToContent)) {
+                    SectionHeader(title = stringResource(R.string.filter_works), modifier = Modifier.padding(horizontal = horizontal))
+                    WorkList(works, onOpenWork)
+                }
+            }
         }
-        item { WorkList(works, onOpenWork) }
     }
     if (themes.isNotEmpty()) {
         item {
-            SectionHeader(
-                title = stringResource(R.string.filter_topics),
-                modifier = Modifier.padding(horizontal = horizontal, vertical = Tokens.Spacing.s2),
-            )
+            if (authors.isEmpty() && works.isEmpty()) {
+                FilteredSection(catalog, filter, onFilter, stringResource(R.string.filter_topics)) { CollectionList(themes, onOpenCollection) }
+            } else {
+                Column(verticalArrangement = Arrangement.spacedBy(LibrarySpacing.headingToContent)) {
+                    SectionHeader(title = stringResource(R.string.filter_topics), modifier = Modifier.padding(horizontal = horizontal))
+                    CollectionList(themes, onOpenCollection)
+                }
+            }
         }
-        item { CollectionList(themes, onOpenCollection) }
     }
 }
 

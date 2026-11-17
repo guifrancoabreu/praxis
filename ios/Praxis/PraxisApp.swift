@@ -3,8 +3,6 @@ import WebKit
 import CryptoKit
 import UIKit
 import PDFKit
-import Vision
-import ImageIO
 
 @main
 struct PraxisApp: App {
@@ -13,7 +11,12 @@ struct PraxisApp: App {
         Analytics.configure()
     }
 
-    var body: some Scene { WindowGroup { LibraryView() } }
+    var body: some Scene {
+        WindowGroup {
+            LibraryView()
+                .background { KeyboardDismissOnTap().frame(width: 0, height: 0) }
+        }
+    }
 }
 
 private enum LibrarySpacing {
@@ -284,7 +287,9 @@ struct LibraryView: View {
                                     if !savedWorks.isEmpty { savedPreview }
                                     popularWorkList(Array(popularWorks.prefix(8)), title: language.text("Biblioteca", "Library"), showAll: true)
                                 } else if !query.isEmpty {
+                                    VStack(alignment: .leading, spacing: LibrarySpacing.filtersToFirstSection) {
                                     filterBar
+                                    VStack(alignment: .leading, spacing: LibrarySpacing.sections) {
                                     switch filter {
                                     case .all:
                                         if !matchingAuthors.isEmpty { writerList(matchingAuthors) }
@@ -293,7 +298,7 @@ struct LibraryView: View {
                                         if !matchingFigures.isEmpty { figureList(matchingFigures) }
                                         if !matchingCountries.isEmpty { countryList(matchingCountries) }
                                         if matchingAuthors.isEmpty && matchingWorks.isEmpty && matchingTopics.isEmpty && matchingFigures.isEmpty && matchingCountries.isEmpty {
-                                            emptyState(title: language.text("Nada encontrado", "No results found"), detail: language.text("Tente outro autor ou título.", "Try another writer or title."))
+                                            emptyState(title: language.text("Nada encontrado", "No results found"), detail: language.text("Tente outro autor ou título.", "Try another writer or title.")).padding(.top, LibrarySpacing.sections)
                                         }
                                     case .writers: writerList(matchingAuthors)
                                     case .works: workList(matchingWorks, title: language.text("Textos", "Works"))
@@ -305,24 +310,28 @@ struct LibraryView: View {
                                     case .countries: countryList(matchingCountries)
                                     case .popular: popularWorkList(popularWorks.filter { $0.1.title.localizedStandardContains(query) || $0.0.full.localizedStandardContains(query) }, title: language.text("Textos populares", "Popular texts"))
                                     }
+                                    }
+                                    }
                                 } else {
+                                    VStack(alignment: .leading, spacing: LibrarySpacing.filtersToFirstSection) {
                                     filterBar
                                     switch filter {
                                     case .all: EmptyView()
                                     case .saved:
                                         if savedWorks.isEmpty {
-                                            emptyState(title: language.text("Sua biblioteca começa aqui", "Your library starts here"), detail: language.text("Salve textos para encontrá-los rapidamente depois.", "Save works to find them quickly later."))
+                                            emptyState(title: language.text("Sua biblioteca começa aqui", "Your library starts here"), detail: language.text("Salve textos para encontrá-los rapidamente depois.", "Save works to find them quickly later.")).padding(.top, LibrarySpacing.sections)
                                         } else { workList(savedWorks, title: language.text("Salvos", "Saved works")) }
                                     case .writers: writerList(matchingAuthors)
                                     case .works: workList(Array(sortedWorks(allWorks).prefix(60)), title: language.text("Todos os textos", "All works"))
                                     case .readingHistory:
-                                        if historyWorks.isEmpty { emptyState(title: language.text("Histórico vazio", "No reading history yet"), detail: language.text("Os textos que você abrir aparecem aqui.", "Works you open will appear here.")) }
+                                        if historyWorks.isEmpty { emptyState(title: language.text("Histórico vazio", "No reading history yet"), detail: language.text("Os textos que você abrir aparecem aqui.", "Works you open will appear here.")).padding(.top, LibrarySpacing.sections) }
                                         else { workList(historyWorks, title: language.text("Histórico de leitura", "Reading log")) }
                                     case .topics: collectionList(catalog.themes, title: language.text("Temas", "Subjects"))
                                     case .history: collectionList(catalog.history, title: language.text("História", "History"))
                                     case .figures: figureList(catalog.figures.filter { !peopleOnly || $0.person })
                                     case .countries: countryList(Array(Set(catalog.authors.map(\.country).filter { !$0.isEmpty })).sorted())
                                     case .popular: popularWorkList(popularWorks, title: language.text("Textos populares", "Popular texts"))
+                                    }
                                     }
                                 }
                                 Text(language.text("Catálogo atualizado em", "Catalog updated") + " " + catalog.generated + " · Marxists Internet Archive")
@@ -562,7 +571,7 @@ struct LibraryView: View {
 
     private func collectionList(_ collections: [CatalogCollection], title: String) -> some View {
         VStack(alignment: .leading, spacing: 12) {
-            sectionHeading(title)
+            listSectionHeading(title)
             let grouped = Dictionary(grouping: collections, by: { $0.group })
             ForEach(grouped.keys.sorted(), id: \.self) { group in
                 if !group.isEmpty { Text(group).font(PraxisFont.heading(.headline, weight: .semibold)).padding(.top, 4) }
@@ -583,7 +592,7 @@ struct LibraryView: View {
 
     private func figureList(_ figures: [CatalogItem]) -> some View {
         VStack(alignment: .leading, spacing: 12) {
-            sectionHeading(language.text("Figuras históricas", "Glossary of people"))
+            listSectionHeading(language.text("Figuras históricas", "Glossary of people"))
             Toggle(language.text("Somente pessoas", "People only"), isOn: $peopleOnly).font(PraxisFont.body(.subheadline))
             LazyVStack(spacing: 0) {
                 ForEach(figures) { figure in
@@ -600,7 +609,7 @@ struct LibraryView: View {
 
     private func countryList(_ countries: [String]) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            sectionHeading(language.text("Países", "Countries"))
+            listSectionHeading(language.text("Países", "Countries"))
             if let catalog {
                 ForEach(countries, id: \.self) { country in
                     NavigationLink { CountryWritersView(country: country, authors: catalog.authors, language: language, knownWorkPaths: knownWorkPaths, catalog: catalog) } label: {
@@ -735,15 +744,15 @@ struct LibraryView: View {
     private func writerList(_ authors: [Author]) -> some View {
         let authors = sortedAuthors(authors)
         return VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                sectionHeading(language.text("Autores", "Writers"))
+            HStack(alignment: .bottom) {
+                sectionHeading(language.text("Autores", "Writers")).padding(.bottom, RefTokens.Spacing.s1)
                 Spacer()
                 sortMenu
                 if catalogSort == .popularity && query.isEmpty && authors.contains(where: { !$0.groups.isEmpty }) {
                     Button(groupWriters ? language.text("A–Z", "A–Z") : language.text("Movimentos", "Movements")) { groupWriters.toggle() }
                         .font(PraxisFont.body(.subheadline, weight: .medium)).foregroundStyle(SystemTokens.Colors.accent)
                 }
-            }
+            }.frame(minHeight: RefTokens.Sizing.touchTarget, alignment: .bottom)
             if catalogSort == .popularity && groupWriters && query.isEmpty && authors.contains(where: { !$0.groups.isEmpty }) {
                 let map = Dictionary(grouping: authors.flatMap { author in
                     (author.groups.isEmpty ? [language.text("Outros", "Other")] : author.groups).map { ($0, author) }
@@ -781,7 +790,7 @@ struct LibraryView: View {
     private func workList(_ works: [(Author, Work)], title: String, showAll: Bool = false) -> some View {
         let works = sortedWorks(works)
         return VStack(alignment: .leading, spacing: 12) {
-            HStack { sectionHeading(title); Spacer(); sortMenu; if showAll { Button(language.text("Ver todos", "See all")) { filterSelection.selectProgrammatically(.works) }.font(PraxisFont.body(.subheadline, weight: .medium)).foregroundStyle(SystemTokens.Colors.accent).frame(minHeight: 44).contentShape(Rectangle()) } }
+            HStack(alignment: .bottom) { sectionHeading(title).padding(.bottom, RefTokens.Spacing.s1); Spacer(); sortMenu; if showAll { Button(language.text("Ver todos", "See all")) { filterSelection.selectProgrammatically(.works) }.font(PraxisFont.body(.subheadline, weight: .medium)).foregroundStyle(SystemTokens.Colors.accent).frame(minHeight: 44).contentShape(Rectangle()) } }.frame(minHeight: RefTokens.Sizing.touchTarget, alignment: .bottom)
             LazyVStack(spacing: 0) {
                 ForEach(Array(works.enumerated()), id: \.element.1.id) { index, item in
                     NavigationLink { ReaderView(work: item.1, authorName: item.1.displayCredit(archiveName: item.0.full), language: language, knownWorkPaths: knownWorkPaths, catalog: catalog) } label: {
@@ -807,8 +816,9 @@ struct LibraryView: View {
         } label: {
             Label(catalogSort.title(language), systemImage: "arrow.up.arrow.down")
                 .font(PraxisFont.body(.subheadline, weight: .medium)).foregroundStyle(SystemTokens.Colors.accent)
+                .padding(.bottom, RefTokens.Spacing.s1)
         }
-        .frame(minHeight: 44)
+        .frame(minHeight: RefTokens.Sizing.touchTarget, alignment: .bottom)
         .contentShape(Rectangle())
         .accessibilityLabel(language.text("Ordenar", "Sort"))
     }
@@ -816,6 +826,12 @@ struct LibraryView: View {
     private func sectionHeading(_ title: String) -> some View {
         Text(title.uppercased()).font(PraxisFont.body(.subheadline, weight: .semibold)).tracking(0.8).foregroundStyle(SystemTokens.Colors.textSecondary)
             .accessibilityAddTraits(.isHeader)
+    }
+
+    private func listSectionHeading(_ title: String) -> some View {
+        sectionHeading(title)
+            .padding(.bottom, RefTokens.Spacing.s1)
+            .frame(maxWidth: .infinity, minHeight: RefTokens.Sizing.touchTarget, alignment: .bottomLeading)
     }
 
     private func feedSection<Content: View>(
@@ -877,7 +893,6 @@ struct AuthorArtwork: View {
     let author: Author
     let language: Language
     @State private var portrait: UIImage?
-    @State private var faceCenter: CGPoint?
     private var url: URL? {
         if let photo = author.photo, let url = URL(string: photo, relativeTo: URL(string: language.base))?.absoluteURL {
             return url
@@ -899,7 +914,7 @@ struct AuthorArtwork: View {
                 if let portrait {
                     let scale = max(proxy.size.width / portrait.size.width, proxy.size.height / portrait.size.height)
                     let size = CGSize(width: portrait.size.width * scale, height: portrait.size.height * scale)
-                    let center = author.id == "engels" ? CGPoint(x: 0.5, y: 0) : (faceCenter ?? CGPoint(x: 0.5, y: 0.25))
+                    let center = author.id == "engels" ? CGPoint(x: 0.5, y: 0) : CGPoint(x: 0.5, y: 0.25)
                     let x = min(max((0.5 - center.x) * size.width, -(size.width - proxy.size.width) / 2), (size.width - proxy.size.width) / 2)
                     let y = min(max((0.5 - center.y) * size.height, -(size.height - proxy.size.height) / 2), (size.height - proxy.size.height) / 2)
                     Image(uiImage: portrait).resizable()
@@ -912,31 +927,9 @@ struct AuthorArtwork: View {
         }
         .task(id: url) {
             portrait = nil
-            faceCenter = nil
             guard let url, let data = try? await PortraitCache.shared.data(for: url, validate: { UIImage(data: $0) != nil }),
                   !Task.isCancelled, let image = UIImage(data: data), image.size.width > 0, image.size.height > 0 else { return }
             portrait = image
-            let center = await Task.detached(priority: .utility) { () -> CGPoint? in
-                guard let cgImage = image.cgImage else { return nil }
-                let orientation: CGImagePropertyOrientation
-                switch image.imageOrientation {
-                case .up: orientation = .up
-                case .down: orientation = .down
-                case .left: orientation = .left
-                case .right: orientation = .right
-                case .upMirrored: orientation = .upMirrored
-                case .downMirrored: orientation = .downMirrored
-                case .leftMirrored: orientation = .leftMirrored
-                case .rightMirrored: orientation = .rightMirrored
-                @unknown default: orientation = .up
-                }
-                let request = VNDetectFaceRectanglesRequest()
-                guard (try? VNImageRequestHandler(cgImage: cgImage, orientation: orientation).perform([request])) != nil,
-                      let face = request.results?.max(by: { $0.boundingBox.width * $0.boundingBox.height < $1.boundingBox.width * $1.boundingBox.height }) else { return nil }
-                return CGPoint(x: face.boundingBox.midX, y: 1 - face.boundingBox.midY)
-            }.value
-            guard !Task.isCancelled else { return }
-            faceCenter = center
         }
     }
     private var monogram: some View {
