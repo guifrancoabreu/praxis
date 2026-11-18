@@ -1,8 +1,6 @@
 package br.praxis.android.ui.support
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,7 +10,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -23,7 +20,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -31,9 +27,10 @@ import androidx.compose.ui.unit.dp
 import br.praxis.android.R
 import br.praxis.android.design.Praxis
 import br.praxis.android.design.Tokens
+import br.praxis.android.design.components.EntryCard
+import br.praxis.android.design.components.EntryCardIndicator
 import br.praxis.android.design.components.PraxisIcon
 import br.praxis.android.design.components.PraxisIconView
-import br.praxis.android.design.components.RoundIconTile
 
 private const val KO_FI_URL = "https://ko-fi.com/guifranco"
 private const val ARCHIVE_DONATION_URL = "https://www.marxists.org/admin/donate/index.htm"
@@ -65,28 +62,30 @@ fun SupportScreen(onBack: () -> Unit, onOpenUrl: (String) -> Unit, onDestination
                 title = stringResource(R.string.support_app_section),
                 body = stringResource(R.string.support_app_body),
             ) {
-                SupportCard(
+                EntryCard(
                     title = stringResource(R.string.support_kofi_title),
-                    action = stringResource(R.string.support_kofi_action),
+                    detail = stringResource(R.string.support_kofi_action),
                     icon = PraxisIcon.Coffee,
                     onClick = {
                         onDestinationOpened(DESTINATION_KOFI)
                         onOpenUrl(KO_FI_URL)
                     },
+                    indicator = EntryCardIndicator.External,
                 )
             }
             SupportSection(
                 title = stringResource(R.string.support_archive_section),
                 body = stringResource(R.string.support_archive_body),
             ) {
-                SupportCard(
+                EntryCard(
                     title = stringResource(R.string.support_archive_title),
-                    action = stringResource(R.string.support_archive_action),
+                    detail = stringResource(R.string.support_archive_action),
                     icon = PraxisIcon.BookOpen,
                     onClick = {
                         onDestinationOpened(DESTINATION_ARCHIVE)
                         onOpenUrl(ARCHIVE_DONATION_URL)
                     },
+                    indicator = EntryCardIndicator.External,
                 )
             }
         }
@@ -156,51 +155,5 @@ private fun SupportSection(title: String, body: String, card: @Composable () -> 
             color = Praxis.colors.textSecondary,
         )
         card()
-    }
-}
-
-/** Surface card with a round icon tile, a serif title, an accent action and an external arrow. */
-@Composable
-private fun SupportCard(title: String, action: String, icon: PraxisIcon, onClick: () -> Unit) {
-    val shape = RoundedCornerShape(Tokens.Radius.lg)
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(shape)
-            .background(Praxis.colors.surface)
-            .border(1.dp, Praxis.colors.separator, shape)
-            .clickable(onClick = onClick)
-            .padding(Tokens.Spacing.s4),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(14.dp),
-    ) {
-        RoundIconTile(diameter = 42.dp) {
-            PraxisIconView(
-                icon = icon,
-                size = 20.dp,
-                tint = Praxis.colors.accent,
-            )
-        }
-        Column(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(Tokens.Spacing.s1),
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleSmall,
-                color = Praxis.colors.textPrimary,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Text(
-                text = action,
-                style = MaterialTheme.typography.labelLarge,
-                color = Praxis.colors.accent,
-            )
-        }
-        PraxisIconView(
-            icon = PraxisIcon.ArrowUpRight,
-            size = 16.dp,
-        )
     }
 }

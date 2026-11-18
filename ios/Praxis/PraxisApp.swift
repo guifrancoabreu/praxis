@@ -479,49 +479,31 @@ struct LibraryView: View {
 
     private var supportFooter: some View {
         NavigationLink { SupportView(language: language) } label: {
-            HStack(spacing: 13) {
-                PraxisIconView(icon: .heart, size: 20, tint: SystemTokens.Colors.accent)
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(language.text("Apoie", "Support")).font(PraxisFont.heading(.headline, weight: .semibold)).foregroundStyle(SystemTokens.Colors.textPrimary)
-                    Text(language.text("Escolha como apoiar", "Choose how to support")).font(PraxisFont.body(.subheadline)).foregroundStyle(SystemTokens.Colors.textSecondary)
-                }
-                Spacer()
-                PraxisIconView(icon: .chevronRight)
-            }.padding(16).frame(maxWidth: .infinity, alignment: .leading)
-                .background(SystemTokens.Colors.surface, in: RoundedRectangle(cornerRadius: RefTokens.Radius.lg, style: .continuous))
-                .overlay(RoundedRectangle(cornerRadius: RefTokens.Radius.lg, style: .continuous).stroke(SystemTokens.Colors.separator, lineWidth: 1))
+            EntryCard(
+                icon: .heart,
+                title: language.text("Apoie", "Support"),
+                detail: language.text("Escolha como apoiar", "Choose how to support")
+            )
         }.buttonStyle(.plain)
     }
 
     private var statsCard: some View {
         NavigationLink { ReadingStatsView(language: language, catalog: catalog, knownWorkPaths: knownWorkPaths) } label: {
-            HStack(spacing: 13) {
-                PraxisIconView(icon: .chartColumn, size: 20, tint: SystemTokens.Colors.accent)
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(language.text("Estatísticas de leitura", "Reading stats")).font(PraxisFont.heading(.headline, weight: .semibold)).foregroundStyle(SystemTokens.Colors.textPrimary)
-                    Text(language.text("Seu progresso, sequência e obras concluídas", "Your progress, streak and finished works")).font(PraxisFont.body(.subheadline)).foregroundStyle(SystemTokens.Colors.textSecondary)
-                }
-                Spacer()
-                PraxisIconView(icon: .chevronRight)
-            }.padding(16).frame(maxWidth: .infinity, alignment: .leading)
-                .background(SystemTokens.Colors.surface, in: RoundedRectangle(cornerRadius: RefTokens.Radius.lg, style: .continuous))
-                .overlay(RoundedRectangle(cornerRadius: RefTokens.Radius.lg, style: .continuous).stroke(SystemTokens.Colors.separator, lineWidth: 1))
+            EntryCard(
+                icon: .chartColumn,
+                title: language.text("Estatísticas de leitura", "Reading stats"),
+                detail: language.text("Seu progresso, sequência e obras concluídas", "Your progress, streak and finished works")
+            )
         }.buttonStyle(.plain)
     }
 
     private var feedbackFooter: some View {
         NavigationLink { FeedbackView(language: language) } label: {
-            HStack(spacing: 13) {
-                PraxisIconView(icon: .messageCircle, size: 20, tint: SystemTokens.Colors.accent)
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(FeedbackCopy.forLanguage(language).title).font(.system(.headline, design: .serif, weight: .semibold)).foregroundStyle(SystemTokens.Colors.textPrimary)
-                    Text(FeedbackCopy.forLanguage(language).lead).font(.subheadline).foregroundStyle(SystemTokens.Colors.textSecondary)
-                }
-                Spacer()
-                PraxisIconView(icon: .chevronRight)
-            }.padding(16).frame(maxWidth: .infinity, alignment: .leading)
-                .background(SystemTokens.Colors.surface, in: RoundedRectangle(cornerRadius: RefTokens.Radius.lg, style: .continuous))
-                .overlay(RoundedRectangle(cornerRadius: RefTokens.Radius.lg, style: .continuous).stroke(SystemTokens.Colors.separator, lineWidth: 1))
+            EntryCard(
+                icon: .messageCircle,
+                title: FeedbackCopy.forLanguage(language).title,
+                detail: FeedbackCopy.forLanguage(language).lead
+            )
         }.buttonStyle(.plain)
     }
 
@@ -1154,7 +1136,6 @@ struct SupportView: View {
                     Text(language.text("Ajude a preservar o Marxists Internet Archive.", "Help preserve the Marxists Internet Archive."))
                         .font(PraxisFont.body(.subheadline)).foregroundStyle(SystemTokens.Colors.textSecondary)
                     supportLink(to: archiveDonationURL, title: "Marxists.org", action: language.text("Doar ao Marxists.org", "Donate to Marxists.org"), icon: .bookOpen)
-                    .padding(.top, 2)
                 }
             }
             .padding(20)
@@ -1169,29 +1150,13 @@ struct SupportView: View {
 
     private func supportLink(to url: URL, title: String, action: String, icon: PraxisIcon) -> some View {
         Link(destination: url) {
-            supportCard(title: title, action: action, icon: icon)
+            EntryCard(icon: icon, title: title, detail: action, indicator: .external)
         }
         .buttonStyle(.plain)
         .simultaneousGesture(TapGesture().onEnded {
             let destination: SupportDestination = title == "Ko-fi" ? .kofi : .archive
             Analytics.track(.supportDestinationOpened(destination))
         })
-    }
-
-    private func supportCard(title: String, action: String, icon: PraxisIcon) -> some View {
-        HStack(spacing: 14) {
-            PraxisIconView(icon: icon, size: 20, tint: SystemTokens.Colors.accent)
-                .frame(width: 42, height: 42).background(SystemTokens.Colors.secondarySurface, in: Circle())
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title).font(PraxisFont.heading(.headline, weight: .semibold)).foregroundStyle(SystemTokens.Colors.textPrimary)
-                Text(action).font(PraxisFont.body(.subheadline, weight: .medium)).foregroundStyle(SystemTokens.Colors.accent)
-            }
-            Spacer(minLength: 4)
-            PraxisIconView(icon: .arrowUpRight, size: 16)
-        }
-        .padding(16)
-        .background(SystemTokens.Colors.surface, in: RoundedRectangle(cornerRadius: RefTokens.Radius.lg, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: RefTokens.Radius.lg, style: .continuous).stroke(SystemTokens.Colors.separator, lineWidth: 1))
     }
 }
 

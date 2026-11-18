@@ -118,6 +118,38 @@ struct ListRow: View {
     }
 }
 
+/// A full-width card for a destination or an external link. The card draws no interaction of its
+/// own: wrap it in a `NavigationLink` for an in-app destination or in a `Link` for an external one.
+struct EntryCard: View {
+    enum Indicator { case chevron, external }
+
+    let icon: PraxisIcon
+    let title: String
+    let detail: String
+    var indicator: Indicator = .chevron
+
+    var body: some View {
+        HStack(spacing: RefTokens.Spacing.s3) {
+            PraxisIconView(icon: icon, size: 20, tint: SystemTokens.Colors.accent)
+            VStack(alignment: .leading, spacing: RefTokens.Spacing.s1) {
+                Text(title)
+                    .font(PraxisFont.heading(.headline, weight: .semibold))
+                    .foregroundStyle(SystemTokens.Colors.textPrimary)
+                Text(detail)
+                    .font(PraxisFont.body(.subheadline))
+                    .foregroundStyle(SystemTokens.Colors.textSecondary)
+            }
+            Spacer(minLength: RefTokens.Spacing.s1)
+            PraxisIconView(icon: indicator == .chevron ? .chevronRight : .arrowUpRight)
+        }
+        .padding(RefTokens.Spacing.s4)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(SystemTokens.Colors.surface, in: RoundedRectangle(cornerRadius: RefTokens.Radius.lg, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: RefTokens.Radius.lg, style: .continuous)
+            .stroke(SystemTokens.Colors.separator, lineWidth: 1))
+    }
+}
+
 /// Adds the platform glass surface on supported systems and a material fallback elsewhere.
 struct GlassSurface: ViewModifier {
     func body(content: Content) -> some View {

@@ -74,12 +74,12 @@ import br.praxis.android.design.Tokens
 import br.praxis.android.design.components.AuthorArtwork
 import br.praxis.android.design.components.BookCover
 import br.praxis.android.design.components.Chevron
+import br.praxis.android.design.components.EntryCard
 import br.praxis.android.design.components.GlassSurface
 import br.praxis.android.design.components.InsetDivider
 import br.praxis.android.design.components.PraxisChip
 import br.praxis.android.design.components.PraxisIcon
 import br.praxis.android.design.components.PraxisIconView
-import br.praxis.android.design.components.RoundIconTile
 import br.praxis.android.design.components.SectionHeader
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -755,93 +755,34 @@ private fun CollectionList(collections: List<CatalogCollection>, onOpen: (Catalo
 
 @Composable
 private fun StatsCard(onClick: () -> Unit) {
-    val shape = RoundedCornerShape(Tokens.Radius.lg)
-    Row(
-        modifier = Modifier
-            .padding(horizontal = horizontal)
-            .fillMaxWidth()
-            .clip(shape)
-            .background(Praxis.colors.surface)
-            .border(1.dp, Praxis.colors.separator, shape)
-            .clickable(onClick = onClick)
-            .padding(Tokens.Spacing.s4),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(13.dp),
-    ) {
-        PraxisIconView(icon = PraxisIcon.ChartColumn, size = 20.dp, tint = Praxis.colors.accent)
-        Column(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(Tokens.Spacing.s1),
-        ) {
-            Text(
-                text = stringResource(R.string.stats_card_title),
-                style = MaterialTheme.typography.titleSmall,
-                color = Praxis.colors.textPrimary,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Text(
-                text = stringResource(R.string.stats_card_subtitle),
-                style = MaterialTheme.typography.bodyMedium,
-                color = Praxis.colors.textSecondary,
-            )
-        }
-        Chevron()
-    }
+    EntryCard(
+        icon = PraxisIcon.ChartColumn,
+        title = stringResource(R.string.stats_card_title),
+        detail = stringResource(R.string.stats_card_subtitle),
+        onClick = onClick,
+        modifier = Modifier.padding(horizontal = horizontal),
+    )
 }
 
 @Composable
 private fun Footer(onOpenSupport: () -> Unit, onOpenFeedback: () -> Unit, onOpenPrivacy: () -> Unit) {
-    val shape = RoundedCornerShape(Tokens.Radius.lg)
     Column(
         modifier = Modifier.padding(horizontal = horizontal),
         verticalArrangement = Arrangement.spacedBy(LibrarySpacing.sections),
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(shape)
-                .background(Praxis.colors.surface)
-                .border(1.dp, Praxis.colors.separator, shape)
-                .clickable(onClick = onOpenSupport)
-                .padding(Tokens.Spacing.s4),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(Tokens.Spacing.s3),
-        ) {
-            PraxisIconView(icon = PraxisIcon.Heart, tint = Praxis.colors.accent)
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = stringResource(R.string.footer_support),
-                    style = MaterialTheme.typography.titleSmall,
-                    color = Praxis.colors.textPrimary,
-                )
-                Text(
-                    text = stringResource(R.string.footer_support_body),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Praxis.colors.textSecondary,
-                )
-            }
-            Chevron()
-        }
+        EntryCard(
+            icon = PraxisIcon.Heart,
+            title = stringResource(R.string.footer_support),
+            detail = stringResource(R.string.footer_support_body),
+            onClick = onOpenSupport,
+        )
         if (runCatching { java.net.URI(BuildConfig.FEEDBACK_URL) }.getOrNull()?.let { it.scheme == "https" && !it.host.isNullOrBlank() } == true) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(shape)
-                .background(Praxis.colors.surface)
-                .border(1.dp, Praxis.colors.separator, shape)
-                .clickable(onClick = onOpenFeedback)
-                .padding(Tokens.Spacing.s4),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(Tokens.Spacing.s3),
-        ) {
-            PraxisIconView(icon = PraxisIcon.MessageCircle, tint = Praxis.colors.accent)
-            Column(modifier = Modifier.weight(1f)) {
-                Text(text = stringResource(R.string.feedback_title), style = MaterialTheme.typography.titleSmall, color = Praxis.colors.textPrimary)
-                Text(text = stringResource(R.string.feedback_card_body), style = MaterialTheme.typography.bodyMedium, color = Praxis.colors.textSecondary)
-            }
-            Chevron()
-        }
+            EntryCard(
+                icon = PraxisIcon.MessageCircle,
+                title = stringResource(R.string.feedback_title),
+                detail = stringResource(R.string.feedback_card_body),
+                onClick = onOpenFeedback,
+            )
         }
         Text(
             text = stringResource(R.string.footer_privacy),
