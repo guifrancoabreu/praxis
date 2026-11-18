@@ -10,9 +10,6 @@ __pycache__/
 .claude/
 feedback-worker/.wrangler/
 
-# Session artifacts: plans, handoffs and working notes (see AGENTS.md)
-ai-artifacts/
-
 # Swift package and Xcode state
 ios/.build/
 ios/.swiftpm/
