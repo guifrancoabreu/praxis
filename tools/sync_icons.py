@@ -209,9 +209,19 @@ def check() -> list[str]:
 
 
 def write() -> None:
-    for path, text in generated().items():
+    expected = generated()
+    for path, text in expected.items():
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(text, encoding="utf-8")
+    # A master that was removed or renamed should not leave a generated asset behind.
+    for directory in IOS_CATALOG.glob("lucide-*.imageset"):
+        if directory / "icon.svg" not in expected:
+            for leftover in directory.iterdir():
+                leftover.unlink()
+            directory.rmdir()
+    for leftover in ANDROID_DRAWABLE.glob("lucide_*.xml"):
+        if leftover not in expected:
+            leftover.unlink()
     print(f"wrote icons for {len(icon_names())} masters: {', '.join(icon_names())}")
 
 

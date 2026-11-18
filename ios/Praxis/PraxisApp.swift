@@ -496,7 +496,7 @@ struct LibraryView: View {
     private var statsCard: some View {
         NavigationLink { ReadingStatsView(language: language, catalog: catalog, knownWorkPaths: knownWorkPaths) } label: {
             HStack(spacing: 13) {
-                PraxisIconView(icon: .chartBar, size: 20, tint: SystemTokens.Colors.accent)
+                PraxisIconView(icon: .chartColumn, size: 20, tint: SystemTokens.Colors.accent)
                 VStack(alignment: .leading, spacing: 3) {
                     Text(language.text("Estatísticas de leitura", "Reading stats")).font(PraxisFont.heading(.headline, weight: .semibold)).foregroundStyle(SystemTokens.Colors.textPrimary)
                     Text(language.text("Seu progresso, sequência e obras concluídas", "Your progress, streak and finished works")).font(PraxisFont.body(.subheadline)).foregroundStyle(SystemTokens.Colors.textSecondary)
@@ -1824,7 +1824,7 @@ struct ReadingStatsView: View {
 
     private var emptyState: some View {
         VStack(alignment: .leading, spacing: 8) {
-            PraxisIconView(icon: .chartBar, size: 28, tint: SystemTokens.Colors.accent).padding(.bottom, 4)
+            PraxisIconView(icon: .chartColumn, size: 28, tint: SystemTokens.Colors.accent).padding(.bottom, 4)
             Text(language.text("Nenhuma leitura ainda", "No reading yet"))
                 .font(PraxisFont.heading(.title3, weight: .semibold))
             Text(language.text("Abra um texto para começar a acompanhar seu progresso.", "Open a work to start tracking your progress."))

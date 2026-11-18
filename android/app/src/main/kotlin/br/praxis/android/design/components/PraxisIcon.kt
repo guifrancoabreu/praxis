@@ -17,7 +17,7 @@ import br.praxis.android.design.Praxis
  * app's own semantic icons.
  */
 enum class PraxisIcon(val res: Int, val defaultSize: Dp) {
-    ChartBar(R.drawable.lucide_chart_bar, 20.dp),
+    ChartColumn(R.drawable.lucide_chart_column, 20.dp),
     MessageCircle(R.drawable.lucide_message_circle, 20.dp),
     ChevronRight(R.drawable.lucide_chevron_right, 16.dp),
 }

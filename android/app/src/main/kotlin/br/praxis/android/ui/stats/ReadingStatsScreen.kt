@@ -306,7 +306,7 @@ private fun EmptyStats() {
             .padding(Tokens.Spacing.s5),
         verticalArrangement = Arrangement.spacedBy(Tokens.Spacing.s2),
     ) {
-        PraxisIconView(icon = PraxisIcon.ChartBar, size = 28.dp, tint = Praxis.colors.accent)
+        PraxisIconView(icon = PraxisIcon.ChartColumn, size = 28.dp, tint = Praxis.colors.accent)
         Text(
             text = stringResource(R.string.stats_empty_title),
             style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp, lineHeight = 30.sp),

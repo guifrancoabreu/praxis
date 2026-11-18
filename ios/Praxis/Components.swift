@@ -134,7 +134,7 @@ struct GlassSurface: ViewModifier {
 /// `shared/assets/icons`. Platform chrome (navigation, share, field controls) keeps the
 /// system glyphs, so this covers only the app's own semantic icons.
 enum PraxisIcon: String {
-    case chartBar = "lucide-chart-bar"
+    case chartColumn = "lucide-chart-column"
     case messageCircle = "lucide-message-circle"
     case chevronRight = "lucide-chevron-right"
 
@@ -142,7 +142,7 @@ enum PraxisIcon: String {
     var defaultSize: CGFloat {
         switch self {
         case .chevronRight: return 16
-        case .chartBar, .messageCircle: return 20
+        case .chartColumn, .messageCircle: return 20
         }
     }
 }

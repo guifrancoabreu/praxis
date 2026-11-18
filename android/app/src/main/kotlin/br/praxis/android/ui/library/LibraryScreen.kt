@@ -770,7 +770,7 @@ private fun StatsCard(onClick: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(13.dp),
     ) {
-        PraxisIconView(icon = PraxisIcon.ChartBar, size = 20.dp, tint = Praxis.colors.accent)
+        PraxisIconView(icon = PraxisIcon.ChartColumn, size = 20.dp, tint = Praxis.colors.accent)
         Column(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(Tokens.Spacing.s1),
