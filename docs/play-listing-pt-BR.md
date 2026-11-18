@@ -2,6 +2,8 @@
 
 Rascunho da ficha brasileira do Praxis para o Google Play, adaptado de `app-store-listing-pt-BR.md`. A descrição abaixo só afirma recursos do build atual do Android. Campos que dependem de uma decisão humana estão em **Pendências antes de publicar**.
 
+A descrição é a mesma das duas lojas: ao mudá-la aqui, mude também em `app-store-listing-pt-BR.md` (e vice-versa). Só os campos e os limites de caracteres diferem.
+
 ## Metadados
 
 - **Nome do app (até 30 caracteres):** Praxis

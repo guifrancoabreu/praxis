@@ -39,3 +39,4 @@ Rascunho para a ficha brasileira da versão atual do Praxis. Revisar os campos m
 1. Confirmar que as URLs públicas de suporte e privacidade estão acessíveis antes de enviar.
 2. Confirmar nome do titular dos direitos, classificação etária, disponibilidade territorial, preço e capturas de tela no App Store Connect.
 3. Revalidar esta descrição se o app mudar suas análises, fontes de conteúdo ou adicionar funcionalidades.
+4. **Direitos sobre o conteúdo:** revisar a situação de uso dos textos, PDFs e retratos do Marxists Internet Archive antes de publicar; o repositório não documenta uma licença geral para todo o arquivo.
