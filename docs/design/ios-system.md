@@ -12,7 +12,7 @@ Gaps, padding and line height follow [spacing.md](spacing.md), which both apps s
 
 ### Typography
 
-Headings, titles, and section headers use Literata; body copy, labels, and controls use Inter. Both faces ship as variable TTFs in `Praxis/Fonts` (SIL Open Font License, with the licenses alongside them) and are registered for the process at launch with CoreText, because the generated Info.plist has no `UIAppFonts` key. Build fonts through `PraxisFont` in `Praxis/PraxisFonts.swift` — `heading(_:weight:)`, `body(_:weight:)`, and `fixed(_:weight:heading:)` — instead of `.system(design: .serif)` or bare text styles, so Dynamic Type keeps scaling from the same Large-size defaults. Named weights resolve through the fonts' variable axes, so check every weight on a device; a simulated render is not proof the instances differ visually.
+Headings, titles, and section headers use Literata; body copy, labels, and controls use Inter. Both faces ship as variable TTFs in `Praxis/Fonts` (SIL Open Font License, with the licenses alongside them; the copies are generated from `shared/assets/fonts/` by `python3 tools/sync_assets.py --write`) and are registered for the process at launch with CoreText, because the generated Info.plist has no `UIAppFonts` key. Build fonts through `PraxisFont` in `Praxis/PraxisFonts.swift` — `heading(_:weight:)`, `body(_:weight:)`, and `fixed(_:weight:heading:)` — instead of `.system(design: .serif)` or bare text styles, so Dynamic Type keeps scaling from the same Large-size defaults. Named weights resolve through the fonts' variable axes, so check every weight on a device; a simulated render is not proof the instances differ visually.
 
 ## Components
 

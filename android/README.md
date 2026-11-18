@@ -8,6 +8,8 @@ Native Kotlin + Jetpack Compose port of Praxis. It aims to look and behave like 
 - `design/tokens.json` — primitive design values; `Tokens.kt` in `design/` is generated from it.
 - `app/src/main/res/font/` — Literata (headings) and Inter (body) as single variable TTFs, wired up in
   `design/PraxisFonts.kt`; their OFL license texts sit in `app/src/main/res/raw/`.
+- Launcher icons and the `res/font` files are generated from `shared/assets/` by
+  `python3 tools/sync_assets.py --write`; do not edit them by hand.
 
 ## Build and run
 

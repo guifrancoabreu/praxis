@@ -2,7 +2,7 @@
 """Generate the Google Play listing artwork from the shared app icon.
 
 Play wants a 512x512 app icon and a 1024x500 feature graphic. Both are built from the same
-1024 px source used by iOS, so the store icon cannot drift from the launcher icon. The feature
+1024 px master in `shared/assets/brand/`, so the store icon cannot drift from the launcher icon. The feature
 graphic keeps the artwork uncropped, centred on the artwork's own red, with the "Praxis" wordmark
 below it in a serif face so the banner matches the wordmark on the support site.
 
@@ -19,7 +19,7 @@ from collections import Counter
 from PIL import Image, ImageDraw, ImageFont
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-SOURCE = ROOT / "ios/Praxis/Assets.xcassets/AppIcon.appiconset/Praxis-logo.png"
+SOURCE = ROOT / "shared" / "assets" / "brand" / "praxis-logo.png"
 OUT = ROOT / "output/play"
 
 ICON_SIZE = 512
