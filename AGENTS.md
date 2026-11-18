@@ -34,6 +34,10 @@ Every unit of work starts as a GitHub issue in this repo. No issue, no branch.
 
 Write PR descriptions in plain, human language — short sentences, no corporate or template-speak. Cover what changed and why, how it was tested, and anything a reviewer wouldn't get from the diff. Screenshots are optional: for visual changes, leave the Screenshots section for the author to paste images into, and drop it entirely when nothing's visual — never fabricate or attach placeholder screenshots. Keep it brief. Follow the structure in `.github/PULL_REQUEST_TEMPLATE.md`.
 
+# Design tokens
+
+`design/tokens.json` is the single source of truth for colour, spacing, type, radius and the reader palettes. `python3 tools/gen_tokens.py --write` regenerates `ios/Praxis/RefTokens.swift` and the Android `Tokens.kt`; never edit those two files, and `--check` must pass (CI runs it). Screens use roles — `SystemTokens.Colors` on iOS, `Praxis.colors` on Android — never raw hex or ad-hoc sizes. A value both apps need goes into the JSON first. The full contract, including how to change a visual decision, is in `docs/design-tokens.md`.
+
 # Branches
 
 Name every short-lived branch off `main` as `<type>/<short-description>`. The description is 3–4 English words, lowercase, hyphenated, and says what the branch ships: `feat/android-reader-parity`, `fix/reader-sepia-contrast`, `chore/refresh-pt-catalog`. Delete the branch after merge.
