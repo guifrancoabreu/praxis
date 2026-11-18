@@ -10,17 +10,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.outlined.MenuBook
-import androidx.compose.material.icons.automirrored.outlined.OpenInNew
-import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.material.icons.outlined.LocalCafe
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -29,7 +24,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -37,6 +31,8 @@ import androidx.compose.ui.unit.dp
 import br.praxis.android.R
 import br.praxis.android.design.Praxis
 import br.praxis.android.design.Tokens
+import br.praxis.android.design.components.PraxisIcon
+import br.praxis.android.design.components.PraxisIconView
 import br.praxis.android.design.components.RoundIconTile
 
 private const val KO_FI_URL = "https://ko-fi.com/guifranco"
@@ -72,7 +68,7 @@ fun SupportScreen(onBack: () -> Unit, onOpenUrl: (String) -> Unit, onDestination
                 SupportCard(
                     title = stringResource(R.string.support_kofi_title),
                     action = stringResource(R.string.support_kofi_action),
-                    icon = Icons.Outlined.LocalCafe,
+                    icon = PraxisIcon.Coffee,
                     onClick = {
                         onDestinationOpened(DESTINATION_KOFI)
                         onOpenUrl(KO_FI_URL)
@@ -86,7 +82,7 @@ fun SupportScreen(onBack: () -> Unit, onOpenUrl: (String) -> Unit, onDestination
                 SupportCard(
                     title = stringResource(R.string.support_archive_title),
                     action = stringResource(R.string.support_archive_action),
-                    icon = Icons.AutoMirrored.Outlined.MenuBook,
+                    icon = PraxisIcon.Library,
                     onClick = {
                         onDestinationOpened(DESTINATION_ARCHIVE)
                         onOpenUrl(ARCHIVE_DONATION_URL)
@@ -128,11 +124,10 @@ private fun TopBar(title: String, onBack: () -> Unit) {
 @Composable
 private fun Lead() {
     Column(verticalArrangement = Arrangement.spacedBy(Tokens.Spacing.s2)) {
-        Icon(
-            imageVector = Icons.Outlined.FavoriteBorder,
-            contentDescription = null,
+        PraxisIconView(
+            icon = PraxisIcon.Heart,
+            size = 38.dp,
             tint = Praxis.colors.accent,
-            modifier = Modifier.size(38.dp),
         )
         Text(
             text = stringResource(R.string.support_title),
@@ -166,7 +161,7 @@ private fun SupportSection(title: String, body: String, card: @Composable () -> 
 
 /** Surface card with a round icon tile, a serif title, an accent action and an external arrow. */
 @Composable
-private fun SupportCard(title: String, action: String, icon: ImageVector, onClick: () -> Unit) {
+private fun SupportCard(title: String, action: String, icon: PraxisIcon, onClick: () -> Unit) {
     val shape = RoundedCornerShape(Tokens.Radius.lg)
     Row(
         modifier = Modifier
@@ -180,11 +175,10 @@ private fun SupportCard(title: String, action: String, icon: ImageVector, onClic
         horizontalArrangement = Arrangement.spacedBy(14.dp),
     ) {
         RoundIconTile(diameter = 42.dp) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
+            PraxisIconView(
+                icon = icon,
+                size = 20.dp,
                 tint = Praxis.colors.accent,
-                modifier = Modifier.size(20.dp),
             )
         }
         Column(
@@ -204,11 +198,9 @@ private fun SupportCard(title: String, action: String, icon: ImageVector, onClic
                 color = Praxis.colors.accent,
             )
         }
-        Icon(
-            imageVector = Icons.AutoMirrored.Outlined.OpenInNew,
-            contentDescription = null,
-            tint = Praxis.colors.textSecondary,
-            modifier = Modifier.size(14.dp),
+        PraxisIconView(
+            icon = PraxisIcon.ArrowUpRight,
+            size = 16.dp,
         )
     }
 }

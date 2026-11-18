@@ -56,4 +56,4 @@ Binaries that both apps ship live in `shared/assets/`. Platform copies are gener
 
 # Icons
 
-The app's own icons are Lucide SVGs in `shared/assets/icons/`, generated into an iOS asset catalog and Android vector drawables by `python3 tools/sync_icons.py --write`; `--check` fails CI when a generated icon drifts, so never edit one. Use them through `PraxisIconView` and keep system glyphs for platform chrome — navigation, share, field controls — where users expect the platform's own shape.
+The app's own icons are Lucide SVGs in `shared/assets/icons/`, generated into an iOS asset catalog and Android vector drawables by `python3 tools/sync_icons.py --write`; `--check` fails CI when a generated icon drifts, so never edit one. Use them through `PraxisIconView` with a semantic name — `docs/design/icons.md` covers what stays a system glyph and the optical size for each slot.

@@ -480,7 +480,7 @@ struct LibraryView: View {
     private var supportFooter: some View {
         NavigationLink { SupportView(language: language) } label: {
             HStack(spacing: 13) {
-                Image(systemName: "heart").font(.title3).foregroundStyle(SystemTokens.Colors.accent)
+                PraxisIconView(icon: .heart, size: 20, tint: SystemTokens.Colors.accent)
                 VStack(alignment: .leading, spacing: 3) {
                     Text(language.text("Apoie", "Support")).font(PraxisFont.heading(.headline, weight: .semibold)).foregroundStyle(SystemTokens.Colors.textPrimary)
                     Text(language.text("Escolha como apoiar", "Choose how to support")).font(PraxisFont.body(.subheadline)).foregroundStyle(SystemTokens.Colors.textSecondary)
@@ -861,7 +861,7 @@ struct LibraryView: View {
 
     private func emptyState(title: String, detail: String) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Image(systemName: "books.vertical").font(.title2).foregroundStyle(SystemTokens.Colors.accent).padding(.bottom, 4)
+            PraxisIconView(icon: .library, size: 28, tint: SystemTokens.Colors.accent).padding(.bottom, 4)
             Text(title).font(PraxisFont.heading(.title3, weight: .semibold))
             Text(detail).font(PraxisFont.body(.subheadline)).foregroundStyle(SystemTokens.Colors.textSecondary)
         }
@@ -972,7 +972,12 @@ struct AuthorView: View {
                     VStack(alignment: .leading, spacing: 7) {
                         Text(author.full).font(PraxisFont.heading(.title2, weight: .semibold))
                         if !author.dates.isEmpty { Text(author.dates).font(PraxisFont.body(.subheadline)).foregroundStyle(.secondary) }
-                        if !author.country.isEmpty { Label(author.country, systemImage: "globe.americas").font(PraxisFont.body(.caption)).foregroundStyle(.secondary) }
+                        if !author.country.isEmpty {
+                            HStack(spacing: 4) {
+                                PraxisIconView(icon: .globe, size: 16)
+                                Text(author.country).font(PraxisFont.body(.caption)).foregroundStyle(SystemTokens.Colors.textSecondary)
+                            }
+                        }
                         ForEach(author.groups, id: \.self) { group in Text(group).font(PraxisFont.body(.caption)).foregroundStyle(SystemTokens.Colors.accent) }
                     }
                 }.padding(.vertical, 6)
@@ -1130,7 +1135,7 @@ struct SupportView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
                 VStack(alignment: .leading, spacing: 8) {
-                    Image(systemName: "heart.text.square").font(.system(size: 38)).foregroundStyle(SystemTokens.Colors.accent)
+                    PraxisIconView(icon: .heart, size: 38, tint: SystemTokens.Colors.accent)
                     Text(language.text("Apoie", "Support")).font(PraxisFont.heading(.largeTitle, weight: .medium))
                     Text(language.text("Escolha como apoiar", "Choose how to support")).font(PraxisFont.body(.body)).foregroundStyle(SystemTokens.Colors.textSecondary)
                 }
@@ -1140,7 +1145,7 @@ struct SupportView: View {
                         .font(PraxisFont.heading(.title3, weight: .semibold))
                     Text(language.text("Ajude a manter o leitor gratuito e em evolução.", "Help keep the reader free and improving."))
                         .font(PraxisFont.body(.subheadline)).foregroundStyle(SystemTokens.Colors.textSecondary)
-                    supportLink(to: koFiURL, title: "Ko-fi", action: language.text("Apoiar no Ko-fi", "Support on Ko-fi"), icon: "cup.and.saucer.fill")
+                    supportLink(to: koFiURL, title: "Ko-fi", action: language.text("Apoiar no Ko-fi", "Support on Ko-fi"), icon: .coffee)
                 }
 
                 VStack(alignment: .leading, spacing: 12) {
@@ -1148,7 +1153,7 @@ struct SupportView: View {
                         .font(PraxisFont.heading(.title3, weight: .semibold))
                     Text(language.text("Ajude a preservar o Marxists Internet Archive.", "Help preserve the Marxists Internet Archive."))
                         .font(PraxisFont.body(.subheadline)).foregroundStyle(SystemTokens.Colors.textSecondary)
-                    supportLink(to: archiveDonationURL, title: "Marxists.org", action: language.text("Doar ao Marxists.org", "Donate to Marxists.org"), icon: "books.vertical.fill")
+                    supportLink(to: archiveDonationURL, title: "Marxists.org", action: language.text("Doar ao Marxists.org", "Donate to Marxists.org"), icon: .library)
                     .padding(.top, 2)
                 }
             }
@@ -1162,7 +1167,7 @@ struct SupportView: View {
         .onAppear { Analytics.track(.supportPageOpened) }
     }
 
-    private func supportLink(to url: URL, title: String, action: String, icon: String) -> some View {
+    private func supportLink(to url: URL, title: String, action: String, icon: PraxisIcon) -> some View {
         Link(destination: url) {
             supportCard(title: title, action: action, icon: icon)
         }
@@ -1173,16 +1178,16 @@ struct SupportView: View {
         })
     }
 
-    private func supportCard(title: String, action: String, icon: String) -> some View {
+    private func supportCard(title: String, action: String, icon: PraxisIcon) -> some View {
         HStack(spacing: 14) {
-            Image(systemName: icon).font(.title3).foregroundStyle(SystemTokens.Colors.accent)
+            PraxisIconView(icon: icon, size: 20, tint: SystemTokens.Colors.accent)
                 .frame(width: 42, height: 42).background(SystemTokens.Colors.background, in: Circle())
             VStack(alignment: .leading, spacing: 4) {
                 Text(title).font(PraxisFont.heading(.headline, weight: .semibold)).foregroundStyle(SystemTokens.Colors.textPrimary)
                 Text(action).font(PraxisFont.body(.subheadline, weight: .medium)).foregroundStyle(SystemTokens.Colors.accent)
             }
             Spacer(minLength: 4)
-            Image(systemName: "arrow.up.right").font(.caption.weight(.semibold)).foregroundStyle(SystemTokens.Colors.textSecondary)
+            PraxisIconView(icon: .arrowUpRight, size: 16)
         }
         .padding(16)
         .background(SystemTokens.Colors.surface, in: RoundedRectangle(cornerRadius: RefTokens.Radius.lg, style: .continuous))

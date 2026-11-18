@@ -174,9 +174,9 @@ def vector_drawable(svg_path: pathlib.Path) -> str:
 
 
 def template_svg(svg_path: pathlib.Path) -> str:
-    """The SVG as the app should ship it: no CSS keyword, so template tinting is predictable."""
+    """The SVG as the app should ship it: an explicit black stroke, no CSS keyword, so template tinting is predictable."""
     text = svg_path.read_text(encoding="utf-8")
-    return text.replace('stroke="currentColor"', f'stroke="{STROKE[:7]}"')
+    return text.replace('stroke="currentColor"', 'stroke="#000000"')
 
 
 def generated() -> dict[pathlib.Path, str]:

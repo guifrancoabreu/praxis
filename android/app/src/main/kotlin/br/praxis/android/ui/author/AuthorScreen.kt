@@ -18,7 +18,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Public
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -48,6 +47,8 @@ import br.praxis.android.design.Tokens
 import br.praxis.android.design.components.AuthorArtwork
 import br.praxis.android.design.components.Chevron
 import br.praxis.android.design.components.InsetDivider
+import br.praxis.android.design.components.PraxisIcon
+import br.praxis.android.design.components.PraxisIconView
 
 /** Author profile, mirroring AuthorView: portrait card, biography and the works by section. */
 @Composable
@@ -157,11 +158,10 @@ private fun AuthorContent(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(Tokens.Spacing.s1),
                             ) {
-                                Icon(
-                                    imageVector = Icons.Filled.Public,
-                                    contentDescription = null,
+                                PraxisIconView(
+                                    icon = PraxisIcon.Globe,
+                                    size = 16.dp,
                                     tint = Praxis.colors.textSecondary,
-                                    modifier = Modifier.size(16.dp),
                                 )
                                 Text(
                                     text = author.country,

@@ -18,6 +18,8 @@ Headings, titles, and section headers use Literata; body copy, labels, and contr
 
 `ListRow` and `BookCover` are reusable presentation components in `Praxis/Components.swift`; their visible content comes from callers. `GlassSurface` provides the adaptive glass/material treatment for floating controls. Catalog-bound rows and artwork stay with the app. Place it inside a native `NavigationLink` so the platform supplies interaction, focus, and accessibility semantics. Screen-specific behavior, data, and translated copy belong to the caller.
 
+Icons are Lucide, generated from `shared/assets/icons/` into both platforms' assets; [icons.md](icons.md) covers which glyphs stay native and the optical size for each slot.
+
 ## Verification
 
 Run the core tests and build described in the iOS README. Reader palette tests check contrast mathematically; they do not establish accessibility compliance. Before considering a screen finished, inspect both appearances, large text, VoiceOver, and touch targets in a simulator or on a device. The WebKit reader's response to text-size changes and archive-specific HTML still requires device verification.

@@ -17,9 +17,14 @@ import br.praxis.android.design.Praxis
  * app's own semantic icons.
  */
 enum class PraxisIcon(val res: Int, val defaultSize: Dp) {
+    ArrowUpRight(R.drawable.lucide_arrow_up_right, 16.dp),
     ChartColumn(R.drawable.lucide_chart_column, 20.dp),
-    MessageCircle(R.drawable.lucide_message_circle, 20.dp),
     ChevronRight(R.drawable.lucide_chevron_right, 16.dp),
+    Coffee(R.drawable.lucide_coffee, 20.dp),
+    Globe(R.drawable.lucide_globe, 16.dp),
+    Heart(R.drawable.lucide_heart, 20.dp),
+    Library(R.drawable.lucide_library, 20.dp),
+    MessageCircle(R.drawable.lucide_message_circle, 20.dp),
 }
 
 /** Renders one Lucide icon tinted with the theme, sized to its optical default. */

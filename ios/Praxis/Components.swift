@@ -134,15 +134,20 @@ struct GlassSurface: ViewModifier {
 /// `shared/assets/icons`. Platform chrome (navigation, share, field controls) keeps the
 /// system glyphs, so this covers only the app's own semantic icons.
 enum PraxisIcon: String {
+    case arrowUpRight = "lucide-arrow-up-right"
     case chartColumn = "lucide-chart-column"
+    case coffee = "lucide-coffee"
+    case globe = "lucide-globe"
+    case heart = "lucide-heart"
+    case library = "lucide-library"
     case messageCircle = "lucide-message-circle"
     case chevronRight = "lucide-chevron-right"
 
     /// Optical size to match the row it sits in; Lucide's stroke scales with the frame.
     var defaultSize: CGFloat {
         switch self {
-        case .chevronRight: return 16
-        case .chartColumn, .messageCircle: return 20
+        case .arrowUpRight, .chevronRight, .globe: return 16
+        case .chartColumn, .coffee, .heart, .library, .messageCircle: return 20
         }
     }
 }

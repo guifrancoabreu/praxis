@@ -26,9 +26,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.ChatBubbleOutline
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -810,12 +808,7 @@ private fun Footer(onOpenSupport: () -> Unit, onOpenFeedback: () -> Unit, onOpen
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(Tokens.Spacing.s3),
         ) {
-            Icon(
-                imageVector = Icons.Filled.Favorite,
-                contentDescription = null,
-                tint = Praxis.colors.accent,
-                modifier = Modifier.size(22.dp),
-            )
+            PraxisIconView(icon = PraxisIcon.Heart, tint = Praxis.colors.accent)
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = stringResource(R.string.footer_support),
@@ -842,12 +835,7 @@ private fun Footer(onOpenSupport: () -> Unit, onOpenFeedback: () -> Unit, onOpen
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(Tokens.Spacing.s3),
         ) {
-            Icon(
-                imageVector = Icons.Outlined.ChatBubbleOutline,
-                contentDescription = null,
-                tint = Praxis.colors.accent,
-                modifier = Modifier.size(22.dp),
-            )
+            PraxisIconView(icon = PraxisIcon.MessageCircle, tint = Praxis.colors.accent)
             Column(modifier = Modifier.weight(1f)) {
                 Text(text = stringResource(R.string.feedback_title), style = MaterialTheme.typography.titleSmall, color = Praxis.colors.textPrimary)
                 Text(text = stringResource(R.string.feedback_card_body), style = MaterialTheme.typography.bodyMedium, color = Praxis.colors.textSecondary)
@@ -876,6 +864,8 @@ private fun EmptyContent(title: String, body: String?) {
             .padding(horizontal = horizontal, vertical = Tokens.Spacing.s8),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        PraxisIconView(icon = PraxisIcon.Library, size = 28.dp, tint = Praxis.colors.accent)
+        Spacer(Modifier.height(Tokens.Spacing.s2))
         Text(text = title, style = MaterialTheme.typography.titleSmall, color = Praxis.colors.textPrimary)
         if (body != null) {
             Spacer(Modifier.height(Tokens.Spacing.s1))
