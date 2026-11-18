@@ -10,8 +10,8 @@ __pycache__/
 .claude/
 feedback-worker/.wrangler/
 
-# Local working notes that are not meant to be committed
-notes/
+# Session artifacts: plans, handoffs and working notes (see AGENTS.md)
+ai-artifacts/
 
 # Swift package and Xcode state
 ios/.build/

@@ -17,7 +17,7 @@ All content docs live in `docs/`, which doubles as the GitHub Pages root: the su
 
 READMEs stay beside their code, and `AGENTS.md` files and `.github/` templates stay where the tools read them; those are wiring, not docs.
 
-Feature plans and working notes are momentary. Don't commit them. A plan belongs in the issue or PR that ships the feature; if something needs to survive the session before that, keep it in a gitignored `notes/` folder.
+Feature plans and working notes are momentary. Don't commit them. A plan belongs in the issue or PR that ships the feature; if something needs to survive the session before that, keep it in the ignored `ai-artifacts/` folder. `docs/AGENTS.md` covers where a given doc belongs.
 
 # PR descriptions
 
