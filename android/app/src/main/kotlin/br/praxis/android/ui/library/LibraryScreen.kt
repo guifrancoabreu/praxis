@@ -581,7 +581,7 @@ private fun WriterCard(author: Author, onClick: () -> Unit) {
         Spacer(Modifier.height(Tokens.Spacing.s1))
         Text(
             text = workCountLabel(author.works.size),
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.caption,
             color = Praxis.colors.textSecondary,
         )
     }
