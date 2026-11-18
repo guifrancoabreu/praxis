@@ -113,18 +113,34 @@ def colors_xml() -> bytes:
     return text.encode("utf-8")
 
 
-def derived() -> dict[pathlib.Path, bytes]:
-    """The Android launcher assets, rebuilt in memory so `--check` can compare bytes."""
-    files: dict[pathlib.Path, bytes] = {}
+def derived() -> dict[pathlib.Path, bytes | Image.Image]:
+    """The Android launcher assets, rebuilt in memory so `--check` can compare them.
+
+    PNGs are kept as images, not bytes: Pillow's encoder differs between versions and
+    platforms, so two runs that produce the same picture can produce different files.
+    """
+    files: dict[pathlib.Path, bytes | Image.Image] = {}
     for density, size in DENSITIES.items():
         directory = ANDROID_RES / f"mipmap-{density}"
-        files[directory / "ic_launcher.png"] = png(square(size))
-        files[directory / "ic_launcher_round.png"] = png(round_icon(size))
-    files[ANDROID_RES / "drawable-nodpi" / "ic_launcher_foreground.png"] = png(adaptive_foreground(FOREGROUND_SIZE))
+        files[directory / "ic_launcher.png"] = square(size)
+        files[directory / "ic_launcher_round.png"] = round_icon(size)
+    files[ANDROID_RES / "drawable-nodpi" / "ic_launcher_foreground.png"] = adaptive_foreground(FOREGROUND_SIZE)
     for name in ["ic_launcher", "ic_launcher_round"]:
         files[ANDROID_RES / "mipmap-anydpi-v26" / f"{name}.xml"] = ADAPTIVE_XML.encode("utf-8")
     files[ANDROID_RES / "values" / "colors.xml"] = colors_xml()
     return files
+
+
+def matches(path: pathlib.Path, expected: bytes | Image.Image) -> bool:
+    if isinstance(expected, bytes):
+        return path.read_bytes() == expected
+    try:
+        with Image.open(path) as existing:
+            if existing.size != expected.size:
+                return False
+            return existing.convert("RGBA").tobytes() == expected.convert("RGBA").tobytes()
+    except OSError:
+        return False
 
 
 def digest(data: bytes) -> str:
@@ -144,7 +160,7 @@ def check() -> list[str]:
     for path, expected in derived().items():
         if not path.is_file():
             stale.append(f"{path.relative_to(ROOT)} is missing")
-        elif path.read_bytes() != expected:
+        elif not matches(path, expected):
             stale.append(f"{path.relative_to(ROOT)} is stale")
     return stale
 
@@ -155,7 +171,10 @@ def write() -> None:
         copy.write_bytes(master.read_bytes())
     for path, data in derived().items():
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_bytes(data)
+        if isinstance(data, bytes):
+            path.write_bytes(data)
+        else:
+            data.save(path, format="PNG")
     print(f"wrote {len(COPIES) + len(derived())} copies from shared/assets")
 
 
