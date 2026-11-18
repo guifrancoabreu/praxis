@@ -6,6 +6,7 @@ import UIKit
 enum SystemTokens {
     struct Theme {
         let accent: Color
+        let primaryForeground: Color
         let background: Color
         let surface: Color
         let secondarySurface: Color
@@ -20,13 +21,14 @@ enum SystemTokens {
     }
 
     static let light = Theme(
-        accent: Color(refHex: RefTokens.Colors.accentLight),
-        background: Color(refHex: RefTokens.Colors.backgroundLight),
-        surface: Color(refHex: RefTokens.Colors.surfaceLight),
-        secondarySurface: Color(refHex: RefTokens.Colors.secondarySurfaceLight),
-        textPrimary: Color(uiColor: .label),
-        textSecondary: Color(refHex: "#524D47"),
-        separator: Color(uiColor: .separator).opacity(RefTokens.Opacity.separator),
+        accent: Color(refHex: RefTokens.Semantic.primaryLight),
+        primaryForeground: Color(refHex: RefTokens.Semantic.primaryForegroundLight),
+        background: Color(refHex: RefTokens.Semantic.backgroundLight),
+        surface: Color(refHex: RefTokens.Semantic.cardLight),
+        secondarySurface: Color(refHex: RefTokens.Semantic.mutedLight),
+        textPrimary: Color(refHex: RefTokens.Semantic.foregroundLight),
+        textSecondary: Color(refHex: RefTokens.Semantic.mutedForegroundLight),
+        separator: Color(refHex: RefTokens.Semantic.separatorLight),
         coverOchre: Color(refHex: RefTokens.Colors.coverOchre),
         coverRust: Color(refHex: RefTokens.Colors.coverRust),
         coverOlive: Color(refHex: RefTokens.Colors.coverOlive),
@@ -35,13 +37,14 @@ enum SystemTokens {
     )
 
     static let dark = Theme(
-        accent: Color(refHex: RefTokens.Colors.accentDark),
-        background: Color(refHex: RefTokens.Colors.backgroundDark),
-        surface: Color(refHex: RefTokens.Colors.surfaceDark),
-        secondarySurface: Color(refHex: RefTokens.Colors.secondarySurfaceDark),
-        textPrimary: Color(uiColor: .label),
-        textSecondary: Color(uiColor: .secondaryLabel),
-        separator: Color(uiColor: .separator).opacity(RefTokens.Opacity.separator),
+        accent: Color(refHex: RefTokens.Semantic.primaryDark),
+        primaryForeground: Color(refHex: RefTokens.Semantic.primaryForegroundDark),
+        background: Color(refHex: RefTokens.Semantic.backgroundDark),
+        surface: Color(refHex: RefTokens.Semantic.cardDark),
+        secondarySurface: Color(refHex: RefTokens.Semantic.mutedDark),
+        textPrimary: Color(refHex: RefTokens.Semantic.foregroundDark),
+        textSecondary: Color(refHex: RefTokens.Semantic.mutedForegroundDark),
+        separator: Color(refHex: RefTokens.Semantic.separatorDark),
         coverOchre: Color(refHex: RefTokens.Colors.coverOchre),
         coverRust: Color(refHex: RefTokens.Colors.coverRust),
         coverOlive: Color(refHex: RefTokens.Colors.coverOlive),
@@ -51,6 +54,7 @@ enum SystemTokens {
 
     enum Colors {
         static let accent = adaptive(\.accent)
+        static let primaryForeground = adaptive(\.primaryForeground)
         static let background = adaptive(\.background)
         static let surface = adaptive(\.surface)
         static let secondarySurface = adaptive(\.secondarySurface)
@@ -73,13 +77,17 @@ enum SystemTokens {
 }
 
 private extension Color {
+    /// Parses the generated `#RRGGBB` and `#AARRGGBB` reference values.
     init(refHex: String) {
-        let value = Int(refHex.dropFirst(), radix: 16) ?? 0
+        let hex = refHex.hasPrefix("#") ? String(refHex.dropFirst()) : refHex
+        let value = Int(hex, radix: 16) ?? 0
+        let hasAlpha = hex.count == 8
+        let alpha = hasAlpha ? Double((value >> 24) & 0xff) / 255 : 1
         self.init(.sRGB,
                   red: Double((value >> 16) & 0xff) / 255,
                   green: Double((value >> 8) & 0xff) / 255,
                   blue: Double(value & 0xff) / 255,
-                  opacity: 1)
+                  opacity: alpha)
     }
 }
 #endif

@@ -449,7 +449,7 @@ struct LibraryView: View {
                             withAnimation(.easeOut(duration: 0.18)) { filterSelection.selectFromBar(item) }
                         } label: {
                             Text(item.title(language)).font(PraxisFont.body(.subheadline, weight: .medium))
-                                .padding(.horizontal, 15).frame(minHeight: 44)
+                                .padding(.horizontal, RefTokens.Spacing.s4).frame(minHeight: RefTokens.Sizing.touchTarget)
                                 .background(filter == item ? SystemTokens.Colors.textPrimary : SystemTokens.Colors.secondarySurface, in: Capsule())
                                 .foregroundStyle(filter == item ? SystemTokens.Colors.background : SystemTokens.Colors.textPrimary)
                         }.buttonStyle(.plain)

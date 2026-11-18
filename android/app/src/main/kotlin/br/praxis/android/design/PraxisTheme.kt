@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.sp
  */
 data class PraxisColors(
     val accent: Color,
+    val primaryContent: Color,
     val background: Color,
     val surface: Color,
     val secondarySurface: Color,
@@ -38,41 +39,43 @@ data class PraxisColors(
 )
 
 private val lightColors = PraxisColors(
-    accent = Tokens.Colors.accentLight,
-    background = Tokens.Colors.backgroundLight,
-    surface = Tokens.Colors.surfaceLight,
-    secondarySurface = Tokens.Colors.secondarySurfaceLight,
-    textPrimary = Color(0xFF000000),
-    textSecondary = Color(0xFF524D47),
-    separator = Color(0x123C3C43),
+    accent = Tokens.Semantic.primaryLight,
+    primaryContent = Tokens.Semantic.primaryForegroundLight,
+    background = Tokens.Semantic.backgroundLight,
+    surface = Tokens.Semantic.cardLight,
+    secondarySurface = Tokens.Semantic.mutedLight,
+    textPrimary = Tokens.Semantic.foregroundLight,
+    textSecondary = Tokens.Semantic.mutedForegroundLight,
+    separator = Tokens.Semantic.separatorLight,
     coverOchre = Tokens.Colors.coverOchre,
     coverRust = Tokens.Colors.coverRust,
     coverOlive = Tokens.Colors.coverOlive,
     coverBlue = Tokens.Colors.coverBlue,
     coverStone = Tokens.Colors.coverStoneLight,
-    chipSelectedBackground = Color(0xFF000000),
-    chipSelectedContent = Tokens.Colors.backgroundLight,
-    chipBackground = Color(0xFFE9E4DA),
-    chipContent = Color(0xFF000000),
+    chipSelectedBackground = Tokens.Semantic.foregroundLight,
+    chipSelectedContent = Tokens.Semantic.backgroundLight,
+    chipBackground = Tokens.Semantic.mutedLight,
+    chipContent = Tokens.Semantic.foregroundLight,
 )
 
 private val darkColors = PraxisColors(
-    accent = Tokens.Colors.accentDark,
-    background = Tokens.Colors.backgroundDark,
-    surface = Tokens.Colors.surfaceDark,
-    secondarySurface = Tokens.Colors.secondarySurfaceDark,
-    textPrimary = Color(0xFFFFFFFF),
-    textSecondary = Color(0x99EBEBF5),
-    separator = Color(0x20545458),
+    accent = Tokens.Semantic.primaryDark,
+    primaryContent = Tokens.Semantic.primaryForegroundDark,
+    background = Tokens.Semantic.backgroundDark,
+    surface = Tokens.Semantic.cardDark,
+    secondarySurface = Tokens.Semantic.mutedDark,
+    textPrimary = Tokens.Semantic.foregroundDark,
+    textSecondary = Tokens.Semantic.mutedForegroundDark,
+    separator = Tokens.Semantic.separatorDark,
     coverOchre = Tokens.Colors.coverOchre,
     coverRust = Tokens.Colors.coverRust,
     coverOlive = Tokens.Colors.coverOlive,
     coverBlue = Tokens.Colors.coverBlue,
     coverStone = Tokens.Colors.coverStoneDark,
-    chipSelectedBackground = Color(0xFFFFFFFF),
-    chipSelectedContent = Tokens.Colors.backgroundDark,
-    chipBackground = Color(0xFF33302B),
-    chipContent = Color(0xFFFFFFFF),
+    chipSelectedBackground = Tokens.Semantic.foregroundDark,
+    chipSelectedContent = Tokens.Semantic.backgroundDark,
+    chipBackground = Tokens.Semantic.mutedDark,
+    chipContent = Tokens.Semantic.foregroundDark,
 )
 
 /**
@@ -142,6 +145,27 @@ val PraxisTypography = Typography(
     ),
 )
 
+/**
+ * The two steps the Material scale has no slot for, named after `Tokens.TypeScale` so call sites
+ * read `MaterialTheme.typography.title3` / `.caption` and still land on the shared scale.
+ */
+private val title3Style = TextStyle(
+    fontFamily = PraxisFonts.Heading,
+    fontWeight = FontWeight.SemiBold,
+    fontSize = Tokens.TypeScale.title3Size,
+    lineHeight = Tokens.TypeScale.title3Leading,
+)
+
+private val captionStyle = TextStyle(
+    fontFamily = PraxisFonts.Body,
+    fontWeight = FontWeight.Normal,
+    fontSize = Tokens.TypeScale.captionSize,
+    lineHeight = Tokens.TypeScale.captionLeading,
+)
+
+val Typography.title3: TextStyle get() = title3Style
+val Typography.caption: TextStyle get() = captionStyle
+
 private val LocalColors = staticCompositionLocalOf { lightColors }
 
 object Praxis {
@@ -157,18 +181,40 @@ fun PraxisTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable
     val material = if (darkTheme) {
         androidx.compose.material3.darkColorScheme(
             primary = colors.accent,
+            onPrimary = colors.primaryContent,
+            primaryContainer = colors.secondarySurface,
+            onPrimaryContainer = colors.textPrimary,
+            secondary = colors.secondarySurface,
+            onSecondary = colors.textPrimary,
+            secondaryContainer = colors.secondarySurface,
+            onSecondaryContainer = colors.textPrimary,
             background = colors.background,
-            surface = colors.surface,
             onBackground = colors.textPrimary,
+            surface = colors.surface,
             onSurface = colors.textPrimary,
+            surfaceVariant = colors.secondarySurface,
+            onSurfaceVariant = colors.textSecondary,
+            outline = colors.separator,
+            outlineVariant = colors.separator,
         )
     } else {
         androidx.compose.material3.lightColorScheme(
             primary = colors.accent,
+            onPrimary = colors.primaryContent,
+            primaryContainer = colors.secondarySurface,
+            onPrimaryContainer = colors.textPrimary,
+            secondary = colors.secondarySurface,
+            onSecondary = colors.textPrimary,
+            secondaryContainer = colors.secondarySurface,
+            onSecondaryContainer = colors.textPrimary,
             background = colors.background,
-            surface = colors.surface,
             onBackground = colors.textPrimary,
+            surface = colors.surface,
             onSurface = colors.textPrimary,
+            surfaceVariant = colors.secondarySurface,
+            onSurfaceVariant = colors.textSecondary,
+            outline = colors.separator,
+            outlineVariant = colors.separator,
         )
     }
     CompositionLocalProvider(LocalColors provides colors) {

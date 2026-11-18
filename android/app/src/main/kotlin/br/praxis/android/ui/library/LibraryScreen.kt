@@ -74,6 +74,8 @@ import br.praxis.android.data.Work
 import br.praxis.android.design.Praxis
 import br.praxis.android.design.PraxisFonts
 import br.praxis.android.design.Tokens
+import br.praxis.android.design.caption
+import br.praxis.android.design.title3
 import br.praxis.android.design.components.AuthorArtwork
 import br.praxis.android.design.components.BookCover
 import br.praxis.android.design.components.Chevron
@@ -433,7 +435,7 @@ private fun FeaturedCard(title: String, credit: String, onClick: () -> Unit, mod
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleLarge.copy(fontFamily = PraxisFonts.Heading),
+                style = MaterialTheme.typography.title3,
                 color = Praxis.colors.textPrimary,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
@@ -519,7 +521,7 @@ private fun ContinueReadingCard(
                 Spacer(Modifier.height(Tokens.Spacing.s1))
                 Text(
                     text = credit,
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.caption,
                     color = Praxis.colors.textSecondary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -533,7 +535,7 @@ private fun ContinueReadingCard(
             Spacer(Modifier.height(Tokens.Spacing.s1))
             Text(
                 text = stringResource(R.string.progress_in_section, (progress.progress * 100).toInt()),
-                style = MaterialTheme.typography.labelMedium,
+                style = MaterialTheme.typography.caption,
                 color = Praxis.colors.textSecondary,
             )
         }
@@ -579,7 +581,7 @@ private fun WriterCard(author: Author, onClick: () -> Unit) {
         Spacer(Modifier.height(Tokens.Spacing.s1))
         Text(
             text = workCountLabel(author.works.size),
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.caption,
             color = Praxis.colors.textSecondary,
         )
     }
@@ -668,7 +670,7 @@ private fun ReadingList(readings: List<ReadingProgress>, onOpenWork: (ReadingPro
                     }
                     Text(
                         text = stringResource(R.string.progress_in_section, (progress.progress * 100).toInt()),
-                        style = MaterialTheme.typography.labelMedium,
+                        style = MaterialTheme.typography.caption,
                         color = Praxis.colors.textSecondary,
                     )
                 }
@@ -710,7 +712,7 @@ private fun WorkRow(work: Work, author: String, onClick: () -> Unit, topPadding:
             if (work.date.isNotEmpty()) {
                 Text(
                     text = work.date,
-                    style = MaterialTheme.typography.labelMedium,
+                    style = MaterialTheme.typography.caption,
                     color = Praxis.colors.textSecondary,
                 )
             }
@@ -880,7 +882,7 @@ private fun EmptyContent(title: String, body: String?) {
             .padding(horizontal = horizontal, vertical = Tokens.Spacing.s8),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(text = title, style = MaterialTheme.typography.titleSmall, color = Praxis.colors.textPrimary)
+        Text(text = title, style = MaterialTheme.typography.title3, color = Praxis.colors.textPrimary)
         if (body != null) {
             Spacer(Modifier.height(Tokens.Spacing.s1))
             Text(text = body, style = MaterialTheme.typography.bodyMedium, color = Praxis.colors.textSecondary)

@@ -41,15 +41,15 @@ object Tokens {
         val coverShadow = 0.08f
     }
 
-    object Shadow {
-        val coverRadius = 4.dp
-        val coverOffsetY = 2.dp
-    }
-
     object Typography {
         val bookCoverTitleCompact = 9.sp
         val bookCoverTitle = 10.sp
         val bookCoverBrand = 7.sp
+    }
+
+    object Shadow {
+        val coverRadius = 4.dp
+        val coverOffsetY = 2.dp
     }
 
     object Colors {
@@ -67,5 +67,125 @@ object Tokens {
         val coverBlue = Color(0xFF365768)
         val coverStoneLight = Color(0xFFE8DECC)
         val coverStoneDark = Color(0xFF302B26)
+    }
+
+    object Semantic {
+        val backgroundLight = Color(0xFFFBFAF7)
+        val backgroundDark = Color(0xFF1A1816)
+        val foregroundLight = Color(0xFF000000)
+        val foregroundDark = Color(0xFFFFFFFF)
+        val cardLight = Color(0xFFFFFEFC)
+        val cardDark = Color(0xFF262320)
+        val popoverLight = Color(0xFFFFFEFC)
+        val popoverDark = Color(0xFF262320)
+        val mutedLight = Color(0xFFE8E3D9)
+        val mutedDark = Color(0xFF33302B)
+        val mutedForegroundLight = Color(0xFF524D47)
+        val mutedForegroundDark = Color(0x99EBEBF5)
+        val primaryLight = Color(0xFF940008)
+        val primaryDark = Color(0xFFFF7A7A)
+        val primaryForegroundLight = Color(0xFFFFFFFF)
+        val primaryForegroundDark = Color(0xFF000000)
+        val borderLight = Color(0x293C3C43)
+        val borderDark = Color(0x4B545458)
+        val inputLight = Color(0x293C3C43)
+        val inputDark = Color(0x4B545458)
+        val ringLight = Color(0xFF940008)
+        val ringDark = Color(0xFFFF7A7A)
+        val separatorLight = Color(0x293C3C43)
+        val separatorDark = Color(0x4B545458)
+    }
+
+    object TypeScale {
+        val displaySize = 34.sp
+        val displayLeading = 50.sp
+        val displayWeight = "bold"
+        val displayFamily = "literata"
+        val title1Size = 28.sp
+        val title1Leading = 42.sp
+        val title1Weight = "semibold"
+        val title1Family = "literata"
+        val title2Size = 22.sp
+        val title2Leading = 33.sp
+        val title2Weight = "semibold"
+        val title2Family = "literata"
+        val title3Size = 20.sp
+        val title3Leading = 30.sp
+        val title3Weight = "semibold"
+        val title3Family = "literata"
+        val headlineSize = 17.sp
+        val headlineLeading = 25.sp
+        val headlineWeight = "semibold"
+        val headlineFamily = "literata"
+        val headingSize = 17.sp
+        val headingLeading = 25.sp
+        val headingWeight = "medium"
+        val headingFamily = "literata"
+        val bodySize = 17.sp
+        val bodyLeading = 21.sp
+        val bodyWeight = "regular"
+        val bodyFamily = "inter"
+        val subheadSize = 15.sp
+        val subheadLeading = 18.sp
+        val subheadWeight = "regular"
+        val subheadFamily = "inter"
+        val subheadMediumSize = 15.sp
+        val subheadMediumLeading = 18.sp
+        val subheadMediumWeight = "medium"
+        val subheadMediumFamily = "inter"
+        val footnoteSize = 13.sp
+        val footnoteLeading = 16.sp
+        val footnoteWeight = "regular"
+        val footnoteFamily = "inter"
+        val captionSize = 12.sp
+        val captionLeading = 15.sp
+        val captionWeight = "regular"
+        val captionFamily = "inter"
+        val overlineSize = 15.sp
+        val overlineLeading = 18.sp
+        val overlineWeight = "semibold"
+        val overlineFamily = "inter"
+        val microSize = 12.sp
+        val microLeading = 15.sp
+        val microWeight = "semibold"
+        val microFamily = "inter"
+    }
+
+    object Reader {
+        object Light {
+            val background = Color(0xFFFBFAF7)
+            val foreground = Color(0xFF1D1B19)
+            val link = Color(0xFFB3121D)
+        }
+
+        object Sepia {
+            val background = Color(0xFFF4ECD8)
+            val foreground = Color(0xFF3B2F22)
+            val link = Color(0xFF9C2A12)
+        }
+
+        object Gray {
+            val background = Color(0xFFD9D9D6)
+            val foreground = Color(0xFF202020)
+            val link = Color(0xFF8E0D16)
+        }
+
+        object Dark {
+            val background = Color(0xFF1C1C1E)
+            val foreground = Color(0xFFDEDEDE)
+            val link = Color(0xFFFF8A80)
+        }
+
+        object Black {
+            val background = Color(0xFF000000)
+            val foreground = Color(0xFFC9C9C9)
+            val link = Color(0xFFFF6E6E)
+        }
+
+        object Red {
+            val background = Color(0xFF4A0808)
+            val foreground = Color(0xFFFBE9D0)
+            val link = Color(0xFFFFCC00)
+        }
     }
 }

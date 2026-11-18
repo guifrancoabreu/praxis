@@ -50,14 +50,13 @@ final class KeyboardDismissView: UIView, UIGestureRecognizerDelegate {
 /// The primary action treatment, adapted from the shared web button.
 struct PrimaryButtonStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled
-    @Environment(\.colorScheme) private var colorScheme
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(PraxisFont.body(.subheadline, weight: .semibold))
             .frame(maxWidth: .infinity, minHeight: RefTokens.Sizing.touchTarget)
             .padding(.horizontal, RefTokens.Spacing.s4)
-            .foregroundStyle(colorScheme == .dark ? Color.black : Color.white)
+            .foregroundStyle(SystemTokens.Colors.primaryForeground)
             .background(SystemTokens.Colors.accent, in: RoundedRectangle(cornerRadius: RefTokens.Radius.md, style: .continuous))
             .opacity(isEnabled ? (configuration.isPressed ? 0.8 : 1) : 0.5)
     }
@@ -114,7 +113,7 @@ struct ListRow: View {
             }
         }
         .padding(.vertical, RefTokens.Spacing.s1)
-        .frame(minHeight: 44, alignment: .leading)
+        .frame(minHeight: RefTokens.Sizing.touchTarget, alignment: .leading)
     }
 }
 
