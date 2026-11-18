@@ -187,7 +187,11 @@ fun ReaderScreen(
 
         Box(modifier = Modifier.fillMaxSize()) {
             when {
-                failed -> ReaderMessage(stringResource(R.string.reader_error), stringResource(R.string.reader_error_body))
+                failed -> ReaderMessage(
+                    stringResource(R.string.reader_error),
+                    stringResource(R.string.reader_error_body),
+                    icon = PraxisIcon.WifiOff,
+                )
                 readings == null -> Loading()
                 isPdf -> {
                     val bytes = pdfBytes
@@ -459,7 +463,11 @@ private fun Loading() {
 }
 
 @Composable
-private fun ReaderMessage(title: String, body: String) {
+private fun ReaderMessage(
+    title: String,
+    body: String,
+    icon: PraxisIcon = PraxisIcon.CircleAlert,
+) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(
             modifier = Modifier
@@ -467,8 +475,8 @@ private fun ReaderMessage(title: String, body: String) {
                 .navigationBarsPadding(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            PraxisIconView(icon = PraxisIcon.WifiOff)
-            Spacer(Modifier.height(Tokens.Spacing.s3))
+            PraxisIconView(icon = icon)
+            Spacer(Modifier.height(Tokens.Spacing.s2))
             Text(text = title, style = MaterialTheme.typography.titleSmall, color = Praxis.colors.textPrimary)
             Spacer(Modifier.height(Tokens.Spacing.s1))
             Text(text = body, style = MaterialTheme.typography.bodyMedium, color = Praxis.colors.textSecondary)

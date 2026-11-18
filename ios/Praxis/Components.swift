@@ -171,6 +171,7 @@ enum PraxisIcon: String {
     case chartColumn = "lucide-chart-column"
     case chevronRight = "lucide-chevron-right"
     case cloudOff = "lucide-cloud-off"
+    case circleAlert = "lucide-circle-alert"
     case coffee = "lucide-coffee"
     case globe = "lucide-globe"
     case heart = "lucide-heart"
@@ -183,7 +184,7 @@ enum PraxisIcon: String {
         switch self {
         case .arrowUpRight, .chevronRight, .globe: return 16
         case .chartColumn, .coffee, .heart, .library, .messageCircle, .bookOpen: return 20
-        case .cloudOff, .wifiOff: return 28
+        case .circleAlert, .cloudOff, .wifiOff: return 28
         }
     }
 }
