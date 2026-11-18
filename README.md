@@ -18,6 +18,7 @@ For a physical device, choose a development team in **Signing & Capabilities** a
 design/
   tokens.json              Primitive design values shared by every app
 shared/
+  assets/                  Brand master and fonts shared by every app
   catalog/                 Catalog snapshots shared by every app (pt, en, es)
   reader/                  Reader stylesheet and scripts shared by every app
 ios/
@@ -33,6 +34,7 @@ tools/
   build_catalog_es.py            Refresh the Spanish starter catalog
   check_shared.py                Verify shared content and builder output paths
   gen_tokens.py                  Verify design tokens and generate the Kotlin ones
+  sync_assets.py                 Copy the shared binaries and regenerate the launcher icons
 ```
 
 ## Catalogs
