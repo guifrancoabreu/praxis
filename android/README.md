@@ -55,4 +55,4 @@ Still open before publishing: confirm in the TelemetryDeck dashboard that the An
 from the same App ID show up separated by platform, and review the privacy policy copy in
 `docs/privacy.html` so it does not speak only to iPhone/iOS. PDF works open in the system browser
 (no in-app renderer yet), portrait cropping uses a centred crop instead of face detection, and
-tablet layouts are out of scope. Play packaging lives in `docs/play-listing-pt-BR.md`.
+tablet layouts are out of scope. Play packaging lives in `docs/stores/play-listing-pt-BR.md`.

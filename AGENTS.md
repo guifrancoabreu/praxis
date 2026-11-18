@@ -10,7 +10,12 @@ Proactively delegate independent, well-scoped work to subagents when it can impr
 
 # Documentation
 
-`docs/` doubles as the GitHub Pages root: the support page, the privacy policy and the stylesheet are served there, and both store listings link to those URLs. Keep that folder for durable reference — the spacing spec, store listing copy — and remember that anything in it is publicly readable as a raw file.
+All content docs live in `docs/`, which doubles as the GitHub Pages root: the support page, the privacy policy and the stylesheet are served there, and both store listings link to those URLs. Anything in that folder is publicly readable as a raw file.
+
+- `docs/design/` — the design language both apps follow: `spacing.md`, `ios-system.md`, `context.md`.
+- `docs/stores/` — the App Store and Play drafts plus the App Review notes.
+
+READMEs stay beside their code, and `AGENTS.md` files and `.github/` templates stay where the tools read them; those are wiring, not docs.
 
 Feature plans and working notes are momentary. Don't commit them. A plan belongs in the issue or PR that ships the feature; if something needs to survive the session before that, keep it in a gitignored `notes/` folder.
 
