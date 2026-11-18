@@ -169,18 +169,21 @@ enum PraxisIcon: String {
     case arrowUpRight = "lucide-arrow-up-right"
     case bookOpen = "lucide-book-open"
     case chartColumn = "lucide-chart-column"
+    case chevronRight = "lucide-chevron-right"
+    case cloudOff = "lucide-cloud-off"
     case coffee = "lucide-coffee"
     case globe = "lucide-globe"
     case heart = "lucide-heart"
     case library = "lucide-library"
     case messageCircle = "lucide-message-circle"
-    case chevronRight = "lucide-chevron-right"
+    case wifiOff = "lucide-wifi-off"
 
     /// Optical size to match the row it sits in; Lucide's stroke scales with the frame.
     var defaultSize: CGFloat {
         switch self {
         case .arrowUpRight, .chevronRight, .globe: return 16
         case .chartColumn, .coffee, .heart, .library, .messageCircle, .bookOpen: return 20
+        case .cloudOff, .wifiOff: return 28
         }
     }
 }

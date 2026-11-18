@@ -12,7 +12,7 @@ Render through `PraxisIcon` and `PraxisIconView` (`Praxis/Components.swift`, `de
 
 Platform chrome keeps the platform's own glyph: navigation and back, toolbars, share and sheet affordances, and field controls such as search and clear. Users expect those to move with the OS, and a redrawn back arrow reads as a bug, not as a brand. Lucide covers only what the app draws for itself — entry cards, row indicators, empty states and content metadata.
 
-One exception: `ContentUnavailableView` on iOS takes a system image by contract. Where it wraps an app error state, a system glyph there is not drift.
+Error and empty states use the app's icons too: both platforms draw the same glyph above the message. Where iOS's `ContentUnavailableView` wants an image, it is passed a `PraxisIconView` through its label builder rather than a system image.
 
 ## 3. Sizes
 
@@ -22,10 +22,10 @@ Lucide draws a 2-wide stroke on a 24 grid, so the stroke scales with the frame: 
 |---|---|---|
 | Entry-card leading icon | 20 | stats, support and feedback cards |
 | Row indicator and metadata | 16 | chevrons, external-link arrows, the author's country |
-| Empty state | 28 | stats, and the library's no-results, saved and history states |
+| Empty and error states | 28 | stats, the library's no-results, saved and history states, and the catalog and reader failures |
 | Standalone page lead | 38 | the Support page |
 
-Tint is `textSecondary` unless the icon leads a card, an empty state or a page, where it takes `accent`.
+Tint is `textSecondary` unless the icon leads a card, an empty state or a page, where it takes `accent`; error states keep the secondary tint so a failure does not read as an alarm.
 
 ## 4. Adding one
 

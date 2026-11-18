@@ -73,6 +73,8 @@ import br.praxis.android.data.ReadingProgress
 import br.praxis.android.design.Praxis
 import br.praxis.android.design.Tokens
 import br.praxis.android.design.components.GlassSurface
+import br.praxis.android.design.components.PraxisIcon
+import br.praxis.android.design.components.PraxisIconView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CancellationException
@@ -465,6 +467,8 @@ private fun ReaderMessage(title: String, body: String) {
                 .navigationBarsPadding(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            PraxisIconView(icon = PraxisIcon.WifiOff)
+            Spacer(Modifier.height(Tokens.Spacing.s3))
             Text(text = title, style = MaterialTheme.typography.titleSmall, color = Praxis.colors.textPrimary)
             Spacer(Modifier.height(Tokens.Spacing.s1))
             Text(text = body, style = MaterialTheme.typography.bodyMedium, color = Praxis.colors.textSecondary)

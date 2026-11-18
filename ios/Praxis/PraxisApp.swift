@@ -367,7 +367,11 @@ struct LibraryView: View {
                         .background(SystemTokens.Colors.background.ignoresSafeArea())
                     }
                 } else if error {
-                    ContentUnavailableView(language.text("Catálogo indisponível", "Catalog unavailable"), systemImage: "books.vertical", description: Text(language.text("Não foi possível abrir o catálogo.", "The catalog could not be opened.")))
+                    ContentUnavailableView {
+                        Label { Text(language.text("Catálogo indisponível", "Catalog unavailable")) } icon: { PraxisIconView(icon: .cloudOff) }
+                    } description: {
+                        Text(language.text("Não foi possível abrir o catálogo.", "The catalog could not be opened."))
+                    }
                 } else { ProgressView().tint(SystemTokens.Colors.accent) }
             }
             .toolbar(.hidden, for: .navigationBar)
@@ -1428,7 +1432,7 @@ struct ReaderView: View {
                 })
             } else if failed {
                 ContentUnavailableView {
-                    Label(language.text("Não foi possível carregar", "Could not load the work"), systemImage: "wifi.slash")
+                    Label { Text(language.text("Não foi possível carregar", "Could not load the work")) } icon: { PraxisIconView(icon: .wifiOff) }
                 } description: {
                     Text(language.text("Verifique sua conexão e tente novamente.", "Check your connection and try again."))
                 } actions: { Button(language.text("Tentar novamente", "Try again")) { Task { await load() } } }

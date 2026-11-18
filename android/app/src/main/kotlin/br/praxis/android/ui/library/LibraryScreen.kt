@@ -818,7 +818,11 @@ private fun EmptyContent(title: String, body: String?) {
 @Composable
 private fun CenteredMessage(text: String) {
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(text = text, style = MaterialTheme.typography.titleSmall, color = Praxis.colors.textSecondary)
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            PraxisIconView(icon = PraxisIcon.CloudOff)
+            Spacer(Modifier.height(Tokens.Spacing.s2))
+            Text(text = text, style = MaterialTheme.typography.titleSmall, color = Praxis.colors.textSecondary)
+        }
     }
 }
 

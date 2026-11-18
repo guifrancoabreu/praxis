@@ -21,11 +21,13 @@ enum class PraxisIcon(val res: Int, val defaultSize: Dp) {
     BookOpen(R.drawable.lucide_book_open, 20.dp),
     ChartColumn(R.drawable.lucide_chart_column, 20.dp),
     ChevronRight(R.drawable.lucide_chevron_right, 16.dp),
+    CloudOff(R.drawable.lucide_cloud_off, 28.dp),
     Coffee(R.drawable.lucide_coffee, 20.dp),
     Globe(R.drawable.lucide_globe, 16.dp),
     Heart(R.drawable.lucide_heart, 20.dp),
     Library(R.drawable.lucide_library, 20.dp),
     MessageCircle(R.drawable.lucide_message_circle, 20.dp),
+    WifiOff(R.drawable.lucide_wifi_off, 28.dp),
 }
 
 /** Renders one Lucide icon tinted with the theme, sized to its optical default. */
