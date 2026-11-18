@@ -477,7 +477,7 @@ private fun ContinueReadingShelf(readings: List<ReadingProgress>, catalog: Catal
                     progress = progress,
                     catalog = catalog,
                     onOpenWork = onOpenWork,
-                    modifier = Modifier.width(236.dp),
+                    modifier = Modifier.width(264.dp),
                     barModifier = Modifier.fillMaxWidth().height(3.dp),
                 )
             }

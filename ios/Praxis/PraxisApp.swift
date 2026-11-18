@@ -651,7 +651,7 @@ struct LibraryView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(alignment: .top, spacing: 12) {
                         ForEach(entries) { entry in
-                            continueReadingCard(entry, width: 236)
+                            continueReadingCard(entry, width: 264)
                         }
                     }
                 }.contentMargins(.trailing, 2).scrollTargetBehavior(.viewAligned)
