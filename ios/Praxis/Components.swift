@@ -135,6 +135,7 @@ struct GlassSurface: ViewModifier {
 /// system glyphs, so this covers only the app's own semantic icons.
 enum PraxisIcon: String {
     case arrowUpRight = "lucide-arrow-up-right"
+    case bookOpen = "lucide-book-open"
     case chartColumn = "lucide-chart-column"
     case coffee = "lucide-coffee"
     case globe = "lucide-globe"
@@ -147,7 +148,7 @@ enum PraxisIcon: String {
     var defaultSize: CGFloat {
         switch self {
         case .arrowUpRight, .chevronRight, .globe: return 16
-        case .chartColumn, .coffee, .heart, .library, .messageCircle: return 20
+        case .chartColumn, .coffee, .heart, .library, .messageCircle, .bookOpen: return 20
         }
     }
 }

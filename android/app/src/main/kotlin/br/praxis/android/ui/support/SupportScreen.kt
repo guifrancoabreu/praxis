@@ -82,7 +82,7 @@ fun SupportScreen(onBack: () -> Unit, onOpenUrl: (String) -> Unit, onDestination
                 SupportCard(
                     title = stringResource(R.string.support_archive_title),
                     action = stringResource(R.string.support_archive_action),
-                    icon = PraxisIcon.Library,
+                    icon = PraxisIcon.BookOpen,
                     onClick = {
                         onDestinationOpened(DESTINATION_ARCHIVE)
                         onOpenUrl(ARCHIVE_DONATION_URL)

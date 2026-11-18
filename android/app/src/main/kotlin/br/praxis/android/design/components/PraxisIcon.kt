@@ -18,6 +18,7 @@ import br.praxis.android.design.Praxis
  */
 enum class PraxisIcon(val res: Int, val defaultSize: Dp) {
     ArrowUpRight(R.drawable.lucide_arrow_up_right, 16.dp),
+    BookOpen(R.drawable.lucide_book_open, 20.dp),
     ChartColumn(R.drawable.lucide_chart_column, 20.dp),
     ChevronRight(R.drawable.lucide_chevron_right, 16.dp),
     Coffee(R.drawable.lucide_coffee, 20.dp),

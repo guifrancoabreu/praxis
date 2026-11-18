@@ -1153,7 +1153,7 @@ struct SupportView: View {
                         .font(PraxisFont.heading(.title3, weight: .semibold))
                     Text(language.text("Ajude a preservar o Marxists Internet Archive.", "Help preserve the Marxists Internet Archive."))
                         .font(PraxisFont.body(.subheadline)).foregroundStyle(SystemTokens.Colors.textSecondary)
-                    supportLink(to: archiveDonationURL, title: "Marxists.org", action: language.text("Doar ao Marxists.org", "Donate to Marxists.org"), icon: .library)
+                    supportLink(to: archiveDonationURL, title: "Marxists.org", action: language.text("Doar ao Marxists.org", "Donate to Marxists.org"), icon: .bookOpen)
                     .padding(.top, 2)
                 }
             }
@@ -1181,7 +1181,7 @@ struct SupportView: View {
     private func supportCard(title: String, action: String, icon: PraxisIcon) -> some View {
         HStack(spacing: 14) {
             PraxisIconView(icon: icon, size: 20, tint: SystemTokens.Colors.accent)
-                .frame(width: 42, height: 42).background(SystemTokens.Colors.background, in: Circle())
+                .frame(width: 42, height: 42).background(SystemTokens.Colors.secondarySurface, in: Circle())
             VStack(alignment: .leading, spacing: 4) {
                 Text(title).font(PraxisFont.heading(.headline, weight: .semibold)).foregroundStyle(SystemTokens.Colors.textPrimary)
                 Text(action).font(PraxisFont.body(.subheadline, weight: .medium)).foregroundStyle(SystemTokens.Colors.accent)
