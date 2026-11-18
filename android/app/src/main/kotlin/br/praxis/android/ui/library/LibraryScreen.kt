@@ -25,11 +25,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.ChatBubbleOutline
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -79,10 +76,12 @@ import br.praxis.android.design.title3
 import br.praxis.android.design.components.AuthorArtwork
 import br.praxis.android.design.components.BookCover
 import br.praxis.android.design.components.Chevron
+import br.praxis.android.design.components.EntryCard
 import br.praxis.android.design.components.GlassSurface
 import br.praxis.android.design.components.InsetDivider
 import br.praxis.android.design.components.PraxisChip
-import br.praxis.android.design.components.RoundIconTile
+import br.praxis.android.design.components.PraxisIcon
+import br.praxis.android.design.components.PraxisIconView
 import br.praxis.android.design.components.SectionHeader
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -758,108 +757,34 @@ private fun CollectionList(collections: List<CatalogCollection>, onOpen: (Catalo
 
 @Composable
 private fun StatsCard(onClick: () -> Unit) {
-    val shape = RoundedCornerShape(Tokens.Radius.lg)
-    Row(
-        modifier = Modifier
-            .padding(horizontal = horizontal)
-            .fillMaxWidth()
-            .clip(shape)
-            .background(Praxis.colors.surface)
-            .border(1.dp, Praxis.colors.separator, shape)
-            .clickable(onClick = onClick)
-            .padding(Tokens.Spacing.s4),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(13.dp),
-    ) {
-        Icon(
-            imageVector = Icons.Filled.BarChart,
-            contentDescription = null,
-            tint = Praxis.colors.accent,
-            modifier = Modifier.size(22.dp),
-        )
-        Column(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(Tokens.Spacing.s1),
-        ) {
-            Text(
-                text = stringResource(R.string.stats_card_title),
-                style = MaterialTheme.typography.titleSmall,
-                color = Praxis.colors.textPrimary,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Text(
-                text = stringResource(R.string.stats_card_subtitle),
-                style = MaterialTheme.typography.bodyMedium,
-                color = Praxis.colors.textSecondary,
-            )
-        }
-        Chevron()
-    }
+    EntryCard(
+        icon = PraxisIcon.ChartColumn,
+        title = stringResource(R.string.stats_card_title),
+        detail = stringResource(R.string.stats_card_subtitle),
+        onClick = onClick,
+        modifier = Modifier.padding(horizontal = horizontal),
+    )
 }
 
 @Composable
 private fun Footer(onOpenSupport: () -> Unit, onOpenFeedback: () -> Unit, onOpenPrivacy: () -> Unit) {
-    val shape = RoundedCornerShape(Tokens.Radius.lg)
     Column(
         modifier = Modifier.padding(horizontal = horizontal),
         verticalArrangement = Arrangement.spacedBy(LibrarySpacing.sections),
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(shape)
-                .background(Praxis.colors.surface)
-                .border(1.dp, Praxis.colors.separator, shape)
-                .clickable(onClick = onOpenSupport)
-                .padding(Tokens.Spacing.s4),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(Tokens.Spacing.s3),
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Favorite,
-                contentDescription = null,
-                tint = Praxis.colors.accent,
-                modifier = Modifier.size(22.dp),
-            )
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = stringResource(R.string.footer_support),
-                    style = MaterialTheme.typography.titleSmall,
-                    color = Praxis.colors.textPrimary,
-                )
-                Text(
-                    text = stringResource(R.string.footer_support_body),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Praxis.colors.textSecondary,
-                )
-            }
-            Chevron()
-        }
+        EntryCard(
+            icon = PraxisIcon.Heart,
+            title = stringResource(R.string.footer_support),
+            detail = stringResource(R.string.footer_support_body),
+            onClick = onOpenSupport,
+        )
         if (runCatching { java.net.URI(BuildConfig.FEEDBACK_URL) }.getOrNull()?.let { it.scheme == "https" && !it.host.isNullOrBlank() } == true) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(shape)
-                .background(Praxis.colors.surface)
-                .border(1.dp, Praxis.colors.separator, shape)
-                .clickable(onClick = onOpenFeedback)
-                .padding(Tokens.Spacing.s4),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(Tokens.Spacing.s3),
-        ) {
-            Icon(
-                imageVector = Icons.Outlined.ChatBubbleOutline,
-                contentDescription = null,
-                tint = Praxis.colors.accent,
-                modifier = Modifier.size(22.dp),
+            EntryCard(
+                icon = PraxisIcon.MessageCircle,
+                title = stringResource(R.string.feedback_title),
+                detail = stringResource(R.string.feedback_card_body),
+                onClick = onOpenFeedback,
             )
-            Column(modifier = Modifier.weight(1f)) {
-                Text(text = stringResource(R.string.feedback_title), style = MaterialTheme.typography.titleSmall, color = Praxis.colors.textPrimary)
-                Text(text = stringResource(R.string.feedback_card_body), style = MaterialTheme.typography.bodyMedium, color = Praxis.colors.textSecondary)
-            }
-            Chevron()
-        }
         }
         Text(
             text = stringResource(R.string.footer_privacy),
@@ -882,6 +807,8 @@ private fun EmptyContent(title: String, body: String?) {
             .padding(horizontal = horizontal, vertical = Tokens.Spacing.s8),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        PraxisIconView(icon = PraxisIcon.Library, size = 28.dp, tint = Praxis.colors.accent)
+        Spacer(Modifier.height(Tokens.Spacing.s2))
         Text(text = title, style = MaterialTheme.typography.title3, color = Praxis.colors.textPrimary)
         if (body != null) {
             Spacer(Modifier.height(Tokens.Spacing.s1))
@@ -893,7 +820,11 @@ private fun EmptyContent(title: String, body: String?) {
 @Composable
 private fun CenteredMessage(text: String) {
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(text = text, style = MaterialTheme.typography.titleSmall, color = Praxis.colors.textSecondary)
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            PraxisIconView(icon = PraxisIcon.CloudOff)
+            Spacer(Modifier.height(Tokens.Spacing.s2))
+            Text(text = text, style = MaterialTheme.typography.titleSmall, color = Praxis.colors.textSecondary)
+        }
     }
 }
 

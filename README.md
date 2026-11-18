@@ -18,7 +18,7 @@ For a physical device, choose a development team in **Signing & Capabilities** a
 design/
   tokens.json              Primitive design values shared by every app
 shared/
-  assets/                  Brand master and fonts shared by every app
+  assets/                  Brand master, fonts and Lucide icons shared by every app
   catalog/                 Catalog snapshots shared by every app (pt, en, es)
   reader/                  Reader stylesheet and scripts shared by every app
 ios/
@@ -35,6 +35,7 @@ tools/
   check_shared.py                Verify shared content and builder output paths
   gen_tokens.py                  Generate and verify the design tokens for both apps
   sync_assets.py                 Copy the shared binaries and regenerate the launcher icons
+  sync_icons.py                  Generate iOS and Android assets from the shared Lucide SVGs
 ```
 
 ## Catalogs

@@ -367,7 +367,11 @@ struct LibraryView: View {
                         .background(SystemTokens.Colors.background.ignoresSafeArea())
                     }
                 } else if error {
-                    ContentUnavailableView(language.text("Catálogo indisponível", "Catalog unavailable"), systemImage: "books.vertical", description: Text(language.text("Não foi possível abrir o catálogo.", "The catalog could not be opened.")))
+                    ContentUnavailableView {
+                        Label { Text(language.text("Catálogo indisponível", "Catalog unavailable")) } icon: { PraxisIconView(icon: .cloudOff) }
+                    } description: {
+                        Text(language.text("Não foi possível abrir o catálogo.", "The catalog could not be opened."))
+                    }
                 } else { ProgressView().tint(SystemTokens.Colors.accent) }
             }
             .toolbar(.hidden, for: .navigationBar)
@@ -479,49 +483,31 @@ struct LibraryView: View {
 
     private var supportFooter: some View {
         NavigationLink { SupportView(language: language) } label: {
-            HStack(spacing: 13) {
-                Image(systemName: "heart").font(.title3).foregroundStyle(SystemTokens.Colors.accent)
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(language.text("Apoie", "Support")).font(PraxisFont.heading(.headline, weight: .semibold)).foregroundStyle(SystemTokens.Colors.textPrimary)
-                    Text(language.text("Escolha como apoiar", "Choose how to support")).font(PraxisFont.body(.subheadline)).foregroundStyle(SystemTokens.Colors.textSecondary)
-                }
-                Spacer()
-                Image(systemName: "chevron.right").font(.caption.weight(.semibold)).foregroundStyle(SystemTokens.Colors.textSecondary)
-            }.padding(16).frame(maxWidth: .infinity, alignment: .leading)
-                .background(SystemTokens.Colors.surface, in: RoundedRectangle(cornerRadius: RefTokens.Radius.lg, style: .continuous))
-                .overlay(RoundedRectangle(cornerRadius: RefTokens.Radius.lg, style: .continuous).stroke(SystemTokens.Colors.separator, lineWidth: 1))
+            EntryCard(
+                icon: .heart,
+                title: language.text("Apoie", "Support"),
+                detail: language.text("Escolha como apoiar", "Choose how to support")
+            )
         }.buttonStyle(.plain)
     }
 
     private var statsCard: some View {
         NavigationLink { ReadingStatsView(language: language, catalog: catalog, knownWorkPaths: knownWorkPaths) } label: {
-            HStack(spacing: 13) {
-                Image(systemName: "chart.bar").font(.title3).foregroundStyle(SystemTokens.Colors.accent)
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(language.text("Estatísticas de leitura", "Reading stats")).font(PraxisFont.heading(.headline, weight: .semibold)).foregroundStyle(SystemTokens.Colors.textPrimary)
-                    Text(language.text("Seu progresso, sequência e obras concluídas", "Your progress, streak and finished works")).font(PraxisFont.body(.subheadline)).foregroundStyle(SystemTokens.Colors.textSecondary)
-                }
-                Spacer()
-                Image(systemName: "chevron.right").font(.caption.weight(.semibold)).foregroundStyle(SystemTokens.Colors.textSecondary)
-            }.padding(16).frame(maxWidth: .infinity, alignment: .leading)
-                .background(SystemTokens.Colors.surface, in: RoundedRectangle(cornerRadius: RefTokens.Radius.lg, style: .continuous))
-                .overlay(RoundedRectangle(cornerRadius: RefTokens.Radius.lg, style: .continuous).stroke(SystemTokens.Colors.separator, lineWidth: 1))
+            EntryCard(
+                icon: .chartColumn,
+                title: language.text("Estatísticas de leitura", "Reading stats"),
+                detail: language.text("Seu progresso, sequência e obras concluídas", "Your progress, streak and finished works")
+            )
         }.buttonStyle(.plain)
     }
 
     private var feedbackFooter: some View {
         NavigationLink { FeedbackView(language: language) } label: {
-            HStack(spacing: 13) {
-                Image(systemName: "bubble.left").font(.title3).foregroundStyle(SystemTokens.Colors.accent)
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(FeedbackCopy.forLanguage(language).title).font(.system(.headline, design: .serif, weight: .semibold)).foregroundStyle(SystemTokens.Colors.textPrimary)
-                    Text(FeedbackCopy.forLanguage(language).lead).font(.subheadline).foregroundStyle(SystemTokens.Colors.textSecondary)
-                }
-                Spacer()
-                Image(systemName: "chevron.right").font(.caption.weight(.semibold)).foregroundStyle(SystemTokens.Colors.textSecondary)
-            }.padding(16).frame(maxWidth: .infinity, alignment: .leading)
-                .background(SystemTokens.Colors.surface, in: RoundedRectangle(cornerRadius: RefTokens.Radius.lg, style: .continuous))
-                .overlay(RoundedRectangle(cornerRadius: RefTokens.Radius.lg, style: .continuous).stroke(SystemTokens.Colors.separator, lineWidth: 1))
+            EntryCard(
+                icon: .messageCircle,
+                title: FeedbackCopy.forLanguage(language).title,
+                detail: FeedbackCopy.forLanguage(language).lead
+            )
         }.buttonStyle(.plain)
     }
 
@@ -580,7 +566,7 @@ struct LibraryView: View {
                         HStack {
                             Text(collection.title).font(PraxisFont.heading(.body, weight: .medium)).foregroundStyle(SystemTokens.Colors.textPrimary)
                             Spacer()
-                            Image(systemName: "chevron.right").font(.caption.weight(.semibold)).foregroundStyle(SystemTokens.Colors.textSecondary)
+                            PraxisIconView(icon: .chevronRight)
                         }.padding(.vertical, 10).contentShape(Rectangle())
                     }.buttonStyle(.plain)
                     Rectangle().fill(SystemTokens.Colors.separator).frame(height: 1)
@@ -613,7 +599,7 @@ struct LibraryView: View {
             if let catalog {
                 ForEach(countries, id: \.self) { country in
                     NavigationLink { CountryWritersView(country: country, authors: catalog.authors, language: language, knownWorkPaths: knownWorkPaths, catalog: catalog) } label: {
-                        HStack { Text(country).foregroundStyle(SystemTokens.Colors.textPrimary); Spacer(); Text(catalog.authors.filter { $0.country == country }.count.formatted()).foregroundStyle(SystemTokens.Colors.textSecondary); Image(systemName: "chevron.right").font(.caption).foregroundStyle(SystemTokens.Colors.textSecondary) }
+                        HStack { Text(country).foregroundStyle(SystemTokens.Colors.textPrimary); Spacer(); Text(catalog.authors.filter { $0.country == country }.count.formatted()).foregroundStyle(SystemTokens.Colors.textSecondary); PraxisIconView(icon: .chevronRight) }
                             .padding(.vertical, 10)
                     }.buttonStyle(.plain)
                 }
@@ -780,7 +766,7 @@ struct LibraryView: View {
                             .font(PraxisFont.body(.subheadline)).foregroundStyle(SystemTokens.Colors.textSecondary)
                     }
                     Spacer(minLength: 4)
-                    Image(systemName: "chevron.right").font(.caption.weight(.semibold)).foregroundStyle(SystemTokens.Colors.textSecondary)
+                    PraxisIconView(icon: .chevronRight)
                 }.padding(.vertical, 11).contentShape(Rectangle())
             }.buttonStyle(.plain).foregroundStyle(SystemTokens.Colors.textPrimary)
             Rectangle().fill(SystemTokens.Colors.separator).frame(height: 1).padding(.leading, 65)
@@ -861,7 +847,7 @@ struct LibraryView: View {
 
     private func emptyState(title: String, detail: String) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Image(systemName: "books.vertical").font(.title2).foregroundStyle(SystemTokens.Colors.accent).padding(.bottom, 4)
+            PraxisIconView(icon: .library, size: 28, tint: SystemTokens.Colors.accent).padding(.bottom, 4)
             Text(title).font(PraxisFont.heading(.title3, weight: .semibold))
             Text(detail).font(PraxisFont.body(.subheadline)).foregroundStyle(SystemTokens.Colors.textSecondary)
         }
@@ -952,7 +938,7 @@ struct WorkListRow: View {
                 if !work.date.isEmpty { Text(work.date).font(PraxisFont.body(.caption)).foregroundStyle(SystemTokens.Colors.textSecondary) }
             }
             Spacer(minLength: 4)
-            Image(systemName: "chevron.right").font(.caption.weight(.semibold)).foregroundStyle(SystemTokens.Colors.textSecondary)
+            PraxisIconView(icon: .chevronRight)
         }
         .padding(.top, flushTop ? 0 : 10).padding(.bottom, 10).contentShape(Rectangle())
     }
@@ -972,7 +958,12 @@ struct AuthorView: View {
                     VStack(alignment: .leading, spacing: 7) {
                         Text(author.full).font(PraxisFont.heading(.title2, weight: .semibold))
                         if !author.dates.isEmpty { Text(author.dates).font(PraxisFont.body(.subheadline)).foregroundStyle(.secondary) }
-                        if !author.country.isEmpty { Label(author.country, systemImage: "globe.americas").font(PraxisFont.body(.caption)).foregroundStyle(.secondary) }
+                        if !author.country.isEmpty {
+                            HStack(spacing: 4) {
+                                PraxisIconView(icon: .globe, size: 16)
+                                Text(author.country).font(PraxisFont.body(.caption)).foregroundStyle(SystemTokens.Colors.textSecondary)
+                            }
+                        }
                         ForEach(author.groups, id: \.self) { group in Text(group).font(PraxisFont.body(.caption)).foregroundStyle(SystemTokens.Colors.accent) }
                     }
                 }.padding(.vertical, 6)
@@ -1130,7 +1121,7 @@ struct SupportView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
                 VStack(alignment: .leading, spacing: 8) {
-                    Image(systemName: "heart.text.square").font(.system(size: 38)).foregroundStyle(SystemTokens.Colors.accent)
+                    PraxisIconView(icon: .heart, size: 38, tint: SystemTokens.Colors.accent)
                     Text(language.text("Apoie", "Support")).font(PraxisFont.heading(.largeTitle, weight: .medium))
                     Text(language.text("Escolha como apoiar", "Choose how to support")).font(PraxisFont.body(.body)).foregroundStyle(SystemTokens.Colors.textSecondary)
                 }
@@ -1140,7 +1131,7 @@ struct SupportView: View {
                         .font(PraxisFont.heading(.title3, weight: .semibold))
                     Text(language.text("Ajude a manter o leitor gratuito e em evolução.", "Help keep the reader free and improving."))
                         .font(PraxisFont.body(.subheadline)).foregroundStyle(SystemTokens.Colors.textSecondary)
-                    supportLink(to: koFiURL, title: "Ko-fi", action: language.text("Apoiar no Ko-fi", "Support on Ko-fi"), icon: "cup.and.saucer.fill")
+                    supportLink(to: koFiURL, title: "Ko-fi", action: language.text("Apoiar no Ko-fi", "Support on Ko-fi"), icon: .coffee)
                 }
 
                 VStack(alignment: .leading, spacing: 12) {
@@ -1148,8 +1139,7 @@ struct SupportView: View {
                         .font(PraxisFont.heading(.title3, weight: .semibold))
                     Text(language.text("Ajude a preservar o Marxists Internet Archive.", "Help preserve the Marxists Internet Archive."))
                         .font(PraxisFont.body(.subheadline)).foregroundStyle(SystemTokens.Colors.textSecondary)
-                    supportLink(to: archiveDonationURL, title: "Marxists.org", action: language.text("Doar ao Marxists.org", "Donate to Marxists.org"), icon: "books.vertical.fill")
-                    .padding(.top, 2)
+                    supportLink(to: archiveDonationURL, title: "Marxists.org", action: language.text("Doar ao Marxists.org", "Donate to Marxists.org"), icon: .bookOpen)
                 }
             }
             .padding(20)
@@ -1162,31 +1152,15 @@ struct SupportView: View {
         .onAppear { Analytics.track(.supportPageOpened) }
     }
 
-    private func supportLink(to url: URL, title: String, action: String, icon: String) -> some View {
+    private func supportLink(to url: URL, title: String, action: String, icon: PraxisIcon) -> some View {
         Link(destination: url) {
-            supportCard(title: title, action: action, icon: icon)
+            EntryCard(icon: icon, title: title, detail: action, indicator: .external)
         }
         .buttonStyle(.plain)
         .simultaneousGesture(TapGesture().onEnded {
             let destination: SupportDestination = title == "Ko-fi" ? .kofi : .archive
             Analytics.track(.supportDestinationOpened(destination))
         })
-    }
-
-    private func supportCard(title: String, action: String, icon: String) -> some View {
-        HStack(spacing: 14) {
-            Image(systemName: icon).font(.title3).foregroundStyle(SystemTokens.Colors.accent)
-                .frame(width: 42, height: 42).background(SystemTokens.Colors.background, in: Circle())
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title).font(PraxisFont.heading(.headline, weight: .semibold)).foregroundStyle(SystemTokens.Colors.textPrimary)
-                Text(action).font(PraxisFont.body(.subheadline, weight: .medium)).foregroundStyle(SystemTokens.Colors.accent)
-            }
-            Spacer(minLength: 4)
-            Image(systemName: "arrow.up.right").font(.caption.weight(.semibold)).foregroundStyle(SystemTokens.Colors.textSecondary)
-        }
-        .padding(16)
-        .background(SystemTokens.Colors.surface, in: RoundedRectangle(cornerRadius: RefTokens.Radius.lg, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: RefTokens.Radius.lg, style: .continuous).stroke(SystemTokens.Colors.separator, lineWidth: 1))
     }
 }
 
@@ -1458,7 +1432,7 @@ struct ReaderView: View {
                 })
             } else if failed {
                 ContentUnavailableView {
-                    Label(language.text("Não foi possível carregar", "Could not load the work"), systemImage: "wifi.slash")
+                    Label { Text(language.text("Não foi possível carregar", "Could not load the work")) } icon: { PraxisIconView(icon: .wifiOff) }
                 } description: {
                     Text(language.text("Verifique sua conexão e tente novamente.", "Check your connection and try again."))
                 } actions: { Button(language.text("Tentar novamente", "Try again")) { Task { await load() } } }
@@ -1824,7 +1798,7 @@ struct ReadingStatsView: View {
 
     private var emptyState: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Image(systemName: "chart.bar").font(.title2).foregroundStyle(SystemTokens.Colors.accent).padding(.bottom, 4)
+            PraxisIconView(icon: .chartColumn, size: 28, tint: SystemTokens.Colors.accent).padding(.bottom, 4)
             Text(language.text("Nenhuma leitura ainda", "No reading yet"))
                 .font(PraxisFont.heading(.title3, weight: .semibold))
             Text(language.text("Abra um texto para começar a acompanhar seu progresso.", "Open a work to start tracking your progress."))

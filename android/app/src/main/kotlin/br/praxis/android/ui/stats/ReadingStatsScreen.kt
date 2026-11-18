@@ -19,7 +19,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -54,6 +53,8 @@ import br.praxis.android.data.ReadingStats
 import br.praxis.android.design.Praxis
 import br.praxis.android.design.Tokens
 import br.praxis.android.design.components.InsetDivider
+import br.praxis.android.design.components.PraxisIcon
+import br.praxis.android.design.components.PraxisIconView
 
 @Composable
 fun ReadingStatsScreen(onBack: () -> Unit) {
@@ -306,12 +307,7 @@ private fun EmptyStats() {
             .padding(Tokens.Spacing.s5),
         verticalArrangement = Arrangement.spacedBy(Tokens.Spacing.s2),
     ) {
-        Icon(
-            imageVector = Icons.Filled.BarChart,
-            contentDescription = null,
-            tint = Praxis.colors.accent,
-            modifier = Modifier.size(28.dp),
-        )
+        PraxisIconView(icon = PraxisIcon.ChartColumn, size = 28.dp, tint = Praxis.colors.accent)
         Text(
             text = stringResource(R.string.stats_empty_title),
             style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp, lineHeight = 30.sp),

@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,7 +24,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -280,23 +278,59 @@ fun InsetDivider(modifier: Modifier = Modifier, startPadding: Dp = Tokens.Spacin
     )
 }
 
+/** Trailing glyph on an [EntryCard]: the destination is inside the app or leaves it. */
+enum class EntryCardIndicator { Chevron, External }
+
+/**
+ * Full-width card for a destination or an external link, matching EntryCard on iOS. The whole card
+ * is the target; the caller supplies the click handler.
+ */
 @Composable
-fun Chevron(modifier: Modifier = Modifier) {
-    Icon(
-        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-        contentDescription = null,
-        tint = Praxis.colors.textSecondary,
-        modifier = modifier.size(18.dp),
-    )
+fun EntryCard(
+    icon: PraxisIcon,
+    title: String,
+    detail: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    indicator: EntryCardIndicator = EntryCardIndicator.Chevron,
+) {
+    val shape = RoundedCornerShape(Tokens.Radius.lg)
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(shape)
+            .background(Praxis.colors.surface)
+            .border(1.dp, Praxis.colors.separator, shape)
+            .clickable(onClick = onClick)
+            .padding(Tokens.Spacing.s4),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(Tokens.Spacing.s3),
+    ) {
+        PraxisIconView(icon = icon, size = 20.dp, tint = Praxis.colors.accent)
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(Tokens.Spacing.s1),
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleSmall,
+                color = Praxis.colors.textPrimary,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Text(
+                text = detail,
+                style = MaterialTheme.typography.bodyMedium,
+                color = Praxis.colors.textSecondary,
+            )
+        }
+        PraxisIconView(
+            icon = if (indicator == EntryCardIndicator.Chevron) PraxisIcon.ChevronRight else PraxisIcon.ArrowUpRight,
+        )
+    }
 }
 
 @Composable
-fun RoundIconTile(diameter: Dp, modifier: Modifier = Modifier, content: @Composable () -> Unit) {
-    Box(
-        modifier = modifier
-            .size(diameter)
-            .clip(CircleShape)
-            .background(Praxis.colors.secondarySurface),
-        contentAlignment = Alignment.Center,
-    ) { content() }
+fun Chevron(modifier: Modifier = Modifier) {
+    PraxisIconView(icon = PraxisIcon.ChevronRight, modifier = modifier)
 }

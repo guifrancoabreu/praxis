@@ -38,3 +38,5 @@ jobs:
         run: python3 tools/gen_tokens.py --check
       - name: Generated assets match shared/assets
         run: python3 tools/sync_assets.py --check
+      - name: Generated icons match shared/assets
+        run: python3 tools/sync_icons.py --check

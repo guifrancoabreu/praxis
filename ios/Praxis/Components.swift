@@ -117,6 +117,38 @@ struct ListRow: View {
     }
 }
 
+/// A full-width card for a destination or an external link. The card draws no interaction of its
+/// own: wrap it in a `NavigationLink` for an in-app destination or in a `Link` for an external one.
+struct EntryCard: View {
+    enum Indicator { case chevron, external }
+
+    let icon: PraxisIcon
+    let title: String
+    let detail: String
+    var indicator: Indicator = .chevron
+
+    var body: some View {
+        HStack(spacing: RefTokens.Spacing.s3) {
+            PraxisIconView(icon: icon, size: 20, tint: SystemTokens.Colors.accent)
+            VStack(alignment: .leading, spacing: RefTokens.Spacing.s1) {
+                Text(title)
+                    .font(PraxisFont.heading(.headline, weight: .semibold))
+                    .foregroundStyle(SystemTokens.Colors.textPrimary)
+                Text(detail)
+                    .font(PraxisFont.body(.subheadline))
+                    .foregroundStyle(SystemTokens.Colors.textSecondary)
+            }
+            Spacer(minLength: RefTokens.Spacing.s1)
+            PraxisIconView(icon: indicator == .chevron ? .chevronRight : .arrowUpRight)
+        }
+        .padding(RefTokens.Spacing.s4)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(SystemTokens.Colors.surface, in: RoundedRectangle(cornerRadius: RefTokens.Radius.lg, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: RefTokens.Radius.lg, style: .continuous)
+            .stroke(SystemTokens.Colors.separator, lineWidth: 1))
+    }
+}
+
 /// Adds the platform glass surface on supported systems and a material fallback elsewhere.
 struct GlassSurface: ViewModifier {
     func body(content: Content) -> some View {
@@ -126,6 +158,51 @@ struct GlassSurface: ViewModifier {
             content.background(.regularMaterial, in: Capsule())
                 .overlay(Capsule().strokeBorder(SystemTokens.Colors.separator.opacity(0.5), lineWidth: 1))
         }
+    }
+}
+
+/// Icons drawn by the app rather than the platform: Lucide assets generated from
+/// `shared/assets/icons`. Platform chrome (navigation, share, field controls) keeps the
+/// system glyphs, so this covers only the app's own semantic icons.
+enum PraxisIcon: String {
+    case arrowUpRight = "lucide-arrow-up-right"
+    case bookOpen = "lucide-book-open"
+    case chartColumn = "lucide-chart-column"
+    case chevronRight = "lucide-chevron-right"
+    case cloudOff = "lucide-cloud-off"
+    case circleAlert = "lucide-circle-alert"
+    case coffee = "lucide-coffee"
+    case globe = "lucide-globe"
+    case heart = "lucide-heart"
+    case library = "lucide-library"
+    case messageCircle = "lucide-message-circle"
+    case wifiOff = "lucide-wifi-off"
+
+    /// Optical size to match the row it sits in; Lucide's stroke scales with the frame.
+    var defaultSize: CGFloat {
+        switch self {
+        case .arrowUpRight, .chevronRight, .globe: return 16
+        case .chartColumn, .coffee, .heart, .library, .messageCircle, .bookOpen: return 20
+        case .circleAlert, .cloudOff, .wifiOff: return 28
+        }
+    }
+}
+
+/// Renders one Lucide icon as a template image so it takes the caller's tint.
+/// Loaded through `UIImage` because a vector SVG in the asset catalog does not tint reliably
+/// through `Image(renderingMode:)`.
+struct PraxisIconView: View {
+    let icon: PraxisIcon
+    var size: CGFloat?
+    var tint: Color = SystemTokens.Colors.textSecondary
+
+    var body: some View {
+        Image(uiImage: UIImage(named: icon.rawValue)?.withRenderingMode(.alwaysTemplate) ?? UIImage())
+            .resizable()
+            .scaledToFit()
+            .frame(width: size ?? icon.defaultSize, height: size ?? icon.defaultSize)
+            .foregroundStyle(tint)
+            .accessibilityHidden(true)
     }
 }
 

@@ -20,7 +20,9 @@ Headings, titles, and section headers use Literata; body copy, labels, and contr
 
 ## Components
 
-`ListRow` and `BookCover` are reusable presentation components in `Praxis/Components.swift`; their visible content comes from callers. `GlassSurface` provides the adaptive glass/material treatment for floating controls. Catalog-bound rows and artwork stay with the app. Place it inside a native `NavigationLink` so the platform supplies interaction, focus, and accessibility semantics. Screen-specific behavior, data, and translated copy belong to the caller.
+`ListRow` and `BookCover` are reusable presentation components in `Praxis/Components.swift`; `EntryCard` is the card for a destination or an external link; their visible content comes from callers. `GlassSurface` provides the adaptive glass/material treatment for floating controls. Catalog-bound rows and artwork stay with the app. Place it inside a native `NavigationLink` so the platform supplies interaction, focus, and accessibility semantics. Screen-specific behavior, data, and translated copy belong to the caller.
+
+Icons are Lucide, generated from `shared/assets/icons/` into both platforms' assets; [icons.md](icons.md) covers which glyphs stay native and the optical size for each slot.
 
 ## Verification
 
