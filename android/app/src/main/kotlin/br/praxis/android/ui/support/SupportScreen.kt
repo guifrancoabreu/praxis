@@ -24,6 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import br.praxis.android.R
 import br.praxis.android.design.Praxis
 import br.praxis.android.design.Tokens
@@ -31,6 +32,7 @@ import br.praxis.android.design.components.EntryCard
 import br.praxis.android.design.components.EntryCardIndicator
 import br.praxis.android.design.components.PraxisIcon
 import br.praxis.android.design.components.PraxisIconView
+import br.praxis.android.design.title3
 
 private const val KO_FI_URL = "https://ko-fi.com/guifranco"
 private const val ARCHIVE_DONATION_URL = "https://www.marxists.org/admin/donate/index.htm"
@@ -130,7 +132,10 @@ private fun Lead() {
         )
         Text(
             text = stringResource(R.string.support_title),
-            style = MaterialTheme.typography.displayLarge.copy(fontWeight = FontWeight.Medium),
+            style = MaterialTheme.typography.displayLarge.copy(
+                fontWeight = FontWeight.Medium,
+                letterSpacing = 0.sp,
+            ),
             color = Praxis.colors.textPrimary,
         )
         Text(
@@ -146,7 +151,7 @@ private fun SupportSection(title: String, body: String, card: @Composable () -> 
     Column(verticalArrangement = Arrangement.spacedBy(Tokens.Spacing.s3)) {
         Text(
             text = title,
-            style = MaterialTheme.typography.titleLarge,
+            style = MaterialTheme.typography.title3,
             color = Praxis.colors.textPrimary,
         )
         Text(

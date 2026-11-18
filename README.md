@@ -33,7 +33,7 @@ tools/
   build_catalog_en.py            Refresh the English catalog
   build_catalog_es.py            Refresh the Spanish starter catalog
   check_shared.py                Verify shared content and builder output paths
-  gen_tokens.py                  Verify design tokens and generate the Kotlin ones
+  gen_tokens.py                  Generate and verify the design tokens for both apps
   sync_assets.py                 Copy the shared binaries and regenerate the launcher icons
   sync_icons.py                  Generate iOS and Android assets from the shared Lucide SVGs
 ```

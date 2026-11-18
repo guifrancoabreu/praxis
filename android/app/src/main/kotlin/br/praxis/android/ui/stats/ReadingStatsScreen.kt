@@ -174,6 +174,7 @@ private fun Hero(streak: Int) {
                 fontSize = 64.sp,
                 lineHeight = 72.sp,
                 fontWeight = FontWeight.Medium,
+                letterSpacing = 0.sp,
             ),
             color = Praxis.colors.textPrimary,
         )
