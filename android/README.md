@@ -5,7 +5,7 @@ Native Kotlin + Jetpack Compose port of Praxis. It aims to look and behave like 
 
 - `shared/catalog/` — catalog snapshots, wired as Gradle assets.
 - `shared/reader/` — the archive reader's stylesheet and scripts (used from Fase 4 onward).
-- `design/tokens.json` — single source of truth for design values; `Tokens.kt` and the iOS `RefTokens.swift` are generated from it. Edit the JSON, never the generated files, and follow [`docs/design-tokens.md`](../docs/design-tokens.md).
+- `design/tokens.json` — single source of truth for design values; `Tokens.kt` and the iOS `RefTokens.swift` are generated from it. Edit the JSON, never the generated files, and follow [`docs/design/tokens.md`](tokens.md).
 - `app/src/main/res/font/` — Literata (headings) and Inter (body) as single variable TTFs, wired up in
   `design/PraxisFonts.kt`; their OFL license texts sit in `app/src/main/res/raw/`.
 - Launcher icons and the `res/font` files are generated from `shared/assets/` by

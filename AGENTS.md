@@ -36,7 +36,7 @@ Write PR descriptions in plain, human language — short sentences, no corporate
 
 # Design tokens
 
-`design/tokens.json` is the single source of truth for colour, spacing, type, radius and the reader palettes. `python3 tools/gen_tokens.py --write` regenerates `ios/Praxis/RefTokens.swift` and the Android `Tokens.kt`; never edit those two files, and `--check` must pass (CI runs it). Screens use roles — `SystemTokens.Colors` on iOS, `Praxis.colors` on Android — never raw hex or ad-hoc sizes. A value both apps need goes into the JSON first. The full contract, including how to change a visual decision, is in `docs/design-tokens.md`.
+`design/tokens.json` is the single source of truth for colour, spacing, type, radius and the reader palettes. `python3 tools/gen_tokens.py --write` regenerates `ios/Praxis/RefTokens.swift` and the Android `Tokens.kt`; never edit those two files, and `--check` must pass (CI runs it). Screens use roles — `SystemTokens.Colors` on iOS, `Praxis.colors` on Android — never raw hex or ad-hoc sizes. A value both apps need goes into the JSON first. The full contract, including how to change a visual decision, is in `docs/design/tokens.md`.
 
 # Branches
 

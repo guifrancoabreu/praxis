@@ -35,7 +35,7 @@ If a colour is needed on both platforms, it becomes a role in `semantic` first. 
 
 ## 3. Type comes from the scale
 
-Thirteen steps, `display` through `micro`, each with size, leading, weight and family. Use a step; do not invent a size. A new step needs a real screen that uses it on iOS first — iOS is the visual reference here, as in `docs/spacing-pattern.md`.
+Thirteen steps, `display` through `micro`, each with size, leading, weight and family. Use a step; do not invent a size. A new step needs a real screen that uses it on iOS first — iOS is the visual reference here, as in `docs/design/spacing.md`.
 
 Material has no slot for `title3` or `caption`, so those two exist as `Typography` extensions in `PraxisTheme.kt`, named after their JSON step and imported at the call site. Keep that pattern for any future step Material cannot express.
 
@@ -56,4 +56,4 @@ Material has no slot for `title3` or `caption`, so those two exist as `Typograph
 
 Enforced by CI: the generated token files match the JSON, the shared catalogs and reader assets are intact, both apps build.
 
-A reviewer's job: no literal colours or sizes in screens, spacing follows `docs/spacing-pattern.md`, type follows the scale, and a new shared component is declared for both platforms. The registry that will check that last one is not built yet — see `docs/ui-library-evaluation.md` §4.3.
+A reviewer's job: no literal colours or sizes in screens, spacing follows `docs/design/spacing.md`, type follows the scale, and a new shared component is declared for both platforms. The registry that will check that last one is not built yet — see `docs/ui-library-evaluation.md` §4.3.

@@ -6,7 +6,7 @@ Status: evaluation, branch `refactor/semantic-design-tokens`. Section 7 is what 
 
 Neither library can be installed in this repo. Both render the DOM: shadcn/ui is React source you copy in, and Vercel's UI SDK is headless primitives with React, Vue, Svelte, Solid and web-component adapters. Praxis ships SwiftUI and Jetpack Compose. There is no official native port of either, and the community ones are too small — or AGPL — to build a design language on.
 
-What is worth taking is the model behind them, and it fits this repo better than expected, because Praxis already does the hard half: values live in `design/tokens.json`, drift is checked in CI, and `docs/spacing-pattern.md` already fixes one visual language across platforms. Two mechanisms are missing, and they are exactly the two these libraries supply:
+What is worth taking is the model behind them, and it fits this repo better than expected, because Praxis already does the hard half: values live in `design/tokens.json`, drift is checked in CI, and `docs/design/spacing.md` already fixes one visual language across platforms. Two mechanisms are missing, and they are exactly the two these libraries supply:
 
 1. **a semantic token layer generated for both platforms.** `SystemTokens.swift` and `PraxisTheme.kt` are hand-maintained twins today, with no check between them.
 2. **a component registry with a parity check.** iOS has 5 shared components across 13 screens; Android has 10 shared composables among 84. The styling rules exist in prose, but nothing lists which components exist and whether both platforms agree.
@@ -67,7 +67,7 @@ Doing this exercise surfaced drift the repo does not currently catch:
 - **`separator` disagrees, and Android's is nearly invisible.** iOS uses `.separator` at 0.45 opacity, which lands near 13% (light) and 27% (dark); Android uses fixed `#123C3C43` (7%) and `#20545458` (12.5%) — roughly half as strong. On a 1px line over `#FBFAF7` that is a divider you can barely see.
 - **Chips exist only on Android**, as four extra roles plus three literal hexes, and `chipBackground` (`#E9E4DA`) sits one step off `secondarySurface` (`#E8E3D9`). iOS inlines the chip in `PraxisApp.swift:452-453`.
 - **Material mapping sets only four roles** (`primary`, `background`, `surface`, `on*`), so Material `Card` and `TextField` fall back to framework defaults. Neither platform defines a focus color at all.
-- **Non-color drift:** `44` is still the row height in `ListRow` and `PraxisChip` even though `sizing.touchTarget` is 48 and `spacing-pattern.md` §4 retires 44; chip padding is 15/10, off the 4-point scale; `title3` and `caption` sit 2–3pt apart across platforms; and Android's `-0.4` tracking default leaks into two headings iOS sets at `0`.
+- **Non-color drift:** `44` is still the row height in `ListRow` and `PraxisChip` even though `sizing.touchTarget` is 48 and `docs/design/spacing.md` §4 retires 44; chip padding is 15/10, off the 4-point scale; `title3` and `caption` sit 2–3pt apart across platforms; and Android's `-0.4` tracking default leaks into two headings iOS sets at `0`.
 
 The same treatment applies to type. `tokens.json` has no UI type scale — `typography` in it only sizes book-cover artwork — so type is declared three times: `PraxisFonts.swift`, `PraxisApp.swift`, and `PraxisTheme.kt`. One `typography.ui` group, built only from sizes already in use:
 
@@ -108,7 +108,7 @@ So the honest framing: this is organization, with two small corrections that a c
 
 ### 4.3 A component registry instead of prose-only contracts
 
-`docs/spacing-pattern.md` already reads like a component contract — it names relationships, allowed values and tap targets. What it cannot do is tell you which components exist on each platform, or fail a build when iOS gains a component Android never gets.
+`docs/design/spacing.md` already reads like a component contract — it names relationships, allowed values and tap targets. What it cannot do is tell you which components exist on each platform, or fail a build when iOS gains a component Android never gets.
 
 A registry is a small manifest, adapted from shadcn's item schema:
 
@@ -157,7 +157,7 @@ If a landing page, public web reader or share-link page is ever on the roadmap, 
 | Action | Verdict | Cost | Why |
 | --- | --- | --- | --- |
 | Semantic color layer + UI type scale in `tokens.json`, generated to Swift and Kotlin | Do next | 1–2 days | Removes a hand-maintained twin; the audit found a latent forced-theme bug and a divider that renders at half strength on Android |
-| Component registry + parity check in CI | Do after the token layer | 2–3 days | Makes `spacing-pattern.md` enforceable and indexes the `PraxisApp.swift` split |
+| Component registry + parity check in CI | Do after the token layer | 2–3 days | Makes `docs/design/spacing.md` enforceable and indexes the `PraxisApp.swift` split |
 | Split screens out of `PraxisApp.swift`, registering each component | Incremental, per screen | per screen | Real problem today: 1843 lines, literals that break the spacing rules |
 | Vercel UI SDK in the reader | No | — | Beta, DOM-bound, bundler cost in a WebView |
 | Community native ports | No, read only | — | Small, unversioned, one AGPL |
