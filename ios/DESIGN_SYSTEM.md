@@ -8,7 +8,7 @@ This small system follows the principles in the monorepo’s design and accessib
 
 ### Spacing and rhythm
 
-Gaps, padding and line height follow [docs/spacing-pattern.md](../docs/spacing-pattern.md), which both apps share: a gap expresses one of three relationships, each with exactly one value, section gaps live in the parent stack, and section headings sit in a 48-high row shared with the tap target. Do not pick a gap value per screen; if a relationship is missing from that table, add it there first.
+Gaps, padding and line height follow [docs/spacing.md](../docs/spacing.md), which both apps share: a gap expresses one of three relationships, each with exactly one value, section gaps live in the parent stack, and section headings sit in a 48-high row shared with the tap target. Do not pick a gap value per screen; if a relationship is missing from that table, add it there first.
 
 ### Typography
 

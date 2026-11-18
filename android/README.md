@@ -46,11 +46,13 @@ app/src/main/kotlin/br/praxis/android/
 
 ## Status
 
-Feature-complete against `docs/plan-android.md` for a Portuguese release: library with chips,
+Feature-complete for a Portuguese release: library with chips,
 featured text, popular writers, saved works, reading log, search and footer; author, collection,
 support and privacy screens; the archive reader with the six themes, custom colours, bookmark,
 source link and 100 MB offline cache; the optional TelemetryDeck consent flow.
 
-Still open before publishing: PDF works open in the system browser (no in-app renderer yet),
-portrait cropping uses a centred crop instead of face detection, and tablet layouts are out of
-scope. Play packaging lives in `docs/play-listing-pt-BR.md`.
+Still open before publishing: confirm in the TelemetryDeck dashboard that the Android and iOS signals
+from the same App ID show up separated by platform, and review the privacy policy copy in
+`docs/privacy.html` so it does not speak only to iPhone/iOS. PDF works open in the system browser
+(no in-app renderer yet), portrait cropping uses a centred crop instead of face detection, and
+tablet layouts are out of scope. Play packaging lives in `docs/play-listing-pt-BR.md`.

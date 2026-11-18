@@ -10,6 +10,9 @@ __pycache__/
 .claude/
 feedback-worker/.wrangler/
 
+# Local working notes that are not meant to be committed
+notes/
+
 # Swift package and Xcode state
 ios/.build/
 ios/.swiftpm/
