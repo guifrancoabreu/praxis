@@ -130,4 +130,39 @@ struct GlassSurface: ViewModifier {
     }
 }
 
+/// Icons drawn by the app rather than the platform: Lucide assets generated from
+/// `shared/assets/icons`. Platform chrome (navigation, share, field controls) keeps the
+/// system glyphs, so this covers only the app's own semantic icons.
+enum PraxisIcon: String {
+    case chartBar = "lucide-chart-bar"
+    case messageCircle = "lucide-message-circle"
+    case chevronRight = "lucide-chevron-right"
+
+    /// Optical size to match the row it sits in; Lucide's stroke scales with the frame.
+    var defaultSize: CGFloat {
+        switch self {
+        case .chevronRight: return 16
+        case .chartBar, .messageCircle: return 20
+        }
+    }
+}
+
+/// Renders one Lucide icon as a template image so it takes the caller's tint.
+/// Loaded through `UIImage` because a vector SVG in the asset catalog does not tint reliably
+/// through `Image(renderingMode:)`.
+struct PraxisIconView: View {
+    let icon: PraxisIcon
+    var size: CGFloat?
+    var tint: Color = SystemTokens.Colors.textSecondary
+
+    var body: some View {
+        Image(uiImage: UIImage(named: icon.rawValue)?.withRenderingMode(.alwaysTemplate) ?? UIImage())
+            .resizable()
+            .scaledToFit()
+            .frame(width: size ?? icon.defaultSize, height: size ?? icon.defaultSize)
+            .foregroundStyle(tint)
+            .accessibilityHidden(true)
+    }
+}
+
 #endif

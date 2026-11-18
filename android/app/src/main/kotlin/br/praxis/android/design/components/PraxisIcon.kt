@@ -1,0 +1,39 @@
+package br.praxis.android.design.components
+
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import br.praxis.android.R
+import br.praxis.android.design.Praxis
+
+/**
+ * Icons drawn by the app rather than the platform: Lucide drawables generated from
+ * `shared/assets/icons`. Platform chrome keeps the system icons, so this covers only the
+ * app's own semantic icons.
+ */
+enum class PraxisIcon(val res: Int, val defaultSize: Dp) {
+    ChartBar(R.drawable.lucide_chart_bar, 20.dp),
+    MessageCircle(R.drawable.lucide_message_circle, 20.dp),
+    ChevronRight(R.drawable.lucide_chevron_right, 16.dp),
+}
+
+/** Renders one Lucide icon tinted with the theme, sized to its optical default. */
+@Composable
+fun PraxisIconView(
+    icon: PraxisIcon,
+    modifier: Modifier = Modifier,
+    size: Dp = icon.defaultSize,
+    tint: Color = Praxis.colors.textSecondary,
+) {
+    Icon(
+        painter = painterResource(icon.res),
+        contentDescription = null,
+        tint = tint,
+        modifier = modifier.size(size),
+    )
+}

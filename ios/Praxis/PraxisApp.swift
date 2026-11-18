@@ -486,7 +486,7 @@ struct LibraryView: View {
                     Text(language.text("Escolha como apoiar", "Choose how to support")).font(PraxisFont.body(.subheadline)).foregroundStyle(SystemTokens.Colors.textSecondary)
                 }
                 Spacer()
-                Image(systemName: "chevron.right").font(.caption.weight(.semibold)).foregroundStyle(SystemTokens.Colors.textSecondary)
+                PraxisIconView(icon: .chevronRight)
             }.padding(16).frame(maxWidth: .infinity, alignment: .leading)
                 .background(SystemTokens.Colors.surface, in: RoundedRectangle(cornerRadius: RefTokens.Radius.lg, style: .continuous))
                 .overlay(RoundedRectangle(cornerRadius: RefTokens.Radius.lg, style: .continuous).stroke(SystemTokens.Colors.separator, lineWidth: 1))
@@ -496,13 +496,13 @@ struct LibraryView: View {
     private var statsCard: some View {
         NavigationLink { ReadingStatsView(language: language, catalog: catalog, knownWorkPaths: knownWorkPaths) } label: {
             HStack(spacing: 13) {
-                Image(systemName: "chart.bar").font(.title3).foregroundStyle(SystemTokens.Colors.accent)
+                PraxisIconView(icon: .chartBar, size: 20, tint: SystemTokens.Colors.accent)
                 VStack(alignment: .leading, spacing: 3) {
                     Text(language.text("Estatísticas de leitura", "Reading stats")).font(PraxisFont.heading(.headline, weight: .semibold)).foregroundStyle(SystemTokens.Colors.textPrimary)
                     Text(language.text("Seu progresso, sequência e obras concluídas", "Your progress, streak and finished works")).font(PraxisFont.body(.subheadline)).foregroundStyle(SystemTokens.Colors.textSecondary)
                 }
                 Spacer()
-                Image(systemName: "chevron.right").font(.caption.weight(.semibold)).foregroundStyle(SystemTokens.Colors.textSecondary)
+                PraxisIconView(icon: .chevronRight)
             }.padding(16).frame(maxWidth: .infinity, alignment: .leading)
                 .background(SystemTokens.Colors.surface, in: RoundedRectangle(cornerRadius: RefTokens.Radius.lg, style: .continuous))
                 .overlay(RoundedRectangle(cornerRadius: RefTokens.Radius.lg, style: .continuous).stroke(SystemTokens.Colors.separator, lineWidth: 1))
@@ -512,13 +512,13 @@ struct LibraryView: View {
     private var feedbackFooter: some View {
         NavigationLink { FeedbackView(language: language) } label: {
             HStack(spacing: 13) {
-                Image(systemName: "bubble.left").font(.title3).foregroundStyle(SystemTokens.Colors.accent)
+                PraxisIconView(icon: .messageCircle, size: 20, tint: SystemTokens.Colors.accent)
                 VStack(alignment: .leading, spacing: 3) {
                     Text(FeedbackCopy.forLanguage(language).title).font(.system(.headline, design: .serif, weight: .semibold)).foregroundStyle(SystemTokens.Colors.textPrimary)
                     Text(FeedbackCopy.forLanguage(language).lead).font(.subheadline).foregroundStyle(SystemTokens.Colors.textSecondary)
                 }
                 Spacer()
-                Image(systemName: "chevron.right").font(.caption.weight(.semibold)).foregroundStyle(SystemTokens.Colors.textSecondary)
+                PraxisIconView(icon: .chevronRight)
             }.padding(16).frame(maxWidth: .infinity, alignment: .leading)
                 .background(SystemTokens.Colors.surface, in: RoundedRectangle(cornerRadius: RefTokens.Radius.lg, style: .continuous))
                 .overlay(RoundedRectangle(cornerRadius: RefTokens.Radius.lg, style: .continuous).stroke(SystemTokens.Colors.separator, lineWidth: 1))
@@ -580,7 +580,7 @@ struct LibraryView: View {
                         HStack {
                             Text(collection.title).font(PraxisFont.heading(.body, weight: .medium)).foregroundStyle(SystemTokens.Colors.textPrimary)
                             Spacer()
-                            Image(systemName: "chevron.right").font(.caption.weight(.semibold)).foregroundStyle(SystemTokens.Colors.textSecondary)
+                            PraxisIconView(icon: .chevronRight)
                         }.padding(.vertical, 10).contentShape(Rectangle())
                     }.buttonStyle(.plain)
                     Rectangle().fill(SystemTokens.Colors.separator).frame(height: 1)
@@ -613,7 +613,7 @@ struct LibraryView: View {
             if let catalog {
                 ForEach(countries, id: \.self) { country in
                     NavigationLink { CountryWritersView(country: country, authors: catalog.authors, language: language, knownWorkPaths: knownWorkPaths, catalog: catalog) } label: {
-                        HStack { Text(country).foregroundStyle(SystemTokens.Colors.textPrimary); Spacer(); Text(catalog.authors.filter { $0.country == country }.count.formatted()).foregroundStyle(SystemTokens.Colors.textSecondary); Image(systemName: "chevron.right").font(.caption).foregroundStyle(SystemTokens.Colors.textSecondary) }
+                        HStack { Text(country).foregroundStyle(SystemTokens.Colors.textPrimary); Spacer(); Text(catalog.authors.filter { $0.country == country }.count.formatted()).foregroundStyle(SystemTokens.Colors.textSecondary); PraxisIconView(icon: .chevronRight) }
                             .padding(.vertical, 10)
                     }.buttonStyle(.plain)
                 }
@@ -780,7 +780,7 @@ struct LibraryView: View {
                             .font(PraxisFont.body(.subheadline)).foregroundStyle(SystemTokens.Colors.textSecondary)
                     }
                     Spacer(minLength: 4)
-                    Image(systemName: "chevron.right").font(.caption.weight(.semibold)).foregroundStyle(SystemTokens.Colors.textSecondary)
+                    PraxisIconView(icon: .chevronRight)
                 }.padding(.vertical, 11).contentShape(Rectangle())
             }.buttonStyle(.plain).foregroundStyle(SystemTokens.Colors.textPrimary)
             Rectangle().fill(SystemTokens.Colors.separator).frame(height: 1).padding(.leading, 65)
@@ -952,7 +952,7 @@ struct WorkListRow: View {
                 if !work.date.isEmpty { Text(work.date).font(PraxisFont.body(.caption)).foregroundStyle(SystemTokens.Colors.textSecondary) }
             }
             Spacer(minLength: 4)
-            Image(systemName: "chevron.right").font(.caption.weight(.semibold)).foregroundStyle(SystemTokens.Colors.textSecondary)
+            PraxisIconView(icon: .chevronRight)
         }
         .padding(.top, flushTop ? 0 : 10).padding(.bottom, 10).contentShape(Rectangle())
     }
@@ -1824,7 +1824,7 @@ struct ReadingStatsView: View {
 
     private var emptyState: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Image(systemName: "chart.bar").font(.title2).foregroundStyle(SystemTokens.Colors.accent).padding(.bottom, 4)
+            PraxisIconView(icon: .chartBar, size: 28, tint: SystemTokens.Colors.accent).padding(.bottom, 4)
             Text(language.text("Nenhuma leitura ainda", "No reading yet"))
                 .font(PraxisFont.heading(.title3, weight: .semibold))
             Text(language.text("Abra um texto para começar a acompanhar seu progresso.", "Open a work to start tracking your progress."))

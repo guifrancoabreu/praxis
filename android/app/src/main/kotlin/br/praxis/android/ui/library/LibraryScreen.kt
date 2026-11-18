@@ -25,7 +25,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Search
@@ -80,6 +79,8 @@ import br.praxis.android.design.components.Chevron
 import br.praxis.android.design.components.GlassSurface
 import br.praxis.android.design.components.InsetDivider
 import br.praxis.android.design.components.PraxisChip
+import br.praxis.android.design.components.PraxisIcon
+import br.praxis.android.design.components.PraxisIconView
 import br.praxis.android.design.components.RoundIconTile
 import br.praxis.android.design.components.SectionHeader
 import kotlinx.coroutines.launch
@@ -769,12 +770,7 @@ private fun StatsCard(onClick: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(13.dp),
     ) {
-        Icon(
-            imageVector = Icons.Filled.BarChart,
-            contentDescription = null,
-            tint = Praxis.colors.accent,
-            modifier = Modifier.size(22.dp),
-        )
+        PraxisIconView(icon = PraxisIcon.ChartBar, size = 20.dp, tint = Praxis.colors.accent)
         Column(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(Tokens.Spacing.s1),

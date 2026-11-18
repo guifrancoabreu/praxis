@@ -26,7 +26,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -283,12 +282,7 @@ fun InsetDivider(modifier: Modifier = Modifier, startPadding: Dp = Tokens.Spacin
 
 @Composable
 fun Chevron(modifier: Modifier = Modifier) {
-    Icon(
-        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-        contentDescription = null,
-        tint = Praxis.colors.textSecondary,
-        modifier = modifier.size(18.dp),
-    )
+    PraxisIconView(icon = PraxisIcon.ChevronRight, modifier = modifier)
 }
 
 @Composable
