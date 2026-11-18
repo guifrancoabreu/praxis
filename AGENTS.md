@@ -19,6 +19,17 @@ READMEs stay beside their code, and `AGENTS.md` files and `.github/` templates s
 
 Feature plans and working notes are momentary. Don't commit them, and don't park them in the repo in a hidden or ignored folder either: a plan belongs in the issue or PR that ships the feature, and anything else is a note to yourself, not a file here. `docs/AGENTS.md` covers where a given doc belongs.
 
+# Tickets
+
+Every unit of work starts as a GitHub issue in this repo. No issue, no branch.
+
+- One issue, one branch, one PR. Something else that needs doing becomes its own issue, linked from the original — not extra scope in the same branch.
+- A ticket says the outcome, not the steps: what it enables, what's in and out of scope, and a few checkable outcomes. Follow `.github/ISSUE_TEMPLATE/task.md`.
+- Link both ways. The issue names its PR, and the PR body opens with `Closes #12` so merging closes the ticket. Don't put the number in the branch name — branch names stay readable, per the rules below.
+- The PR title carries the ticket in brackets: `[#12] Generate shared binaries from one place`. The title stays a readable sentence; the number is what makes a PR list scannable as a ticket list.
+- Stacked work gets one ticket per layer, with the parent named in `Links`.
+- Keep the issue current while you work. Scope changes, decisions and follow-ups belong in that thread, not in a chat log.
+
 # PR descriptions
 
 Write PR descriptions in plain, human language — short sentences, no corporate or template-speak. Cover what changed and why, how it was tested, and anything a reviewer wouldn't get from the diff. Screenshots are optional: for visual changes, leave the Screenshots section for the author to paste images into, and drop it entirely when nothing's visual — never fabricate or attach placeholder screenshots. Keep it brief. Follow the structure in `.github/PULL_REQUEST_TEMPLATE.md`.

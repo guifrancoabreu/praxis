@@ -1,3 +1,5 @@
+Closes #<!-- ticket number -->
+
 ## What & why
 
 What changed and why, in a couple of sentences.
