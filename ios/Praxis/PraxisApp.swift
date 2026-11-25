@@ -347,6 +347,8 @@ struct LibraryView: View {
                                 }
                             }
                             .padding(.horizontal, 20)
+                            .frame(maxWidth: 760)
+                            .frame(maxWidth: .infinity)
                             .padding(.top, 14)
                             .padding(.bottom, 28)
                         }
@@ -360,6 +362,8 @@ struct LibraryView: View {
                         .safeAreaInset(edge: .bottom, spacing: 0) {
                             searchField
                                 .padding(.horizontal, 20)
+                                .frame(maxWidth: 760)
+                                .frame(maxWidth: .infinity)
                                 .padding(.top, 8)
                                 .padding(.bottom, 8)
                         }
